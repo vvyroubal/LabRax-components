@@ -41,11 +41,17 @@ All of this is already applied in the plated 3MF; it matters only if you plate
 the STLs yourself.
 
 - `tray` — floor down. Flat, 8 mm tall, no overhangs.
-- `top_bar` — as exported, flat.
-- `ear_l` / `ear_r` — standing on the floor face, turned 90° in plan to fit.
-  **These need support** — see below.
-- `stop_l` / `stop_r` — laid on their backs, so the upright is loaded across
-  the layers rather than being peeled apart.
+- `top_bar` — **upside down**. The right way up, its rear flange starts
+  2.8 mm above the bed with nothing beneath it; inverted, the flat face that
+  is the top of the 1U lies on the bed and everything builds upward.
+- `ear_l` / `ear_r` — standing on the floor face, turned 90° in plan to fit
+  the bed. **These need support** — see below.
+- `stop_l` / `stop_r` — as modelled. Upright and foot both start at the floor
+  line, so the part builds straight off the bed. It is tall for its footprint,
+  so give it a brim.
+
+With those orientations and support on the ears, Bambu Studio slices both
+plates with no warnings at all.
 
 ## The ears need support
 

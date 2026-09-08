@@ -52,11 +52,14 @@ PLATES = [
         # The ears turn 90 degrees in plan; they still print floor-down.
         ("ear_l", (90.0, 32.5), [("z", 90)], SUPPORT),
         ("ear_r", (90.0, 92.5), [("z", 90)], SUPPORT),
-        ("top_bar", (90.0, 136.0), [], {}),
-        # Laid on their backs: the upright's load is then across the layers
-        # rather than trying to peel them apart.
-        ("stop_l", (78.0, 156.5), [("x", -90), ("z", 90)], {}),
-        ("stop_r", (104.0, 156.5), [("x", -90), ("z", 90)], {}),
+        # Upside down. The right way up its rear flange begins 2.8 mm above
+        # the bed with nothing under it; inverted, the flat face that was the
+        # top of the 1U lies on the bed and every feature builds upward.
+        ("top_bar", (90.0, 136.0), [("x", 180)], {}),
+        # Left the way they are modelled: upright and foot both start at the
+        # floor line, so the whole part builds off the bed.
+        ("stop_l", (78.0, 158.0), [], {}),
+        ("stop_r", (104.0, 158.0), [], {}),
     ]),
 ]
 
