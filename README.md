@@ -30,6 +30,7 @@ tools/
   measure_rack.py re-derives the [rack] numbers from the Lab Rax mesh files
   preview.py      renders images/ (FreeCAD is headless here)
   plate.py        arranges the STLs onto A1 mini plates as a Bambu 3MF
+  a1mini_project.json  the A1 mini preset the 3MF has to carry to be a project
 docs/
   measurements.md where every number came from
   print-settings.md
@@ -67,10 +68,11 @@ Six prints, four of them distinct. Nothing exceeds a 180 × 180 mm bed.
 | `ear_l` / `ear_r` | 55 × 149 × 44.5 | 1 each |
 | `stop_l` / `stop_r` | 9 × 12 × 22 | 1 each |
 
-`make plate` writes `export/3mf/UCG_Fiber_LabRax-A1mini.3mf` — two plates, the
-tray on its own and everything else together, already rotated and with support
-enabled on the ears. Slicing it headlessly with Bambu Studio 2.8.2.61 returns
-`Success` on both plates.
+`make plate` writes `export/3mf/UCG_Fiber_LabRax-A1mini.3mf` — a Bambu Studio
+project with two plates, the tray on its own and everything else together,
+already rotated, with support enabled on the ears and the A1 mini presets
+carried along. Bambu Studio 2.8.2.61 slices both plates with no warnings:
+57.5 g / 1h 49m for the tray, 92.2 g / 3h 11m for the rest.
 
 A 212.8 mm device will not fit a 180 mm bed in any orientation, so the bracket
 has to be split. It is modelled **as one 254 mm solid and then divided** by

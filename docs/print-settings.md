@@ -6,17 +6,39 @@ Sliced for a **Bambu Lab A1 mini** (180 × 180 × 180).
 make plate      # export/3mf/UCG_Fiber_LabRax-A1mini.3mf
 ```
 
-That file is plated and ready to open in Bambu Studio: two plates, parts
-rotated into the orientation they print in, and supports already switched on
-for the two ears. Everything sits at least 3 mm from the bed edge.
+That file is a full Bambu Studio project: two plates, parts rotated into the
+orientation they print in, supports already switched on for the two ears, and
+the A1 mini presets carried with it. Everything sits at least 3 mm from the bed
+edge.
 
-| plate | parts |
-|---|---|
-| 1 | `tray` — 172 × 149 mm, it fills the bed on its own |
-| 2 | `ear_l`, `ear_r`, `top_bar`, `stop_l`, `stop_r` |
+| plate | parts | filament | time |
+|---|---|---|---|
+| 1 | `tray` — 172 × 149 mm, it fills the bed on its own | 57.5 g | 1h 49m |
+| 2 | `ear_l`, `ear_r`, `top_bar`, `stop_l`, `stop_r` | 92.2 g | 3h 11m |
 
-Verified by slicing it headlessly with Bambu Studio 2.8.2.61: both plates
-return `Success`, and every object reports as manifold.
+Figures are from slicing it with Bambu Studio 2.8.2.61 at its stock
+`0.20mm Standard @BBL A1M`. Both plates return `Success` with no warnings and
+every object reports as manifold.
+
+### It has to be a project, not just geometry
+
+A 3MF carrying only meshes and a `model_settings.config` is not enough. Bambu
+Studio answers **"The 3mf file has invalid config, load geometry data only"**
+and drops the plates and the per-object settings on the floor. What it wants
+is a complete `Metadata/project_settings.config`; `tools/a1mini_project.json`
+is one, taken from the stock Lab Rax rack project, and `tools/plate.py` embeds
+it. It carries the A1 mini presets and five filament slots — change the
+filament to taste once it is open.
+
+Two flags matter when checking this from the command line:
+
+```sh
+bambu-studio --arrange 0 --export-3mf out.3mf in.3mf   # keep the placement
+bambu-studio --arrange 0 --slice 0 --outputdir /tmp in.3mf
+```
+
+Without `--arrange 0` the CLI re-arranges everything on load whatever the file
+says, which makes it look as though the plating had been ignored.
 
 ## Material
 

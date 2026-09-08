@@ -19,6 +19,7 @@ is still worth running `--slice 0` over the result, which is what proves the
 plates are well formed and printable.
 """
 
+import json
 import os
 import re
 import struct
@@ -30,6 +31,11 @@ import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STL = os.path.join(ROOT, "export", "stl")
 OUT = os.path.join(ROOT, "export", "3mf", "UCG_Fiber_LabRax-A1mini.3mf")
+# A complete A1 mini configuration, lifted from the stock Lab Rax rack project.
+# Without a valid one of these Bambu Studio refuses the whole config -- "The
+# 3mf file has invalid config, load geometry data only" -- and throws away the
+# plates and the per-object settings along with it.
+PROJECT_SETTINGS = os.path.join(ROOT, "tools", "a1mini_project.json")
 
 BED = 180.0           # A1 mini, and there are no excluded areas on it
 PLATE_STRIDE = BED * 1.2  # Bambu Studio's plate spacing; see the note above
@@ -171,8 +177,18 @@ def build():
 
     model = ('<?xml version="1.0" encoding="UTF-8"?>\n'
              '<model unit="millimeter" xml:lang="en-US" '
-             'xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02">\n'
-             ' <metadata name="Application">UCG_Fiber tools/plate.py</metadata>\n'
+             'xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" '
+             'xmlns:BambuStudio="http://schemas.bambulab.com/package/2021">\n'
+             ' <metadata name="Application">BambuStudio-02.08.02.61</metadata>\n'
+             ' <metadata name="BambuStudio:3mfVersion">1</metadata>\n'
+             ' <metadata name="Title">UCG-Fiber Lab Rax bracket</metadata>\n'
+             ' <metadata name="Designer"></metadata>\n'
+             ' <metadata name="Description">1U bracket, plated for an A1 mini'
+             '</metadata>\n'
+             ' <metadata name="CreationDate">2026-09-08</metadata>\n'
+             ' <metadata name="ModificationDate">2026-09-08</metadata>\n'
+             ' <metadata name="Copyright"></metadata>\n'
+             ' <metadata name="LicenseTerms"></metadata>\n'
              ' <resources>%s</resources>\n'
              ' <build>%s</build>\n'
              '</model>\n' % ("".join(objects), "".join(items)))
@@ -194,11 +210,14 @@ def build():
             'Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/'
             '3dmodel"/>\n</Relationships>\n')
 
+    project = json.dumps(json.load(open(PROJECT_SETTINGS)), indent=1)
+
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with zipfile.ZipFile(OUT, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
         for name, body in (("[Content_Types].xml", ctypes),
                            ("_rels/.rels", rels),
                            ("3D/3dmodel.model", model),
+                           ("Metadata/project_settings.config", project),
                            ("Metadata/model_settings.config", settings)):
             # A fixed timestamp keeps rebuilds byte-identical, so an unchanged
             # model does not show up as a modified file.
