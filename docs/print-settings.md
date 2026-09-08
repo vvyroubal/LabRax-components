@@ -11,10 +11,11 @@ orientation they print in, supports already switched on for the two ears, and
 the A1 mini presets carried with it. Everything sits at least 3 mm from the bed
 edge.
 
-| plate | parts | filament | time |
-|---|---|---|---|
-| 1 | `tray` — 172 × 149 mm, it fills the bed on its own | 57.5 g | 1h 49m |
-| 2 | `ear_l`, `ear_r`, `top_bar`, `stop_l`, `stop_r` | 92.2 g | 3h 11m |
+| plate | parts | filament |
+|---|---|---|
+| 1 | `tray` — 172 × 152 mm, it fills the bed on its own | 59.9 g |
+| 2 | `ear_l`, `ear_r` | 74.9 g |
+| 3 | `top_bar`, `stop_l`, `stop_r` | 18.9 g |
 
 Figures are from slicing it with Bambu Studio 2.8.2.61 at its stock
 `0.20mm Standard @BBL A1M`. Both plates return `Success` with no warnings and
@@ -39,6 +40,13 @@ bambu-studio --arrange 0 --slice 0 --outputdir /tmp in.3mf
 
 Without `--arrange 0` the CLI re-arranges everything on load whatever the file
 says, which makes it look as though the plating had been ignored.
+
+The CLI will not slice a project with more than one plate — every plate after
+the first comes back "some objects are located over the boundary of the heated
+bed", and Bambu Studio's *own* exports fail the same way, so it is the CLI and
+not the file. The GUI is fine with it; the stock Lab Rax rack project has
+eleven plates. To check the geometry from the command line, build a one-plate
+file per plate and slice those, which is what was done for the figures above.
 
 ## Material
 
@@ -70,7 +78,8 @@ the STLs yourself.
   the bed. **These need support** — see below.
 - `stop_l` / `stop_r` — as modelled. Upright and foot both start at the floor
   line, so the part builds straight off the bed. It is tall for its footprint,
-  so give it a brim.
+  so give it a brim. The hold-down flange is a 3 mm overhang, short enough to
+  bridge.
 
 With those orientations and support on the ears, Bambu Studio slices both
 plates with no warnings at all.

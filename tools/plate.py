@@ -6,12 +6,9 @@ its own, and everything else goes on the second.
 
     python3 tools/plate.py        # writes export/3mf/UCG_Fiber_LabRax-A1mini.3mf
 
-Bambu Studio lays its plates out along one global axis, spaced at 1.2 times
-the bed size -- 216 mm for the A1 mini's 180 mm bed. That factor is what the
-stock Lab Rax rack project uses on a 180 mm bed, and what Bambu Studio itself
-writes on its 200 mm default bed (240 mm). Meshes are centred on their own
-origin and the transform carries the placement, which is Bambu Studio's own
-convention.
+Meshes are centred on their own origin and the build transform carries the
+placement, which is Bambu Studio's own convention. See plate_origin() for how
+the plates are laid out in that global space.
 
 Note that `bambu-studio --export-3mf` re-arranges everything on load whatever
 the input says, so it cannot be used to check that the placement survives; it
@@ -38,34 +35,37 @@ OUT = os.path.join(ROOT, "export", "3mf", "UCG_Fiber_LabRax-A1mini.3mf")
 PROJECT_SETTINGS = os.path.join(ROOT, "tools", "a1mini_project.json")
 
 BED = 180.0           # A1 mini, and there are no excluded areas on it
-PLATE_STRIDE = BED * 1.2  # Bambu Studio's plate spacing; see the note above
-MARGIN = 3.0          # smallest gap to the bed edge we will accept
+PLATE_STRIDE = 250.0  # see plate_origin()
+# The stock A1 mini process puts a 5 mm brim on, and the brim has to land on
+# the bed too, so parts want ~6 mm of clearance. The tray and the top bar are
+# 172 mm wide and can only ever have 4 mm, which Bambu Studio accepts; nothing
+# else is allowed closer than this.
+MARGIN = 4.0
 
 # Each entry: part, (in-plate centre x, y), rotations baked into the mesh as
 # (axis, degrees) applied in order, and any per-object slicer settings.
 #
 # The ears need support. Above the faceplate window there is nothing to build
-# on, so the top rail starts as a 200 mm2 ledge hanging in mid-air at z = 34,
-# reaching 32 mm inboard from the only full-height part of the faceplate. The
-# support column stands inside the window opening and lifts straight out.
+# on, so the top rail starts as a ledge hanging in mid-air at z = 34, reaching
+# inboard from the only full-height part of the faceplate. The support column
+# stands inside the window opening and lifts straight out.
 SUPPORT = {"enable_support": "1", "support_type": "normal(auto)"}
 
 PLATES = [
     ("Tray", [
         ("tray", (90.0, 90.0), [], {}),
     ]),
-    ("Ears, top bar and stops", [
-        # The ears turn 90 degrees in plan; they still print floor-down.
-        ("ear_l", (90.0, 32.5), [("z", 90)], SUPPORT),
-        ("ear_r", (90.0, 92.5), [("z", 90)], SUPPORT),
-        # Upside down. The right way up its rear flange begins 2.8 mm above
-        # the bed with nothing under it; inverted, the flat face that was the
+    ("Ears", [
+        ("ear_l", (48.0, 90.0), [], SUPPORT),
+        ("ear_r", (132.0, 90.0), [], SUPPORT),
+    ]),
+    ("Top bar and stops", [
+        # Upside down: the right way up its rear flange begins 2.8 mm above
+        # the bed with nothing under it. Inverted, the flat face that was the
         # top of the 1U lies on the bed and every feature builds upward.
-        ("top_bar", (90.0, 136.0), [("x", 180)], {}),
-        # Left the way they are modelled: upright and foot both start at the
-        # floor line, so the whole part builds off the bed.
-        ("stop_l", (78.0, 158.0), [], {}),
-        ("stop_r", (104.0, 158.0), [], {}),
+        ("top_bar", (90.0, 130.0), [("x", 180)], {}),
+        ("stop_l", (70.0, 40.0), [], {}),
+        ("stop_r", (100.0, 40.0), [], {}),
     ]),
 ]
 
@@ -98,13 +98,26 @@ def rotate(V, ops):
     return V
 
 
-def plate_origin(index):
-    """Bottom-left of plate `index` (1-based) in Bambu's global layout.
+PLATES_PER_ROW = 2
 
-    Kept to a single row: the spacing between rows is a different number and
-    we have never needed more than a handful of plates.
+
+def plate_origin(index):
+    """Bottom-left of plate `index` (1-based) in Bambu Studio's global layout.
+
+    Plates sit on a grid, two to a row, stepping +250 mm across a row and
+    -250 mm down to the next. Both numbers were read back out of Bambu Studio
+    itself: load a file, let it arrange, export, and see where it put things.
+
+    Getting this wrong fails in two different ways, neither of which mentions
+    coordinates. Land outside the grid entirely and the plate comes back empty
+    -- "one of the plate is empty or has no object fully inside it". Land near
+    enough that the parts are assigned to the right plate but not exactly on
+    it, and they are placed relative to the wrong origin -- "some objects are
+    located over the boundary of the heated bed".
     """
-    return (index - 1) * PLATE_STRIDE, 0.0
+    col = (index - 1) % PLATES_PER_ROW
+    row = (index - 1) // PLATES_PER_ROW
+    return col * PLATE_STRIDE, -row * PLATE_STRIDE
 
 
 def build():
@@ -115,6 +128,7 @@ def build():
     for pindex, (pname, parts) in enumerate(PLATES, start=1):
         ox, oy = plate_origin(pindex)
         instances = []
+        placed = []   # (name, x0, x1, y0, y1) already put on this plate
         for name, (cx, cy), ops, opts in parts:
             path = os.path.join(STL, name + ".stl")
             if not os.path.exists(path):
@@ -164,6 +178,11 @@ def build():
                              '      <metadata key="object_id" value="%d"/>\n'
                              '      <metadata key="instance_id" value="0"/>\n'
                              '    </model_instance>' % oid)
+            for oname, ox0, ox1, oy0, oy1 in placed:
+                if x0 < ox1 and ox0 < x1 and y0 < oy1 and oy0 < y1:
+                    problems.append("%s overlaps %s on plate %d"
+                                    % (name, oname, pindex))
+            placed.append((name, x0, x1, y0, y1))
             report.append((pindex, name, size, (x0, x1), (y0, y1), len(T),
                            bool(opts)))
             oid += 1

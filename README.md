@@ -69,10 +69,9 @@ Six prints, four of them distinct. Nothing exceeds a 180 × 180 mm bed.
 | `stop_l` / `stop_r` | 9 × 12 × 22 | 1 each |
 
 `make plate` writes `export/3mf/UCG_Fiber_LabRax-A1mini.3mf` — a Bambu Studio
-project with two plates, the tray on its own and everything else together,
-already rotated, with support enabled on the ears and the A1 mini presets
-carried along. Bambu Studio 2.8.2.61 slices both plates with no warnings:
-57.5 g / 1h 49m for the tray, 92.2 g / 3h 11m for the rest.
+project with three plates, already rotated, with support enabled on the ears
+and the A1 mini presets carried along. Each plate slices with no warnings:
+59.9 g for the tray, 74.9 g for the ears, 18.9 g for the top bar and stops.
 
 A 212.8 mm device will not fit a 180 mm bed in any orientation, so the bracket
 has to be split. It is modelled **as one 254 mm solid and then divided** by
@@ -92,23 +91,38 @@ into its own M6 screws.
 | | |
 |---|---|
 | 6 × M6 × 10 button head | bracket to rack (3 per side) |
-| 8 × M3 × 16 self-tapping | ears to tray and top bar, into printed pilots |
-| 2 × M3 × 8 self-tapping | rear stops, into the floor |
+| 4 × M6 × 10 + 4 × M6 nuts | ears to tray, at the rear blocks (2 per side) |
+| 8 × M3 × 8 + 8 × M3 nuts | ears to tray and top bar, at the faceplate (4 per side) |
+| 2 × M3 × 10 + 2 × M3 nuts | rear stops |
 
-The M3 pilots are ⌀2.5 mm and 16 mm deep; drill them out to ⌀4.0 if you would
-rather use heat-set inserts and machine screws.
+Every joint is a bolt through a clearance hole into a **hex nut trapped in a
+pocket**, which is how Lab Rax bolts its own printed parts together. The
+pockets are modelled from the ones on `Bolted+Version+Post+Joiner.stl`.
+
+A trapped M6 nut needs roughly 13 mm of material around it, and the faceplate
+rails are only 8.0 and 10.45 mm tall, so the faceplate joints are M3. The M6
+ones go behind the device, which is the only place in a 1U holding a 30 mm
+device where the full height is free.
 
 ## Assembly
 
-1. Screw the two ears to the `tray` (lower row) and to the `top_bar` (upper
-   row) — 2 screws per side, per row. The counterbores sit flush in the
-   faceplate.
-2. **Slide the gateway in from the rear.** It stops against the faceplate lips.
-3. Fit the two `stop` pieces behind it, one screw each.
-4. Bolt the assembly into the rack with six M6.
+1. Drop the nuts in: M3 into the tray's two lower pockets per side (from
+   underneath) and the top bar's two upper ones (from the top face); M6 into
+   the tray's rear blocks (from above); M3 into the floor's underside where
+   each stop lands.
+2. Bolt each ear to the tray — 2 × M3 × 8 through the lower faceplate lap, and
+   2 × M6 × 10 driven in from behind through the rear block.
+3. **Lower the gateway in from above.** It cannot slide in from the rear: the
+   M6 blocks are in the way and there is nowhere else to put them.
+4. Bolt the `top_bar` on, 2 × M3 × 8 per side. Its flange then covers the front
+   of the device and holds it down.
+5. Fit the two `stop` pieces, one M3 × 10 each. Their flanges hold the rear
+   down.
+6. Bolt the assembly into the rack with six M6.
 
-The device is captured on five sides: the floor below, the side rails and their
-top lips, the faceplate lips at the front, and the stops at the rear.
+The device is captured on all six sides: the floor below, the side rails, the
+faceplate lips at the front, the stops at the rear, and the top bar and stop
+flanges above.
 
 ## Orientation
 

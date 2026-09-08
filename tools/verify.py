@@ -24,6 +24,8 @@ if not ROOT:
         ROOT = os.getcwd()
 sys.path.insert(0, os.path.join(ROOT, "src"))
 
+import math  # noqa: E402
+
 import FreeCAD  # noqa: E402,F401
 import Part  # noqa: E402
 from FreeCAD import Vector  # noqa: E402
@@ -57,6 +59,26 @@ def box(x0, x1, y0, y1, z0, z1):
 
 def vol(shape):
     return 0.0 if shape is None or not shape.Solids else shape.Volume
+
+
+def nut(xc, zc, af, y0, y1):
+    """A real hex nut as a solid, flats top and bottom, axis along Y."""
+    r = af / math.sqrt(3.0)
+    pts = [Vector(xc + r * math.cos(math.radians(a)), y0,
+                  zc + r * math.sin(math.radians(a)))
+           for a in (0, 60, 120, 180, 240, 300)]
+    return Part.Face(Part.makePolygon(pts + [pts[0]])).extrude(
+        Vector(0.0, y1 - y0, 0.0))
+
+
+def vnut(xc, yc, af, z0, z1):
+    """The same, axis along Z."""
+    r = af / math.sqrt(3.0)
+    pts = [Vector(xc + r * math.cos(math.radians(a)),
+                  yc + r * math.sin(math.radians(a)), z0)
+           for a in (0, 60, 120, 180, 240, 300)]
+    return Part.Face(Part.makePolygon(pts + [pts[0]])).extrude(
+        Vector(0.0, 0.0, z1 - z0))
 
 
 def main():
@@ -133,10 +155,11 @@ def main():
     dev = box(-P.DEV_W / 2, P.DEV_W / 2, 0.0, P.DEV_D, P.DEV_Z0, P.DEV_Z1)
     check(vol(whole.common(dev)) < VOID, "device sits without interference",
           "%.3f mm3" % vol(whole.common(dev)))
-    # Loaded from the rear: sweep the device back out again.
-    sweep = box(-P.DEV_W / 2, P.DEV_W / 2, 0.0, 400, P.DEV_Z0, P.DEV_Z1)
-    check(vol(asm.common(sweep)) < VOID, "slides in from the rear past the frame",
-          "%.3f mm3" % vol(asm.common(sweep)))
+    # Lowered in from above, before the top bar and the stops go on.
+    cradle = parts["tray"].fuse(parts["ear_l"]).fuse(parts["ear_r"])
+    drop = box(-P.DEV_W / 2, P.DEV_W / 2, 0.0, P.DEV_D, P.DEV_Z0, 400)
+    check(vol(cradle.common(drop)) < VOID, "drops in from above into the cradle",
+          "%.3f mm3" % vol(cradle.common(drop)))
     # Forwards it must be stopped by the faceplate lips.
     fwd = box(-P.DEV_W / 2, P.DEV_W / 2, -P.FACE_T, 0.0, P.DEV_Z0, P.DEV_Z1)
     check(vol(asm.common(fwd)) > 100.0, "faceplate lips stop it at the front",
@@ -146,10 +169,81 @@ def main():
     both = all(vol(parts[n].common(back)) > 50.0 for n in stops)
     check(both, "rear stops close the pocket",
           "%.0f mm3 each" % vol(parts["stop_l"].common(back)))
-    # Upwards, by the side rail lips.
-    up = box(-P.DEV_W / 2, P.DEV_W / 2, 0.0, P.POCKET_D, P.DEV_Z1, P.RACK_U)
-    check(vol(asm.common(up)) > 100.0, "top lips stop it lifting out",
-          "%.0f mm3 of overlap" % vol(asm.common(up)))
+    # Upwards: the top bar's flange at the front, the stops at the back.
+    over = box(-P.DEV_W / 2, P.DEV_W / 2, 0.0, P.DEV_D, P.DEV_Z1, P.RACK_U)
+    vf = vol(parts["top_bar"].common(over))
+    check(vf > 100.0, "top bar holds the device down at the front",
+          "%.0f mm3 over it" % vf)
+    vr = min(vol(parts[n].common(over)) for n in stops)
+    check(vr > 20.0, "rear stops hold it down at the back",
+          "%.0f mm3 over it each" % vr)
+    # And the top bar must go on after the device, not before.
+    check(vol(parts["top_bar"].common(drop)) > 100.0,
+          "top bar is fitted after the device", "it overhangs the drop path")
+
+    print("\n[faceplate joints -- M3 through the lap into a trapped nut]")
+    NUT3_AF, NUT3_T = 5.5, 2.4
+    for sx in (-1, 1):
+        for x in P.JOINT_SCREW_X:
+            for z in P.JOINT_SCREW_Z:
+                xc = sx * x
+                shank = Part.makeCylinder(
+                    3.0 / 2, P.FACE_T, Vector(xc, -P.FACE_T - 0.05, z),
+                    Vector(0, 1, 0))
+                v = vol(asm.common(shank))
+                check(v < VOID, "M3 shank clear at x=%+7.2f z=%5.2f" % (xc, z),
+                      "%.3f mm3" % v)
+    for sx in (-1, 1):
+        for x in P.JOINT_SCREW_X:
+            for z in P.JOINT_SCREW_Z:
+                xc = sx * x
+                n = nut(xc, z, NUT3_AF, -P.FACE_T / 2 + 0.05,
+                        -P.FACE_T / 2 + 0.05 + NUT3_T)
+                v = vol(asm.common(n))
+                check(v < VOID, "M3 nut seats at x=%+7.2f z=%5.2f" % (xc, z),
+                      "%.3f mm3" % v)
+                # ... and can be dropped in from the nearest outside face.
+                to = 0.0 if z < P.WIN_Z1 else P.RACK_U
+                path = box(xc - NUT3_AF / 2, xc + NUT3_AF / 2,
+                           -P.FACE_T / 2 + 0.05,
+                           -P.FACE_T / 2 + 0.05 + NUT3_T, z, to)
+                v = vol(asm.common(path))
+                check(v < VOID, "M3 nut can be fed in at x=%+7.2f z=%5.2f"
+                      % (xc, z), "%.3f mm3" % v)
+
+    print("\n[rear joints -- M6 into a trapped nut, behind the device]")
+    NUT6_AF, NUT6_T = 10.0, 5.0
+    for sx in (-1, 1):
+        for x in P.REAR_BOLT_X:
+            xc, z = sx * x, P.REAR_BOLT_Z
+            shank = Part.makeCylinder(
+                6.0 / 2, P.REAR_Y1 - P.REAR_Y_MID + P.M6_HEX_D + 0.2,
+                Vector(xc, P.REAR_Y_MID - P.M6_HEX_D - 0.1, z), Vector(0, 1, 0))
+            v = vol(asm.common(shank))
+            check(v < VOID, "M6 shank clear at x=%+7.2f" % xc, "%.3f mm3" % v)
+            n = nut(xc, z, NUT6_AF, P.REAR_Y_MID - P.M6_HEX_D + 0.05,
+                    P.REAR_Y_MID - 0.05)
+            v = vol(asm.common(n))
+            check(v < VOID, "M6 nut seats at x=%+7.2f" % xc, "%.3f mm3" % v)
+            path = box(xc - NUT6_AF / 2, xc + NUT6_AF / 2,
+                       P.REAR_Y_MID - P.M6_HEX_D + 0.05, P.REAR_Y_MID - 0.05,
+                       z, P.REAR_Z1)
+            v = vol(asm.common(path))
+            check(v < VOID, "M6 nut can be fed in at x=%+7.2f" % xc,
+                  "%.3f mm3" % v)
+            # The bolt must not reach the device: an M6x10 tip stops short.
+            tip = P.REAR_Y1 - P.M6_CB_Y - 10.0
+            check(tip > P.POCKET_D, "M6x10 tip clears the device at x=%+7.2f"
+                  % xc, "tip Y=%.1f, device ends %.1f" % (tip, P.POCKET_D))
+
+    print("\n[rear stop -- M3 into a nut under the floor]")
+    for sx in (-1, 1):
+        xc = sx * (P.STOP_X0 + P.POCKET_HW) / 2.0
+        for y in P.STOP_SCREW_Y:
+            n = vnut(xc, y, NUT3_AF, 0.05, 0.05 + NUT3_T)
+            v = vol(whole.common(n))
+            check(v < VOID, "M3 nut seats under the floor at x=%+7.2f" % xc,
+                  "%.3f mm3" % v)
 
     print("\n[clearances]")
     check(near(P.POST_CLEAR_HW - P.BODY_HW, 0.925, 1e-9),

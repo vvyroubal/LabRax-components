@@ -65,18 +65,23 @@ FACE_T = 8.0    # [design] faceplate thickness; laps as 2 x 4 mm at the joint
 FLOOR_T = 6.0   # [design] floor under the device; also deep enough that the
                 # joint screws' counterbore and pilot both fit in the front rail
 RAIL_T = 3.2    # [design] side rail; 107.0 + 3.2 = 110.2 <= 111.125
-LIP_T = 3.5     # [design] top lip thickness
-LIP_IN = 4.0    # [design] how far the top lip reaches over the device
+
+# The device drops into the cradle from above -- it cannot slide in from the
+# rear, because the M6 joint blocks stand in the way and there is nowhere else
+# to put them. So the side rails carry no top lip; the top bar's flange holds
+# the device down at the front and the rear stops do it at the back.
+HOLD_T = 3.5    # [design] thickness of the stops' hold-down flange
+HOLD_D = 3.0    # [design] how far it reaches forward over the device; kept
+                # short so it bridges rather than needing support
 
 DEV_Z0 = FLOOR_T                    # 4.0  device underside
 DEV_Z1 = DEV_Z0 + DEV_H             # 34.0 device top
 POCKET_TOP = DEV_Z0 + DEV_H + CLR_H  # 34.8
-RAIL_TOP = POCKET_TOP + LIP_T       # 38.3
+RAIL_TOP = POCKET_TOP + HOLD_T      # 40.3
 
 BODY_HW = POCKET_HW + RAIL_T  # 110.2, leaves 0.925 mm per side to the posts
-LIP_X = POCKET_HW - LIP_IN    # 103.0 inner edge of the top lip
 
-BODY_D = 141.0  # [design] floor depth; device occupies Y 0..129
+BODY_D = 144.0  # [design] floor depth; device occupies Y 0..129
 
 # Faceplate window. Smaller than the device on every side, so the device --
 # loaded from the rear -- cannot pass through it. 2.0-2.4 mm of lip all round
@@ -88,20 +93,47 @@ WIN_Z1 = 34.0    # [design] 2.0 mm above the device top
 # ---------------------------------------------------- split for printing ---
 # 212.8 mm will not fit a 180 x 180 bed in any orientation, so the bracket is
 # a centre tray plus two mirrored end brackets. 172 mm keeps 4 mm of margin.
-SPLIT_X = 72.0   # [design] tray / ear boundary
+SPLIT_X = 66.0   # [design] tray / ear boundary
 LAP_X = 86.0     # [design] outboard end of the faceplate lap; also the widest
                  # point of the tray, so 2*LAP_X must fit the bed
-BOSS_D = 14.0    # [design] depth of the tray's screw boss above the device
+BOSS_D = 14.0    # [design] depth of the tray's flange above the device
 
-# Joint screws: M3 self-tapping into a printed pilot, driven from the front
-# through the ear's half of the faceplate lap.
-M3_CLEAR = 3.3
-M3_PILOT = 2.5
-M3_CB_D = 6.2   # button-head counterbore
-M3_CB_Z = 2.0
-JOINT_SCREW_X = (76.0, 83.0)  # [design] within the lap
+# ------------------------------------------------------- captive nuts ------
+# Lab Rax bolts its printed parts together with a hex nut trapped behind a
+# clearance hole. Measured off Bolted+Version+Post+Joiner.stl: a 6.40 mm
+# clearance hole 2 mm deep, then a hexagonal pocket 11.65 mm across corners
+# (10.09 across flats, so AF/sqrt(3) circumradius) and 5 mm deep -- an M6 nut
+# is 10.0 across flats and 5.0 thick. The same pattern is used here at both
+# sizes. See docs/measurements.md.
+M6_CLEAR = 6.4      # [rack]
+M6_HEX_AF = 10.09   # [rack] 11.65 across corners
+M6_HEX_D = 5.0      # [rack] nut thickness
+M6_CB_D = 10.9      # [rack] button-head counterbore
+M6_CB_Y = 3.5
+
+M3_CLEAR = 3.4      # [design]
+M3_HEX_AF = 5.6     # [design] M3 nut is 5.5 across flats
+M3_HEX_D = 2.6      # [design] M3 nut is 2.4 thick
+M3_CB_D = 6.2       # [design]
+M3_CB_Y = 2.0
+
+# A trapped nut needs roughly 13 mm of material around it at M6, and the
+# faceplate rails are only 8.0 and 10.45 mm tall, so the faceplate joints are
+# M3 and the M6 ones live behind the device where the whole 1U is free.
+JOINT_SCREW_X = (71.0, 81.0)  # [design] within the lap, 10 mm apart
 JOINT_SCREW_Z = (4.0, 39.0)   # [design] one row in the front rail below the
                               # window, one in the top rail above it
+
+# ------------------------------------------------- rear M6 joint blocks ----
+# Two blocks per side, lapped front-to-back, behind the device. Kept low so
+# cables leaving the rear ports pass over the top of them.
+REAR_X0 = 52.0       # [design] inboard end; sets how wide the ear prints
+REAR_Y0 = 130.0      # [design] 1.0 mm behind the device pocket
+REAR_Y_MID = 137.0   # [design] tray block ends / ear block begins
+REAR_Y1 = 144.0      # [design]
+REAR_Z1 = 15.0       # [design] 2.5 mm of wall above and below an M6 nut
+REAR_BOLT_X = (60.0, 78.0)  # [design]
+REAR_BOLT_Z = 7.5           # [design]
 
 # ------------------------------------------------------------- venting -----
 VENT_W = 9.0        # [design] floor slot width
@@ -121,7 +153,7 @@ RAIL_VENTS_Y = ((16.0, 44.0), (56.0, 84.0), (96.0, 124.0))  # [design]
 STOP_X0 = 98.0       # [design] 8.4 mm of overlap onto the device corner
 STOP_Y0 = POCKET_D   # 129.0
 STOP_T = 4.0         # [design] upright thickness
-STOP_Z1 = 28.0       # [design] upright height
+STOP_Z1 = RAIL_TOP   # [design] upright height, up to the rail top
 STOP_FOOT_D = 12.0   # [design] foot length behind the upright
-STOP_SCREW_Y = (136.0,)  # [design] hold-down screw
+STOP_SCREW_Y = (137.0,)  # [design] hold-down screw, into a nut under the floor
 STOP_FOOT_T = 6.0    # [design] foot thickness, enough for the screw counterbore
