@@ -8,9 +8,9 @@ CAD   := cad/UCG_Fiber_LabRax.FCStd
 PARTS := tray top_bar ear_l ear_r stop_l stop_r
 STLS  := $(addprefix $(STL)/,$(addsuffix .stl,$(PARTS)))
 
-.PHONY: all model verify images clean
+.PHONY: all model verify images plate clean
 
-all: model verify images
+all: model verify images plate
 
 model: $(CAD)
 
@@ -26,5 +26,9 @@ verify: $(CAD)
 images: $(STLS)
 	python3 tools/preview.py
 
+# Arranged onto A1 mini plates, ready to open in Bambu Studio.
+plate: $(STLS)
+	python3 tools/plate.py
+
 clean:
-	rm -rf $(STL) $(STEP) images cad/*.FCStd cad/*.FCBak
+	rm -rf $(STL) $(STEP) export/3mf images cad/*.FCStd cad/*.FCBak

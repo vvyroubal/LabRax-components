@@ -13,8 +13,9 @@ drawn: `src/params.py` holds every dimension and `src/model.py` builds the
 solids from it. `make` produces `cad/UCG_Fiber_LabRax.FCStd` plus STL and STEP.
 
 ```sh
-make            # build the model and its exports, then verify
+make            # build the model and its exports, verify, render
 make verify     # re-check the solids against the rack, device and bed
+make plate      # export/3mf/UCG_Fiber_LabRax-A1mini.3mf, ready for Bambu Studio
 ```
 
 ## Layout
@@ -28,6 +29,7 @@ tools/
   verify.py       54 checks against the rack, the device and the printer
   measure_rack.py re-derives the [rack] numbers from the Lab Rax mesh files
   preview.py      renders images/ (FreeCAD is headless here)
+  plate.py        arranges the STLs onto A1 mini plates as a Bambu 3MF
 docs/
   measurements.md where every number came from
   print-settings.md
@@ -64,6 +66,11 @@ Six prints, four of them distinct. Nothing exceeds a 180 × 180 mm bed.
 | `top_bar` | 172 × 22 × 10.5 | 1 |
 | `ear_l` / `ear_r` | 55 × 149 × 44.5 | 1 each |
 | `stop_l` / `stop_r` | 9 × 12 × 22 | 1 each |
+
+`make plate` writes `export/3mf/UCG_Fiber_LabRax-A1mini.3mf` — two plates, the
+tray on its own and everything else together, already rotated and with support
+enabled on the ears. Slicing it headlessly with Bambu Studio 2.8.2.61 returns
+`Success` on both plates.
 
 A 212.8 mm device will not fit a 180 mm bed in any orientation, so the bracket
 has to be split. It is modelled **as one 254 mm solid and then divided** by
@@ -145,3 +152,8 @@ why the top rail is now its own part.
   measurements. `CLR_W` is 1.2 mm; widen it in `params.py` if yours is tight.
 - No fillets. The geometry is kept to booleans on prisms so the script stays
   robust; edges are square.
+- **The ears print with support.** The faceplate above the window has nothing
+  under it, so each ear starts a 200 mm² ledge in mid-air at z = 34. The
+  support sits in the window opening and lifts out; the design change that
+  would avoid it is described in
+  [docs/print-settings.md](docs/print-settings.md).
