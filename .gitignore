@@ -1,0 +1,3 @@
+cad/*.FCBak
+__pycache__/
+*.pyc
