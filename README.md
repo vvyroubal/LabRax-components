@@ -63,10 +63,9 @@ Six prints, four of them distinct. Nothing exceeds a 180 × 180 mm bed.
 
 | part | size (mm) | qty |
 |---|---|---|
-| `tray` | 172 × 149 × 8 | 1 |
+| `tray` | 172 × 152 × 28 | 1 |
 | `top_bar` | 172 × 22 × 10.5 | 1 |
-| `ear_l` / `ear_r` | 55 × 149 × 44.5 | 1 each |
-| `stop_l` / `stop_r` | 9 × 12 × 22 | 1 each |
+| `ear_l` / `ear_r` | 61 × 152 × 44.5 | 1 each |
 
 `make plate` writes `export/3mf/UCG_Fiber_LabRax-A1mini.3mf` — a Bambu Studio
 project with three plates, already rotated, with support enabled on the ears
@@ -93,7 +92,6 @@ into its own M6 screws.
 | 6 × M6 × 10 button head | bracket to rack (3 per side) |
 | 4 × M6 × 10 + 4 × M6 nuts | ears to tray, at the rear blocks (2 per side) |
 | 8 × M3 × 8 + 8 × M3 nuts | ears to tray and top bar, at the faceplate (4 per side) |
-| 2 × M3 × 10 + 2 × M3 nuts | rear stops |
 
 Every joint is a bolt through a clearance hole into a **hex nut trapped in a
 pocket**, which is how Lab Rax bolts its own printed parts together. The
@@ -116,13 +114,24 @@ device where the full height is free.
    M6 blocks are in the way and there is nowhere else to put them.
 4. Bolt the `top_bar` on, 2 × M3 × 8 per side. Its flange then covers the front
    of the device and holds it down.
-5. Fit the two `stop` pieces, one M3 × 10 each. Their flanges hold the rear
-   down.
-6. Bolt the assembly into the rack with six M6.
+5. Bolt the assembly into the rack with six M6.
 
-The device is captured on all six sides: the floor below, the side rails, the
-faceplate lips at the front, the stops at the rear, and the top bar and stop
-flanges above.
+The device is captured by the floor, the side rails, the faceplate lips at the
+front, the ears' rear beam behind, and the top bar's flange above.
+
+## Where the load goes
+
+The gateway is 734 g, and none of that should be asked to cross a printed
+joint through a couple of bolts. The **tray bears on the ear along its whole
+length**: a step lap runs the full 144 mm, the ear keeping the bottom 3 mm of
+the floor and the tray sitting on it. Weight goes tray → ear → M6 rack screws
+by bearing, not by bending the floor across to a fixing.
+
+The rear M6 blocks tie the halves together rather than carrying the device.
+Each is webbed out to its side rail, so the block, the ear's floor and the
+rail form one rear beam; without that web the block hangs off the 6 mm edge of
+the floor and the bolts do nothing. That beam also runs forward to meet the
+device, which is what stops it moving back — there is no separate stop part.
 
 ## Orientation
 

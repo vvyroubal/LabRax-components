@@ -35,12 +35,15 @@ OUT = os.path.join(ROOT, "export", "3mf", "UCG_Fiber_LabRax-A1mini.3mf")
 PROJECT_SETTINGS = os.path.join(ROOT, "tools", "a1mini_project.json")
 
 BED = 180.0           # A1 mini, and there are no excluded areas on it
-PLATE_STRIDE = 250.0  # see plate_origin()
+PLATE_STRIDE = 216.0  # see plate_origin()
 # The stock A1 mini process puts a 5 mm brim on, and the brim has to land on
 # the bed too, so parts want ~6 mm of clearance. The tray and the top bar are
 # 172 mm wide and can only ever have 4 mm, which Bambu Studio accepts; nothing
 # else is allowed closer than this.
 MARGIN = 4.0
+# Parts get a 5 mm brim each, and two brims that run into one another make
+# Bambu Studio report "G-code conflicts detected after slicing".
+GAP = 12.0
 
 # Each entry: part, (in-plate centre x, y), rotations baked into the mesh as
 # (axis, degrees) applied in order, and any per-object slicer settings.
@@ -55,17 +58,12 @@ PLATES = [
     ("Tray", [
         ("tray", (90.0, 90.0), [], {}),
     ]),
-    ("Ears", [
-        ("ear_l", (48.0, 90.0), [], SUPPORT),
-        ("ear_r", (132.0, 90.0), [], SUPPORT),
-    ]),
-    ("Top bar and stops", [
-        # Upside down: the right way up its rear flange begins 2.8 mm above
-        # the bed with nothing under it. Inverted, the flat face that was the
-        # top of the 1U lies on the bed and every feature builds upward.
-        ("top_bar", (90.0, 130.0), [("x", 180)], {}),
-        ("stop_l", (70.0, 40.0), [], {}),
-        ("stop_r", (100.0, 40.0), [], {}),
+    ("Ears and top bar", [
+        ("ear_l", (35.5, 90.0), [], SUPPORT),
+        ("ear_r", (108.5, 90.0), [], SUPPORT),
+        # On edge to fit beside the ears, and upside down: the right way up
+        # its rear flange begins 2.8 mm above the bed with nothing under it.
+        ("top_bar", (162.0, 90.0), [("x", 180), ("z", 90)], {}),
     ]),
 ]
 
@@ -118,6 +116,38 @@ def plate_origin(index):
     col = (index - 1) % PLATES_PER_ROW
     row = (index - 1) // PLATES_PER_ROW
     return col * PLATE_STRIDE, -row * PLATE_STRIDE
+
+
+def _single_filament(cfg, keep=2):
+    """Cut the project down to one filament -- the PETG slot.
+
+    The profile arrives with the A1 mini's five slots. With more than one,
+    Bambu Studio plants a wipe tower on every plate, and on a plate packed
+    this tightly it lands on top of a part: "G-code conflicts detected after
+    slicing". This is a single-material print, so the other four go.
+
+    Anything that is a list as long as the filament count is per-filament;
+    a few keys hold n^2 or k*n entries and are cut to match. The prime tower
+    is switched off with them.
+    """
+    n = len(cfg.get("filament_type", []))
+    if n <= 1:
+        return cfg
+    out = {}
+    for k, v in cfg.items():
+        if isinstance(v, list) and len(v) == n:
+            out[k] = [v[keep]]
+        elif isinstance(v, list) and len(v) == n * n:      # flush matrix
+            out[k] = [v[keep * n + keep]]
+        elif isinstance(v, list) and len(v) and len(v) % n == 0 and len(v) != n:
+            per = len(v) // n
+            out[k] = v[keep * per:(keep + 1) * per]
+        else:
+            out[k] = v
+    # With one filament there is nothing to purge, and the tower's parked
+    # position (15, 141) sits on top of a part.
+    out["enable_prime_tower"] = "0"
+    return out
 
 
 def build():
@@ -179,9 +209,10 @@ def build():
                              '      <metadata key="instance_id" value="0"/>\n'
                              '    </model_instance>' % oid)
             for oname, ox0, ox1, oy0, oy1 in placed:
-                if x0 < ox1 and ox0 < x1 and y0 < oy1 and oy0 < y1:
-                    problems.append("%s overlaps %s on plate %d"
-                                    % (name, oname, pindex))
+                if (x0 - GAP < ox1 and ox0 - GAP < x1
+                        and y0 - GAP < oy1 and oy0 - GAP < y1):
+                    problems.append("%s is within %.0f mm of %s on plate %d"
+                                    % (name, GAP, oname, pindex))
             placed.append((name, x0, x1, y0, y1))
             report.append((pindex, name, size, (x0, x1), (y0, y1), len(T),
                            bool(opts)))
@@ -229,7 +260,8 @@ def build():
             'Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/'
             '3dmodel"/>\n</Relationships>\n')
 
-    project = json.dumps(json.load(open(PROJECT_SETTINGS)), indent=1)
+    project = json.dumps(_single_filament(json.load(open(PROJECT_SETTINGS))),
+                         indent=1)
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with zipfile.ZipFile(OUT, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:

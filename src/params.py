@@ -120,20 +120,37 @@ M3_CB_Y = 2.0
 # A trapped nut needs roughly 13 mm of material around it at M6, and the
 # faceplate rails are only 8.0 and 10.45 mm tall, so the faceplate joints are
 # M3 and the M6 ones live behind the device where the whole 1U is free.
-JOINT_SCREW_X = (71.0, 81.0)  # [design] within the lap, 10 mm apart
+JOINT_SCREW_X = (70.0, 78.0)  # [design] within the lap, clear of the step
 JOINT_SCREW_Z = (4.0, 39.0)   # [design] one row in the front rail below the
                               # window, one in the top rail above it
 
+# ------------------------------------------- how the tray meets the ear ----
+# The device's weight has to reach the rack. It goes into the tray, across to
+# the ears, and out through their M6 rack screws -- so the tray must bear on
+# the ear along its whole length, not hang off a couple of bolts. A step lap
+# runs the full depth: the ear keeps the bottom 3 mm and the tray sits on it.
+# Both edges stay 3 mm thick, and the tray's 4 mm overhang bridges cleanly.
+STEP_X0 = 82.0   # [design] lap runs from here out to LAP_X
+STEP_Z = 3.0     # [design] the ear's share of the floor under the lap
+
 # ------------------------------------------------- rear M6 joint blocks ----
-# Two blocks per side, lapped front-to-back, behind the device. Kept low so
-# cables leaving the rear ports pass over the top of them.
-REAR_X0 = 52.0       # [design] inboard end; sets how wide the ear prints
+# One block per side, lapped front-to-back behind the device, carrying two M6
+# stacked vertically. Sits just inboard of the ear so it is short, and the ear
+# ties it out to the side rail with a web -- without that the block hangs off
+# the 6 mm floor edge and the joint is worth nothing.
+REAR_X0 = 70.0       # [design] inboard end; sets how wide the ear prints
 REAR_Y0 = 130.0      # [design] 1.0 mm behind the device pocket
 REAR_Y_MID = 137.0   # [design] tray block ends / ear block begins
 REAR_Y1 = 144.0      # [design]
-REAR_Z1 = 15.0       # [design] 2.5 mm of wall above and below an M6 nut
-REAR_BOLT_X = (60.0, 78.0)  # [design]
-REAR_BOLT_Z = 7.5           # [design]
+REAR_Z1 = 28.0       # [design] room for two M6 nuts, one above the other
+REAR_BOLT_X = (78.0,)       # [design] 2.2 mm of wall each side of the nut
+REAR_BOLT_Z = (7.0, 21.0)   # [design]
+REAR_TIE_Z = 9.0     # [design] low stiffener along the tray's rear edge
+
+# The rear beam runs forward to meet the device, so it is the rear stop as
+# well -- no separate part. Outboard enough that it cannot foul a connector
+# whichever way round the device is fitted.
+REAR_STOP_X0 = 95.0  # [design] 11.4 mm of overlap onto the device's corner
 
 # ------------------------------------------------------------- venting -----
 VENT_W = 9.0        # [design] floor slot width
@@ -146,14 +163,3 @@ RAIL_VENT_Z0 = 10.0
 RAIL_VENT_Z1 = 30.0
 RAIL_VENTS_Y = ((16.0, 44.0), (56.0, 84.0), (96.0, 124.0))  # [design]
 
-# --------------------------------------------------------- rear retainer ---
-# The device slides in from the rear and stops against the faceplate lips. A
-# pair of small stops then closes the rear. They sit at the extreme corners so
-# they cannot foul a connector.
-STOP_X0 = 98.0       # [design] 8.4 mm of overlap onto the device corner
-STOP_Y0 = POCKET_D   # 129.0
-STOP_T = 4.0         # [design] upright thickness
-STOP_Z1 = RAIL_TOP   # [design] upright height, up to the rail top
-STOP_FOOT_D = 12.0   # [design] foot length behind the upright
-STOP_SCREW_Y = (137.0,)  # [design] hold-down screw, into a nut under the floor
-STOP_FOOT_T = 6.0    # [design] foot thickness, enough for the screw counterbore

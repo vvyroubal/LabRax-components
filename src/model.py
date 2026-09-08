@@ -8,10 +8,8 @@ means the mating faces cannot drift apart when a dimension changes.
 Parts:
     tray      centre section: vented floor + the faceplate below the window
     top_bar   the faceplate above the window, bridging the two ears
-    ear_l     left end bracket: rack ear, side rail, top lip, floor
+    ear_l     left end bracket: rack ear, side rail, floor, rear beam
     ear_r     mirror of ear_l
-    stop_l    small rear stop that closes the device in from behind
-    stop_r    mirror of stop_l
 """
 
 import math
@@ -146,37 +144,34 @@ def _top_flange():
     return box(-P.LAP_X, P.LAP_X, 0.0, P.BOSS_D, P.POCKET_TOP, P.RACK_U)
 
 
-def _stop_pads():
-    """Local floor thickening behind the device, for the rear stop screws."""
-    out = None
-    for sx in (-1, 1):
-        x0, x1 = sx * P.STOP_X0, sx * P.POCKET_HW
-        pad = box(x0, x1, P.STOP_Y0, P.BODY_D, 0.0, P.FLOOR_T)
-        out = pad if out is None else out.fuse(pad)
-    return out
-
-
 def _rear_blocks():
-    """Blocks behind the device where the ear and tray bolt together with M6.
+    """The rear structure: M6 joint blocks, the webs that anchor them, the
+    stiffener along the tray's rear edge, and the device's rear stop.
 
     A trapped M6 nut wants about 13 mm of material around it and the faceplate
-    rails are 8.0 and 10.45 mm tall, so this is the only part of the bracket
-    that can host one: behind the device the whole 1U is free. Kept to 15 mm
-    tall so cables leaving the rear ports pass over the top.
+    rails are 8.0 and 10.45 mm tall, so behind the device is the only place in
+    the bracket that can host one.
+
+    The web matters as much as the block. Without it the block hangs off the
+    6 mm edge of the floor and bolting to it achieves nothing; with it the
+    block, the ear's floor and the side rail become one rear beam. That beam
+    runs forward to meet the device, so it is the rear stop as well.
     """
-    out = None
+    out = box(-P.LAP_X, P.LAP_X, P.REAR_Y0, P.REAR_Y1, 0.0, P.REAR_TIE_Z)
     for sx in (-1, 1):
-        blk = box(sx * P.REAR_X0, sx * P.LAP_X, P.REAR_Y0, P.REAR_Y1,
-                  0.0, P.REAR_Z1)
-        out = blk if out is None else out.fuse(blk)
+        out = out.fuse(box(sx * P.REAR_X0, sx * P.LAP_X, P.REAR_Y0, P.REAR_Y1,
+                           0.0, P.REAR_Z1))
+        out = out.fuse(box(sx * P.LAP_X, sx * P.BODY_HW, P.REAR_Y_MID,
+                           P.REAR_Y1, 0.0, P.REAR_Z1))
+        out = out.fuse(box(sx * P.REAR_STOP_X0, sx * P.BODY_HW, P.POCKET_D,
+                           P.REAR_Y1, 0.0, P.REAR_Z1))
     return out
 
 
 def bracket_solid():
     """The whole bracket, before it is divided into printable parts."""
     s = _faceplate()
-    for piece in (_floor(), _rails(), _top_flange(), _stop_pads(),
-                  _rear_blocks()):
+    for piece in (_floor(), _rails(), _top_flange(), _rear_blocks()):
         s = s.fuse(piece)
     return s.removeSplitter()
 
@@ -208,6 +203,9 @@ def _tray_region():
     for sx in (-1, 1):
         r = r.cut(box(sx * P.REAR_X0, sx * P.LAP_X, P.REAR_Y_MID, BIG,
                       -BIG, BIG))
+        # The step lap: the ear keeps the bottom of the floor out at the edge,
+        # and the tray sits on it for the whole depth.
+        r = r.cut(box(sx * P.STEP_X0, sx * P.LAP_X, 0.0, BIG, -BIG, P.STEP_Z))
     return r
 
 
@@ -248,7 +246,8 @@ def _face_nut_side():
 
 
 def _rear_axes():
-    return [(sx * x, P.REAR_BOLT_Z) for sx in (-1, 1) for x in P.REAR_BOLT_X]
+    return [(sx * x, z) for sx in (-1, 1)
+            for x in P.REAR_BOLT_X for z in P.REAR_BOLT_Z]
 
 
 def _rear_bolt_side():
@@ -272,17 +271,6 @@ def _rear_nut_side():
     return cuts
 
 
-def _stop_nut_side():
-    """M3 nut pocket in the underside of the floor, under each rear stop."""
-    cuts = []
-    for sx in (-1, 1):
-        xc = sx * (P.STOP_X0 + P.POCKET_HW) / 2.0
-        for y in P.STOP_SCREW_Y:
-            cuts.append(vhex_trap(xc, y, P.M3_HEX_AF, -0.1, P.M3_HEX_D))
-            cuts.append(vhole(xc, y, P.M3_CLEAR, P.M3_HEX_D, P.FLOOR_T + 0.1))
-    return cuts
-
-
 def build_parts():
     """Return {name: Part.Shape} for every printable part."""
     full = bracket_solid()
@@ -290,7 +278,7 @@ def build_parts():
     top_r = _top_region()
 
     tray = full.common(tray_r)
-    for c in _face_nut_side() + _rear_nut_side() + _stop_nut_side():
+    for c in _face_nut_side() + _rear_nut_side():
         tray = tray.cut(c)
 
     top_bar = full.common(top_r)
@@ -298,7 +286,7 @@ def build_parts():
         top_bar = top_bar.cut(c)
 
     ears = full.cut(tray_r).cut(top_r)
-    for c in _face_bolt_side() + _rear_bolt_side() + _stop_nut_side():
+    for c in _face_bolt_side() + _rear_bolt_side():
         ears = ears.cut(c)
 
     parts = {"tray": tray.removeSplitter(),
@@ -306,30 +294,5 @@ def build_parts():
     for name, sx in (("ear_l", -1), ("ear_r", 1)):
         parts[name] = ears.common(box(0.0, sx * BIG, -BIG, BIG,
                                       -BIG, BIG)).removeSplitter()
-    for name, sx in (("stop_l", -1), ("stop_r", 1)):
-        parts[name] = _rear_stop(sx).removeSplitter()
     return parts
 
-
-def _rear_stop(sx):
-    """L-shaped block that closes the rear of the pocket.
-
-    It sits against the inner face of a side rail, overlapping the device's
-    rear corner -- far enough outboard that it cannot foul a connector
-    whichever way round the device is fitted. Bolted down into a nut trapped
-    in the underside of the floor.
-    """
-    x0, x1 = sx * P.STOP_X0, sx * P.POCKET_HW
-    up = box(x0, x1, P.STOP_Y0, P.STOP_Y0 + P.STOP_T, P.FLOOR_T, P.STOP_Z1)
-    # Reaches forward over the device's rear top corner to hold it down.
-    up = up.fuse(box(x0, x1, P.STOP_Y0 - P.HOLD_D, P.STOP_Y0,
-                     P.POCKET_TOP, P.STOP_Z1))
-    foot_y0 = P.STOP_Y0 + P.STOP_T
-    foot_top = P.FLOOR_T + P.STOP_FOOT_T
-    foot = box(x0, x1, foot_y0, P.BODY_D, P.FLOOR_T, foot_top)
-    s = up.fuse(foot)
-    xc = sx * (P.STOP_X0 + P.POCKET_HW) / 2.0
-    for y in P.STOP_SCREW_Y:
-        s = s.cut(vhole(xc, y, P.M3_CLEAR, P.FLOOR_T - 0.1, foot_top + 0.1))
-        s = s.cut(vhole(xc, y, P.M3_CB_D, foot_top - P.M3_CB_Y, foot_top + 0.1))
-    return s

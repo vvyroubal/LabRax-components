@@ -28,7 +28,7 @@ import model  # noqa: E402
 
 DOC = "UCG_Fiber_LabRax"
 # Printed as they are modelled: floor down, faceplate standing at the front.
-PARTS = ("tray", "top_bar", "ear_l", "ear_r", "stop_l", "stop_r")
+PARTS = ("tray", "top_bar", "ear_l", "ear_r")
 
 
 def main():
