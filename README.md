@@ -152,6 +152,10 @@ why the top rail is now its own part.
   measurements. `CLR_W` is 1.2 mm; widen it in `params.py` if yours is tight.
 - No fillets. The geometry is kept to booleans on prisms so the script stays
   robust; edges are square.
+- `cad/*.FCStd` and `export/step/*` embed a build timestamp, so `make` leaves
+  them looking modified even when nothing changed. The 3MF and the STLs are
+  reproducible. Discard the timestamp-only churn with
+  `git checkout -- cad export/step`.
 - **The ears print with support.** The faceplate above the window has nothing
   under it, so each ear starts a 200 mm² ledge in mid-air at z = 34. The
   support sits in the window opening and lifts out; the design change that

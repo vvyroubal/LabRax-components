@@ -193,10 +193,16 @@ def build():
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with zipfile.ZipFile(OUT, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
-        z.writestr("[Content_Types].xml", ctypes)
-        z.writestr("_rels/.rels", rels)
-        z.writestr("3D/3dmodel.model", model)
-        z.writestr("Metadata/model_settings.config", settings)
+        for name, body in (("[Content_Types].xml", ctypes),
+                           ("_rels/.rels", rels),
+                           ("3D/3dmodel.model", model),
+                           ("Metadata/model_settings.config", settings)):
+            # A fixed timestamp keeps rebuilds byte-identical, so an unchanged
+            # model does not show up as a modified file.
+            info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.external_attr = 0o644 << 16
+            z.writestr(info, body)
 
     print("%s  (%.0f kB)" % (os.path.relpath(OUT, ROOT),
                              os.path.getsize(OUT) / 1024.0))
