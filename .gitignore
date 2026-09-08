@@ -1,3 +1,4 @@
 cad/*.FCBak
 __pycache__/
 *.pyc
+result.json
