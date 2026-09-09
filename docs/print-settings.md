@@ -23,6 +23,33 @@ About 208 g all told. Figures are from slicing with
 Bambu Studio 2.8.2.61 at its stock `0.20mm Standard @BBL A1M`; every plate
 returns `Success` with no warnings.
 
+## Is it really printable?
+
+Fitting the bed is not the same as printing inside it: support does not stay
+within the part it holds up, and on the trays it reaches about 5 mm past the
+overhanging edge. `tools/plate.py` only knows where the parts sit.
+
+```sh
+make plates     # slices all five and measures the toolpaths
+```
+
+That writes each plate out on its own, slices it with Bambu Studio, and reads
+the extents back out of the G-code, ignoring the machine's own prime routine
+(the A1 mini primes at X = -13.5, outside the bed and none of our business).
+Measured:
+
+| plate | X printed | Y printed | max Z | nearest edge |
+|---|---|---|---|---|
+| `side_l` | 12.20 – 169.62 | 12.20 – 167.80 | 44.40 | 10.4 mm |
+| `side_r` | 12.20 – 167.80 | 10.38 – 167.80 | 44.40 | 10.4 mm |
+| `tray_l` | 19.01 – 158.29 | 9.21 – 175.79 | 16.00 | 4.2 mm |
+| `tray_r` | 19.01 – 160.99 | 4.25 – 175.79 | 16.00 | 4.2 mm |
+| `top_bar_l/r` | 34.71 – 145.29 | 49.71 – 130.29 | 20.80 | 34.7 mm |
+
+Everything is inside 180 × 180 × 180. The trays are the tight ones — 167 mm
+deep on a 180 mm bed, with support spreading past the front edge — which is
+why they are placed 2.5 mm back of centre and print without a brim.
+
 ## Material
 
 **PETG.** The UCG-Fiber is fanless and dissipates its heat through the case;
@@ -37,7 +64,7 @@ room but is not the right choice here.
 | Layer height | 0.2 mm |
 | Walls | 4 (the side rails are 3.2 mm — this makes them solid) |
 | Infill | 25 %, gyroid |
-| Brim | 5 mm, which the stock profile puts on automatically |
+| Brim | 5 mm from the stock profile; turned off for the trays, which are large flat faces and would otherwise reach the edge of the plate |
 
 ## Orientation
 

@@ -18,6 +18,7 @@ feature.
 make            # build the model and its exports, verify, render, plate
 make verify     # re-check the solids against the rack, device and bed
 make plate      # export/3mf/UCG_Fiber_LabRax-A1mini.3mf, for Bambu Studio
+make plates     # slice every plate and check it prints inside the bed
 ```
 
 ## Layout
@@ -33,6 +34,7 @@ tools/
   measure_rack.py re-derives the [rack] numbers from the Lab Rax mesh files
   preview.py      renders images/ (FreeCAD is headless here)
   plate.py        arranges the STLs onto A1 mini plates as a Bambu 3MF
+  checkplates.py  slices all five for real and measures the toolpaths
   a1mini_project.json  the A1 mini preset the 3MF carries to be a project
 docs/
   measurements.md where every number came from

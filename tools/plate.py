@@ -41,6 +41,10 @@ PLATE_STRIDE = 216.0  # see plate_origin()
 # 172 mm wide and can only ever have 4 mm, which Bambu Studio accepts; nothing
 # else is allowed closer than this.
 MARGIN = 4.0
+# Support does not stay inside the part it holds up -- on the trays it reaches
+# about 5 mm past the overhanging edge -- and which edge that is cannot be
+# known without slicing. This margin bounds the part itself; what actually
+# gets printed is measured by tools/checkplates.py.
 # Parts get a 5 mm brim each, and two brims that run into one another make
 # Bambu Studio report "G-code conflicts detected after slicing".
 GAP = 12.0
@@ -53,6 +57,12 @@ GAP = 12.0
 # inboard from the only full-height part of the faceplate. The support column
 # stands inside the window opening and lifts straight out.
 SUPPORT = {"enable_support": "1", "support_type": "normal(auto)"}
+# A tray is 167 mm deep on a 180 mm bed. The stock 5 mm brim would leave its
+# outer edge 1.5 mm from the edge of the plate, which is no place to be
+# starting a first layer. These parts are a large flat face on the bed and do
+# not need one.
+NO_BRIM = {"brim_type": "no_brim"}
+TRAY = dict(SUPPORT, **NO_BRIM)
 
 PLATES = [
     # A side is 192 mm long, so it only goes on the bed turned 45 degrees.
@@ -60,8 +70,8 @@ PLATES = [
     ("Right side", [("side_r", (90.0, 90.0), [("z", 45)], SUPPORT)]),
     # The lap strip along each tray edge stands 3 mm off the bed, so the tray
     # wants support under its rim. It comes away from the underside.
-    ("Left tray", [("tray_l", (90.0, 90.0), [], SUPPORT)]),
-    ("Right tray", [("tray_r", (90.0, 90.0), [], SUPPORT)]),
+    ("Left tray", [("tray_l", (90.0, 92.5), [], TRAY)]),
+    ("Right tray", [("tray_r", (90.0, 92.5), [], TRAY)]),
     # Both bars upside down: the right way up, the rear flange begins 2.8 mm
     # above the bed with nothing under it. Inverted, the flat face that is the
     # top of the 1U lies on the bed and everything builds upward.
@@ -177,9 +187,11 @@ def build():
 
             x0, x1 = cx - size[0] / 2, cx + size[0] / 2
             y0, y1 = cy - size[1] / 2, cy + size[1] / 2
-            if x0 < MARGIN or y0 < MARGIN or x1 > BED - MARGIN or y1 > BED - MARGIN:
-                problems.append("%s runs off plate %d: x %.1f..%.1f y %.1f..%.1f"
-                                % (name, pindex, x0, x1, y0, y1))
+            if (x0 < MARGIN or y0 < MARGIN
+                    or x1 > BED - MARGIN or y1 > BED - MARGIN):
+                problems.append("%s comes within %.1f mm of the plate edge on "
+                                "plate %d: x %.1f..%.1f y %.1f..%.1f"
+                                % (name, MARGIN, pindex, x0, x1, y0, y1))
 
             verts = "".join('<vertex x="%.5f" y="%.5f" z="%.5f"/>' % tuple(v)
                             for v in V)

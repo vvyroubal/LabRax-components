@@ -185,7 +185,9 @@ def tray(doc, sx, name):
         sk.circle(s, kx, P.KEY_Y,
                   P.KEY_D if sx > 0 else P.KEY_D + P.KEY_FIT)
     if sx > 0:
-        sk.pad(doc, bd, s, P.LAP_T - 0.6, reversed_=True)
+        # Down to Z=0, so the peg stands on the bed when the half is printed
+        # and fills the socket to the full depth when it is assembled.
+        sk.pad(doc, bd, s, P.LAP_T, reversed_=True)
     else:
         sk.pocket(doc, bd, s, P.LAP_T)
 

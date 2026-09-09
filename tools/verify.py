@@ -254,8 +254,8 @@ def main():
               "%.3f mm3" % vol(trays.common(feed)))
     # The pegs that key the front of the joint, where no bolt will fit.
     for kx in (-P.KEY_X, P.KEY_X):
-        peg = Part.makeCylinder(P.KEY_D / 2, P.LAP_T,
-                                Vector(kx, P.KEY_Y, 0.6), Vector(0, 0, 1))
+        peg = Part.makeCylinder(P.KEY_D / 2, P.LAP_T - 0.1,
+                                Vector(kx, P.KEY_Y, 0.05), Vector(0, 0, 1))
         check(vol(parts["tray_r"].common(peg)) > 20.0
               and vol(parts["tray_l"].common(peg)) < VOID,
               "a peg keys the joint at x=%+6.1f" % kx,

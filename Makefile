@@ -8,7 +8,7 @@ CAD   := cad/UCG_Fiber_LabRax.FCStd
 PARTS := side_l side_r tray_l tray_r top_bar_l top_bar_r
 STLS  := $(addprefix $(STL)/,$(addsuffix .stl,$(PARTS)))
 
-.PHONY: all model verify images plate clean
+.PHONY: all model verify images plate plates clean
 
 all: model verify images plate
 
@@ -29,6 +29,12 @@ images: $(STLS)
 # Arranged onto A1 mini plates, ready to open in Bambu Studio.
 plate: $(STLS)
 	python3 tools/plate.py
+
+# Slice every plate for real and measure what the printer would actually do.
+# Slow (it runs the slicer five times) and needs Bambu Studio, so it is not
+# part of `all`.
+plates: plate
+	python3 tools/checkplates.py
 
 clean:
 	rm -rf $(STL) $(STEP) export/3mf images cad/*.FCStd cad/*.FCBak
