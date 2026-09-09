@@ -30,7 +30,7 @@ src/
   model.py        the six bodies
 build.py          writes cad/, export/stl/, export/step/
 tools/
-  verify.py       104 checks against the rack, the device and the printer
+  verify.py       91 checks against the rack, the device and the printer
   measure_rack.py re-derives the [rack] numbers from the Lab Rax mesh files
   preview.py      renders images/ (FreeCAD is headless here)
   plate.py        arranges the STLs onto A1 mini plates as a Bambu 3MF
@@ -69,13 +69,13 @@ stock Lab Rax faceplates slot their holes for the same reason.
 
 ## Parts
 
-Six prints, all distinct, none over a 180 mm bed.
+Five prints, all distinct, none over a 180 mm bed.
 
 | part | size (mm) | qty |
 |---|---|---|
 | `side_l` / `side_r` | 29 × 192 × 44.5 | 1 each |
 | `tray_l` / `tray_r` | 137 × 167 × 16 | 1 each |
-| `top_bar_l` / `top_bar_r` | 111 × 25 × 21 | 1 each |
+| `top_bar` | 220 × 20 × 21 | 1 |
 
 A **side** is one piece: front ear, side rail, rear ear, the ledge the tray
 lands on, and the rear stop. It reaches all the way from the front posts to
@@ -87,15 +87,15 @@ half laps the other way onto its side's ledge. It is a light load over a wide
 plate — 734 g over a 214 × 129 × 6 span works out around 0.2 mm of deflection
 — so it does not need stiffening, only holding together and locating.
 
-The **top bar** closes the front over the device, in halves for the same
-reason. Each end nests into a notch in the side, so the ear and the rail still
-meet underneath it.
+The **top bar** closes the front over the device, and is **one piece**. At
+220 × 20 mm it will not fit the bed square on, but turned 45° its footprint is
+168 mm and it does — and printed upside down, the face that was the top of the
+1U lies flat on the bed, so it needs neither support nor a brim. Each end
+nests into a notch in the side, so the ear and the rail still meet underneath.
 
-The halves **lap across the middle** rather than meeting end to end: over the
-centre 50 mm the left half is the front web and the right half is the flange
-behind it, and two M3 pull them together. Butted, each half would hang off the
-single M6 at its own end — a pivot — and the bar would sag with the seam
-opening in the middle.
+It was two halves once. Butted, each hung off the single M6 at its own end —
+a pivot, and the seam opened. Lapping them fixed that but needed two M3, the
+only ones left in the design. One piece has neither problem.
 
 ![iso](images/assembly-iso.png)
 
@@ -105,12 +105,9 @@ opening in the middle.
 |---|---|
 | 12 × M6 × 12 button head | bracket to rack: 3 per ear, 4 ears |
 | 2 × M6 × 20 + 2 × M6 nuts | top bar halves, through the front ears |
-| 2 × M3 × 16 + 2 × M3 nuts | top bar halves to each other, across the lap |
 | 2 × M6 × 20 + 2 × M6 nuts | tray halves to each other |
 
-M6 everywhere it fits. The one exception is the pair across the top bar's own
-lap: the bar is 7.65 mm tall between the device and the top of the U, and an
-M6 nut is 11.55 mm across the corners. An M3 is 6.35 and goes in.
+**M6 throughout — one driver, one box of hardware.**
 
 The rack screws need no nuts — the posts have them. The top-bar screw goes in
 from the front, through the ear, and into a nut trapped in the bar with its
@@ -139,10 +136,9 @@ front. Depth was never the problem — there are 16 mm there; height is.
    sockets. A nib in front and the rear stop behind hold them fore and aft, so
    they need no fixing to the sides. Run the two M6 in from the left.
 3. **Lower the gateway in from above** onto the tray.
-4. Fit the M6 nuts in the top bars and the two M3 nuts in the right half's
-   lap slots, dropping them in from the top of the bar. Offer each half up
-   into its notch, run an M6 in from the front through each ear, then the two
-   M3 through the centre lap. Nip up the rack screws.
+4. Drop an M6 nut into each end of the top bar — the pockets face rear — then
+   offer the bar up into the notches and run an M6 in from the front through
+   each ear. Nip up the rack screws.
 
 The gateway is held by the tray below, the side rails either side, the top bar
 in front, the rear stops behind, and the top bar's flange above.
@@ -167,7 +163,7 @@ choice around it.
 ## What is checked
 
 `make verify` measures the built solids, not the parameters, so a feature that
-silently does nothing is caught rather than assumed away. 104 checks: that each
+silently does nothing is caught rather than assumed away. 91 checks: that each
 body is one valid solid built from sketches driving pads and pockets; that it
 fits the bed, turning a long part on the diagonal if it has to; that no two
 parts foul each other; that an M6 passes all twelve rack slots; that the
@@ -176,9 +172,9 @@ from the rear; that the tray is solid under the device all the way across,
 that both halves lap rather than butt, that each is carried by its side's
 ledge, that a real M6 nut solid seats in each slot and can be dropped in from
 above, and that nothing rises above the tray in front of the device's face;
-that the top bar's halves lap and bear on each other rather than butting, and
-are held at two widely spaced points so neither can pivot; and that the device
-drops in, is stopped rear and above, and cannot be pushed out of the front.
+that the top bar is one solid spanning the whole opening, with an M6 at each
+end whose nut seats and can be fitted; and that the device drops in, is
+stopped rear and above, and cannot be pushed out of the front.
 
 It has earned its keep. Building this version it caught the top bar
 overrunning the 222.25 mm post opening, a notch cutting the wrong side of its

@@ -135,28 +135,19 @@ BAR_X1 = BODY_HW    # [design] outboard end. The bar passes between the posts
 BAR_Z0 = 36.8       # [design] underside over the device
 BAR_END_X0 = 96.0   # [design] the taller end block starts here
 BAR_END_Z0 = 23.7   # [design] deep enough for an M6 nut across its flats
-BAR_FLANGE_D = 17.0  # [design] how far it reaches back over the device
+BAR_FLANGE_D = 12.0  # [design] how far it reaches back over the device.
+                     # Every millimetre here costs 0.7 mm of bed diagonal.
 BAR_FLANGE_Z0 = BAR_Z0      # flush with the bar's underside
 
 BAR_SCREW_X = 103.0   # [design] inboard of the rack slots, inside the ear
 BAR_SCREW_Z = 30.16   # [design] midway between two EIA holes
 
-# The two halves lap on the centreline: over this much of the middle the left
-# half is the front web and the right half is the flange behind it, and two
-# M3 pull them together. Without that they only touch, and each half hangs off
-# the single M6 at its own end -- a pivot, and the bar sags.
-#
-# M3 because the bar is 7.65 mm tall between the device and the top of the U.
-# An M6 nut is 11.55 across the corners and will not go in at any angle; an M3
-# is 6.35 and just does, dropped into a slot open at the top of the bar.
-BAR_LAP = 25.0        # [design] half-length of the lap
-BAR_BOLT_X = (-15.0, 15.0)  # [design]
-BAR_BOLT_Z = 41.0     # [design] as high as the nut's corners allow
-BAR_NUT_Y = 10.0      # [design] the nut sits just behind the web
-
-M3_CLEAR = 3.4        # [design]
-M3_NUT_AF = 5.7       # [design] an M3 nut is 5.5 across the flats
-M3_NUT_D = 2.6        # [design] ... and 2.4 thick
+# The bar is one piece. At 220.4 x 20 mm it will not fit a 180 mm bed square
+# on, but turned 45 degrees its bounding box is 170 mm and it does -- and the
+# face that was the top of the 1U lies flat on the bed, so it needs neither
+# support nor a joint. Halved and butted it was a beam pinned at each end by a
+# single screw, which is a pivot; halved and lapped it needed two M3, the only
+# ones left in the design. One piece has neither problem.
 
 # ------------------------------------------------------------ fasteners ----
 M6_CLEAR = 6.4      # [rack]

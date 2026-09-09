@@ -17,7 +17,7 @@ the bed edge.
 | 2 | `side_r` | 36.7 g |
 | 3 | `tray_l` | 52.5 g |
 | 4 | `tray_r` | 60.6 g |
-| 5 | `top_bar_l`, `top_bar_r` | 21.4 g |
+| 5 | `top_bar` | 33 g |
 
 About 208 g all told. Figures are from slicing with
 Bambu Studio 2.8.2.61 at its stock `0.20mm Standard @BBL A1M`; every plate
@@ -44,7 +44,7 @@ Measured:
 | `side_r` | 12.20 – 167.80 | 10.38 – 167.80 | 44.40 | 10.4 mm |
 | `tray_l` | 19.01 – 158.29 | 9.21 – 175.79 | 16.00 | 4.2 mm |
 | `tray_r` | 19.01 – 160.99 | 4.25 – 175.79 | 16.00 | 4.2 mm |
-| `top_bar_l/r` | 22.61 – 157.39 | 49.71 – 130.29 | 20.80 | 22.6 mm |
+| `top_bar` | 6.43 – 173.57 | 6.43 – 173.57 | 20.80 | 6.4 mm |
 
 Everything is inside 180 × 180 × 180. The trays are the tight ones — 167 mm
 deep on a 180 mm bed, with support spreading past the front edge — which is
@@ -77,7 +77,9 @@ the STLs yourself.
 - `tray_l` / `tray_r` — flat, as exported. **Needs support**: the lap strip
   along each edge stands 3 mm off the bed so it can land on the side's ledge.
   The support is a thin rim on the underside and comes away cleanly.
-- `top_bar_l` / `top_bar_r` — **upside down**. The right way up, the bar's
+- `top_bar` — **upside down and turned 45°**. At 220 mm it only fits the bed
+  cornerwise, and inverted the face that was the top of the 1U lies flat on
+  the bed: full contact, no support, no brim. The right way up, its
   rear flange starts 2.8 mm above
   the bed with nothing beneath it; inverted, the flat face that is the top of
   the 1U lies on the bed and everything builds upward.

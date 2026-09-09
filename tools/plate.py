@@ -72,13 +72,10 @@ PLATES = [
     # wants support under its rim. It comes away from the underside.
     ("Left tray", [("tray_l", (90.0, 92.5), [], TRAY)]),
     ("Right tray", [("tray_r", (90.0, 92.5), [], TRAY)]),
-    # Both bars upside down: the right way up, the rear flange begins 2.8 mm
-    # above the bed with nothing under it. Inverted, the flat face that is the
-    # top of the 1U lies on the bed and everything builds upward.
-    ("Top bars", [
-        ("top_bar_l", (90.0, 62.0), [("x", 180)], {}),
-        ("top_bar_r", (90.0, 118.0), [("x", 180)], {}),
-    ]),
+    # The bar is 220 mm long and only fits cornerwise. Upside down: the face
+    # that was the top of the 1U then lies flat on the bed, which is the whole
+    # of its underside, so it needs no support and no brim.
+    ("Top bar", [("top_bar", (90.0, 90.0), [("x", 180), ("z", 45)], NO_BRIM)]),
 ]
 
 
@@ -231,7 +228,7 @@ def build():
                                     % (name, GAP, oname, pindex))
             placed.append((name, x0, x1, y0, y1))
             report.append((pindex, name, size, (x0, x1), (y0, y1), len(T),
-                           bool(opts)))
+                           opts.get("enable_support") == "1"))
             oid += 1
 
         cfg_plates.append('  <plate>\n'

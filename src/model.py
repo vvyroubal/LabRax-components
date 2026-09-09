@@ -1,12 +1,12 @@
 """The bracket, built as PartDesign bodies from sketches.
 
-Six printed parts:
+Five printed parts:
 
     side_l, side_r      one piece each: front ear, side rail, rear ear, the
                         ledge the tray lands on, and the rear stop
     tray_l, tray_r      the floor the device stands on, lapped on the
                         centreline
-    top_bar_l, top_bar_r  the front panel's top bar, in halves
+    top_bar             the front panel's top bar, in one piece
 
 The bracket bolts to all four rack posts. Every rack screw is an M6 driven
 from outside the rack inwards into the hex nut the post already holds, so the
@@ -96,72 +96,48 @@ def side(doc, sx, name):
     return bd
 
 
-def top_bar(doc, sx, name):
-    """Half of the front panel's top bar.
+def top_bar(doc, name):
+    """The front panel's top bar, in one piece.
 
-    The two halves lap across the middle rather than meeting end to end: over
-    the centre the left half is the front web and the right half is the flange
-    behind it, and two M3 pull the two together. Left the way they were, each
-    half hung off the single M6 at its own end, which is a pivot -- the bar
-    would sag in the middle and the seam would open.
+    It spans the whole opening, so there is no joint in it to open up and no
+    half of it that can pivot on its own screw. Its two end blocks reach down
+    to BAR_END_Z0 and stand in the 8 mm between the rack face and the device:
+    they are what stops the gateway coming out of the front.
     """
     bd = sk.body(doc, name)
 
-    # The web, and the taller block at the outboard end that meets the ear.
-    # It runs past the centreline to +BAR_LAP whichever half this is, so on
-    # the left it is nearly the whole bar and on the right it is just the end.
+    # The web, with a taller block at each end where it meets an ear.
     s = sk.sketch(doc, bd, name + "_Sk_web",
                   sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
-    sk.polygon(s, [(P.BAR_LAP, P.BAR_Z0),
-                   (sx * P.BAR_END_X0, P.BAR_Z0),
-                   (sx * P.BAR_END_X0, P.BAR_END_Z0),
-                   (sx * P.BAR_X1, P.BAR_END_Z0),
-                   (sx * P.BAR_X1, P.RACK_U),
-                   (P.BAR_LAP, P.RACK_U)])
+    sk.polygon(s, [(-P.BAR_X1, P.BAR_END_Z0),
+                   (-P.BAR_END_X0, P.BAR_END_Z0),
+                   (-P.BAR_END_X0, P.BAR_Z0),
+                   (P.BAR_END_X0, P.BAR_Z0),
+                   (P.BAR_END_X0, P.BAR_END_Z0),
+                   (P.BAR_X1, P.BAR_END_Z0),
+                   (P.BAR_X1, P.RACK_U),
+                   (-P.BAR_X1, P.RACK_U)])
     sk.pad(doc, bd, s, P.BAR_T, reversed_=True)
 
     # The flange behind it, reaching back over the device so it cannot lift.
-    # It starts at -BAR_LAP, so across the middle it is the right half's.
     s = sk.sketch(doc, bd, name + "_Sk_flange",
                   sk.plane(Vector(0, P.BAR_T, 0), sk.X, sk.Z))
-    sk.rect(s, -P.BAR_LAP, P.BAR_FLANGE_Z0, sx * P.POCKET_HW, P.RACK_U)
+    sk.rect(s, -P.POCKET_HW, P.BAR_FLANGE_Z0, P.POCKET_HW, P.RACK_U)
     sk.pad(doc, bd, s, P.BAR_FLANGE_D, reversed_=True)
 
-    # The M6 into the rack ear: clearance from the front, then the nut, its
-    # pocket facing rear so it is dropped in before the bar is offered up.
-    s = sk.sketch(doc, bd, name + "_Sk_screw",
+    # An M6 at each end: clearance from the front, then the nut, its pocket
+    # facing rear so it goes in before the bar is offered up.
+    s = sk.sketch(doc, bd, name + "_Sk_screws",
                   sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
-    sk.circle(s, sx * P.BAR_SCREW_X, P.BAR_SCREW_Z, P.M6_CLEAR)
+    for sx in (-1, 1):
+        sk.circle(s, sx * P.BAR_SCREW_X, P.BAR_SCREW_Z, P.M6_CLEAR)
     sk.pocket(doc, bd, s, P.BAR_T - P.M6_HEX_D)
 
-    s = sk.sketch(doc, bd, name + "_Sk_nut",
+    s = sk.sketch(doc, bd, name + "_Sk_nuts",
                   sk.plane(Vector(0, P.BAR_T, 0), sk.X, sk.Z))
-    sk.hexagon(s, sx * P.BAR_SCREW_X, P.BAR_SCREW_Z, P.M6_HEX_AF)
+    for sx in (-1, 1):
+        sk.hexagon(s, sx * P.BAR_SCREW_X, P.BAR_SCREW_Z, P.M6_HEX_AF)
     sk.pocket(doc, bd, s, P.M6_HEX_D)
-
-    # The two M3 across the lap. They pass through the left half's web and
-    # pick up nuts dropped into slots in the right half's flange.
-    if sx < 0:
-        s = sk.sketch(doc, bd, name + "_Sk_lapbolts",
-                      sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
-        for bx in P.BAR_BOLT_X:
-            sk.circle(s, bx, P.BAR_BOLT_Z, P.M3_CLEAR)
-        sk.pocket(doc, bd, s, P.BAR_T)
-    else:
-        s = sk.sketch(doc, bd, name + "_Sk_lapholes",
-                      sk.plane(Vector(0, P.BAR_T, 0), sk.X, sk.Z))
-        for bx in P.BAR_BOLT_X:
-            sk.circle(s, bx, P.BAR_BOLT_Z, P.M3_CLEAR)
-        sk.pocket(doc, bd, s, P.BAR_NUT_Y - P.BAR_T + P.M3_NUT_D + 4.0)
-
-        s = sk.sketch(doc, bd, name + "_Sk_lapnuts",
-                      sk.plane(Vector(0, P.BAR_NUT_Y, 0), sk.X, sk.Z))
-        for bx in P.BAR_BOLT_X:
-            sk.rect(s, bx - P.M3_NUT_AF / 2, P.BAR_BOLT_Z - 3.3,
-                    bx + P.M3_NUT_AF / 2, P.RACK_U + 1.0)
-        # Explicit: there is flange both sides of this plane, so the automatic
-        # choice would be satisfied cutting the wrong side of the bolt.
-        sk.pocket(doc, bd, s, P.M3_NUT_D, reversed_=False)
     return bd
 
 
@@ -246,6 +222,5 @@ def build(doc):
         "side_r": side(doc, +1, "side_r"),
         "tray_l": tray(doc, -1, "tray_l"),
         "tray_r": tray(doc, +1, "tray_r"),
-        "top_bar_l": top_bar(doc, -1, "top_bar_l"),
-        "top_bar_r": top_bar(doc, +1, "top_bar_r"),
+        "top_bar": top_bar(doc, "top_bar"),
     }

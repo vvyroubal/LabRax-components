@@ -167,64 +167,44 @@ def main():
               "M6 head bears on the front ear at x=%+8.3f" % (sx * P.SCREW_X),
               "%.1f mm3" % vol(asm.common(head)))
 
-    print("\n[top bar -- M6 through the ear into a nut facing rear]")
+    print("\n[top bar -- one piece, no joint to open]")
+    bar = parts["top_bar"]
+    check(len(bar.Solids) == 1 and bar.BoundBox.XLength > 2 * P.POCKET_HW,
+          "the bar spans the whole opening in one piece",
+          "%.1f mm wide" % bar.BoundBox.XLength)
     for sx in (-1, 1):
         x = sx * P.BAR_SCREW_X
-        z = P.BAR_SCREW_Z
-        side = parts["side_l" if sx < 0 else "side_r"]
-        bar = parts["top_bar_l" if sx < 0 else "top_bar_r"]
-        shank = Part.makeCylinder(3.0, P.EAR_T + P.BAR_T - P.M6_HEX_D + 0.1,
-                                  Vector(x, -P.EAR_T - 0.05, z), Vector(0, 1, 0))
-        check(vol(asm.common(shank)) < VOID,
-              "M6 passes the ear and the bar at x=%+7.2f" % x,
-              "%.3f mm3" % vol(asm.common(shank)))
-        n = hexnut(x, z, 10.0, P.BAR_T - P.M6_HEX_D + 0.05, P.BAR_T - 0.05)
-        check(vol(asm.common(n)) < VOID, "M6 nut seats in the bar at x=%+7.2f" % x,
-              "%.3f mm3" % vol(asm.common(n)))
-        # The nut goes in before the bar is offered up, so only the bar has
-        # to be out of the way.
-        feed = hexnut(x, z, 10.0, P.BAR_T - P.M6_HEX_D + 0.05, P.BAR_T + 20.0)
-        check(vol(bar.common(feed)) < VOID,
-              "the nut can be fed in from the rear at x=%+7.2f" % x,
-              "%.3f mm3" % vol(bar.common(feed)))
-        # The bar must sit in the side's notch, not clash with it.
-        check(vol(side.common(bar)) < VOID, "bar clears the side at x=%+7.2f" % x,
-              "%.3f mm3" % vol(side.common(bar)))
-
-    print("\n[top bar -- the two halves have to be one beam]")
-    bl, br = parts["top_bar_l"], parts["top_bar_r"]
-    lap = box(-P.BAR_LAP, P.BAR_LAP, 0.0, P.BAR_T + P.BAR_FLANGE_D,
-              P.BAR_Z0, P.RACK_U)
-    vl, vr = vol(bl.common(lap)), vol(br.common(lap))
-    check(vl > 2000.0 and vr > 2000.0, "the halves lap across the middle",
-          "%.0f / %.0f mm3 in the lap" % (vl, vr))
-    # They must meet over a real face, not a line: the web's back and the
-    # flange's front, right across the lap.
-    face = box(-P.BAR_LAP, P.BAR_LAP, P.BAR_T - 0.6, P.BAR_T + 0.6,
-               P.BAR_Z0, P.RACK_U)
-    check(vol(bl.common(face)) > 100.0 and vol(br.common(face)) > 100.0,
-          "and they bear on each other across it",
-          "%.0f / %.0f mm3" % (vol(bl.common(face)), vol(br.common(face))))
-    for bx in P.BAR_BOLT_X:
-        shank = Part.makeCylinder(1.7, P.BAR_NUT_Y + P.M3_NUT_D + 2.0,
-                                  Vector(bx, -0.05, P.BAR_BOLT_Z),
+        shank = Part.makeCylinder(3.0, P.BAR_T - P.M6_HEX_D + 0.1,
+                                  Vector(x, -0.05, P.BAR_SCREW_Z),
                                   Vector(0, 1, 0))
-        v = vol(bl.common(shank)) + vol(br.common(shank))
-        check(v < VOID, "M3 crosses the lap at x=%+6.1f" % bx, "%.3f mm3" % v)
-        n = hexnut3(bx, P.BAR_BOLT_Z, 5.5,
-                    P.BAR_NUT_Y + 0.05, P.BAR_NUT_Y + P.M3_NUT_D - 0.05)
-        check(vol(br.common(n)) < VOID, "its nut seats at x=%+6.1f" % bx,
-              "%.3f mm3" % vol(br.common(n)))
-        feed = box(bx - 2.75, bx + 2.75, P.BAR_NUT_Y + 0.05,
-                   P.BAR_NUT_Y + P.M3_NUT_D - 0.05, P.BAR_BOLT_Z, P.RACK_U + 5)
-        check(vol(br.common(feed)) < VOID,
-              "and drops in from the top of the bar at x=%+6.1f" % bx,
-              "%.3f mm3" % vol(br.common(feed)))
-    # Neither half may be a pivot: two fixings, far apart, on one beam.
-    check(len(P.BAR_BOLT_X) >= 2 and 2 * P.BAR_SCREW_X > 150.0,
-          "the bar is held at two widely spaced points",
-          "M6 at x=+/-%.0f, M3 at x=%s"
-          % (P.BAR_SCREW_X, ", ".join("%+.0f" % b for b in P.BAR_BOLT_X)))
+        check(vol(bar.common(shank)) < VOID,
+              "M6 passes the bar at x=%+7.2f" % x,
+              "%.3f mm3" % vol(bar.common(shank)))
+        n = hexnut3(x, P.BAR_SCREW_Z, 10.0,
+                    P.BAR_T + 0.05, P.BAR_T + P.M6_HEX_D - 0.05)
+        check(vol(bar.common(n)) < VOID,
+              "and its nut seats facing rear at x=%+7.2f" % x,
+              "%.3f mm3" % vol(bar.common(n)))
+        feed = hexnut3(x, P.BAR_SCREW_Z, 10.0,
+                       P.BAR_T + P.M6_HEX_D - 0.05, P.BAR_T + 25.0)
+        check(vol(bar.common(feed)) < VOID,
+              "and can be put in from behind at x=%+7.2f" % x,
+              "%.3f mm3" % vol(bar.common(feed)))
+        # The whole screw, from outside the rack through the ear into the nut.
+        through = Part.makeCylinder(3.0, P.EAR_T + P.BAR_T - P.M6_HEX_D + 0.1,
+                                    Vector(x, -P.EAR_T - 0.05, P.BAR_SCREW_Z),
+                                    Vector(0, 1, 0))
+        check(vol(asm.common(through)) < VOID,
+              "the screw reaches it through the ear at x=%+7.2f" % x,
+              "%.3f mm3" % vol(asm.common(through)))
+        side = parts["side_l" if sx < 0 else "side_r"]
+        check(vol(side.common(bar)) < VOID,
+              "the bar nests in the side's notch at x=%+7.2f" % x,
+              "%.3f mm3" % vol(side.common(bar)))
+    # Held at both ends of one beam, so no part of it can pivot.
+    check(2 * P.BAR_SCREW_X > 150.0, "it is held at two widely spaced points",
+          "M6 at x = +/-%.0f, %.0f mm apart" % (P.BAR_SCREW_X,
+                                                2 * P.BAR_SCREW_X))
 
     print("\n[device]")
     dev = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0, P.DEV_Y0 + P.DEV_D,
@@ -258,19 +238,19 @@ def main():
         v = vol(asm.common(moved))
         check(v > 50.0, "cannot be pushed %.1f mm out of the front" % push,
               "%.0f mm3 of interference" % v)
-    bars = parts["top_bar_l"].fuse(parts["top_bar_r"])
     face = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0 - P.BAR_T, P.DEV_Y0,
                P.DEV_Z0, P.DEV_Z1)
-    per = vol(parts["top_bar_l"].common(face))
+    half = box(-P.DEV_W / 2, 0.0, P.DEV_Y0 - P.BAR_T, P.DEV_Y0,
+               P.DEV_Z0, P.DEV_Z1)
+    per = vol(bar.common(face.common(half)))
     check(per > 300.0, "the bar's end blocks stand in front of the device",
           "%.0f mm3 each end, over Z %.1f..%.1f"
           % (per, P.BAR_END_Z0, P.DEV_Z1))
 
     over = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0, P.DEV_Y0 + P.DEV_D,
                P.DEV_Z1, P.RACK_U)
-    bars = parts["top_bar_l"].fuse(parts["top_bar_r"])
-    check(vol(bars.common(over)) > 100.0, "top bar caps it once fitted",
-          "%.0f mm3 over it" % vol(bars.common(over)))
+    check(vol(bar.common(over)) > 100.0, "top bar caps it once fitted",
+          "%.0f mm3 over it" % vol(bar.common(over)))
 
     print("\n[the tray]")
     trays = parts["tray_l"].fuse(parts["tray_r"]).removeSplitter()
