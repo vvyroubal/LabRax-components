@@ -30,7 +30,7 @@ src/
   model.py        the six bodies
 build.py          writes cad/, export/stl/, export/step/
 tools/
-  verify.py       91 checks against the rack, the device and the printer
+  verify.py       100 checks against the rack, the device and the printer
   measure_rack.py re-derives the [rack] numbers from the Lab Rax mesh files
   preview.py      renders images/ (FreeCAD is headless here)
   plate.py        arranges the STLs onto A1 mini plates as a Bambu 3MF
@@ -91,6 +91,12 @@ The **top bar** closes the front over the device, in halves for the same
 reason. Each end nests into a notch in the side, so the ear and the rail still
 meet underneath it.
 
+The halves **lap across the middle** rather than meeting end to end: over the
+centre 50 mm the left half is the front web and the right half is the flange
+behind it, and two M3 pull them together. Butted, each half would hang off the
+single M6 at its own end — a pivot — and the bar would sag with the seam
+opening in the middle.
+
 ![iso](images/assembly-iso.png)
 
 ## Fasteners
@@ -99,9 +105,12 @@ meet underneath it.
 |---|---|
 | 12 × M6 × 12 button head | bracket to rack: 3 per ear, 4 ears |
 | 2 × M6 × 20 + 2 × M6 nuts | top bar halves, through the front ears |
+| 2 × M3 × 16 + 2 × M3 nuts | top bar halves to each other, across the lap |
 | 2 × M6 × 20 + 2 × M6 nuts | tray halves to each other |
 
-**M6 throughout — one driver, one box of hardware.**
+M6 everywhere it fits. The one exception is the pair across the top bar's own
+lap: the bar is 7.65 mm tall between the device and the top of the U, and an
+M6 nut is 11.55 mm across the corners. An M3 is 6.35 and goes in.
 
 The rack screws need no nuts — the posts have them. The top-bar screw goes in
 from the front, through the ear, and into a nut trapped in the bar with its
@@ -130,8 +139,10 @@ front. Depth was never the problem — there are 16 mm there; height is.
    sockets. A nib in front and the rear stop behind hold them fore and aft, so
    they need no fixing to the sides. Run the two M6 in from the left.
 3. **Lower the gateway in from above** onto the tray.
-4. Fit the nuts in the top bars, offer each half up into its notch, and run an
-   M6 in from the front through the ear. Nip up the rack screws.
+4. Fit the M6 nuts in the top bars and the two M3 nuts in the right half's
+   lap slots, dropping them in from the top of the bar. Offer each half up
+   into its notch, run an M6 in from the front through each ear, then the two
+   M3 through the centre lap. Nip up the rack screws.
 
 The gateway is held by the tray below, the side rails either side, the top bar
 in front, the rear stops behind, and the top bar's flange above.
@@ -156,7 +167,7 @@ choice around it.
 ## What is checked
 
 `make verify` measures the built solids, not the parameters, so a feature that
-silently does nothing is caught rather than assumed away. 91 checks: that each
+silently does nothing is caught rather than assumed away. 100 checks: that each
 body is one valid solid built from sketches driving pads and pockets; that it
 fits the bed, turning a long part on the diagonal if it has to; that no two
 parts foul each other; that an M6 passes all twelve rack slots; that the
@@ -165,7 +176,9 @@ from the rear; that the tray is solid under the device all the way across,
 that both halves lap rather than butt, that each is carried by its side's
 ledge, that a real M6 nut solid seats in each slot and can be dropped in from
 above, and that nothing rises above the tray in front of the device's face;
-and that the device drops in and is stopped front, rear and above.
+that the top bar's halves lap and bear on each other rather than butting, and
+are held at two widely spaced points so neither can pivot; and that the device
+drops in and is stopped front, rear and above.
 
 It has earned its keep. Building this version it caught the top bar
 overrunning the 222.25 mm post opening, a notch cutting the wrong side of its
@@ -184,9 +197,9 @@ dimension.
   side panel rather than measured on an assembled rack — the 3MF is a print
   plate, not an assembly. The rear ears land on it. If your rack differs, it
   is the one number to change.
-- **0.925 mm per side between the side rails and the posts is the tightest
-  dimension.** Print one side first and offer it up before committing to the
-  rest.
+- **0.925 mm per side between the rails and the posts is the tightest
+  dimension**, and the top bar now takes the same. Print one side first and
+  offer it up before committing to the rest.
 - Device dimensions are Ubiquiti's published figures, not calliper
   measurements. `CLR_W` is 1.2 mm; widen it if yours is tight.
 - No fillets. The geometry is kept to sketched prisms so the script stays

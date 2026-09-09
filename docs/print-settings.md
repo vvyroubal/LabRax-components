@@ -44,7 +44,7 @@ Measured:
 | `side_r` | 12.20 – 167.80 | 10.38 – 167.80 | 44.40 | 10.4 mm |
 | `tray_l` | 19.01 – 158.29 | 9.21 – 175.79 | 16.00 | 4.2 mm |
 | `tray_r` | 19.01 – 160.99 | 4.25 – 175.79 | 16.00 | 4.2 mm |
-| `top_bar_l/r` | 34.71 – 145.29 | 49.71 – 130.29 | 20.80 | 34.7 mm |
+| `top_bar_l/r` | 22.61 – 157.39 | 49.71 – 130.29 | 20.80 | 22.6 mm |
 
 Everything is inside 180 × 180 × 180. The trays are the tight ones — 167 mm
 deep on a 180 mm bed, with support spreading past the front edge — which is
