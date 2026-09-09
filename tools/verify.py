@@ -68,6 +68,20 @@ def hexnut(cx, cz, af, y0, y1):
         Vector(0, y1 - y0, 0))
 
 
+def hexnut2(cy, cz, af, x0, x1):
+    """A hex nut lying with its axis along X, flats facing the slot walls.
+
+    That is how a nut dropped into a slot sits: `af` across in Y, and the
+    corners -- af * 2 / sqrt(3) -- standing up in Z.
+    """
+    r = af / math.sqrt(3.0)
+    pts = [Vector(x0, cy + r * math.cos(math.radians(a)),
+                  cz + r * math.sin(math.radians(a)))
+           for a in (30, 90, 150, 210, 270, 330)]
+    return Part.Face(Part.makePolygon(pts + [pts[0]])).extrude(
+        Vector(x1 - x0, 0, 0))
+
+
 def fits_bed(b):
     """A long thin part can go on the bed diagonally."""
     w, d = b.XLength, b.YLength
@@ -219,18 +233,34 @@ def main():
           "the halves lap on the centreline",
           "%.0f / %.0f mm3" % (vol(parts["tray_l"].common(lap)),
                                vol(parts["tray_r"].common(lap))))
-    # Bolted across that lap, with a nut that can be dropped in from above.
+    # Bolted across that lap with M6, behind the device where a nut fits.
     for y in P.TRAY_BOLT_Y:
-        shank = Part.makeCylinder(1.6, 2 * P.TAB_HX,
+        check(y > P.DEV_Y1, "tray bolt at y=%5.1f is clear of the device" % y,
+              "device ends at %.1f" % P.DEV_Y1)
+        shank = Part.makeCylinder(3.0, 2 * P.TAB_HX,
                                   Vector(-P.TAB_HX - 0.05, y, P.TRAY_BOLT_Z),
                                   Vector(1, 0, 0))
         check(vol(trays.common(shank)) < VOID,
-              "tray bolt passes both halves at y=%5.1f" % y,
+              "M6 passes both halves at y=%5.1f" % y,
               "%.3f mm3" % vol(trays.common(shank)))
-        nut = box(2.05, 2.0 + P.M3_NUT_D - 0.05, y - 2.75, y + 2.75,
-                  P.TRAY_BOLT_Z - 3.18, P.TRAY_BOLT_Z + 3.18)
-        check(vol(trays.common(nut)) < VOID, "its nut seats at y=%5.1f" % y,
+        # A real M6 nut: 10.0 across the flats, 11.55 across the corners.
+        nut = hexnut2(y, P.TRAY_BOLT_Z, 10.0, 2.05, 2.0 + P.M6_NUT_D - 0.05)
+        check(vol(trays.common(nut)) < VOID, "its M6 nut seats at y=%5.1f" % y,
               "%.3f mm3" % vol(trays.common(nut)))
+        feed = box(2.05, 2.0 + P.M6_NUT_D - 0.05, y - 5.0, y + 5.0,
+                   P.TRAY_BOLT_Z, P.TAB_Z1 + 5.0)
+        check(vol(trays.common(feed)) < VOID,
+              "it can be dropped in from above at y=%5.1f" % y,
+              "%.3f mm3" % vol(trays.common(feed)))
+    # The peg that keys the front of the joint.
+    peg = Part.makeCylinder(P.KEY_D / 2, P.LAP_T,
+                            Vector(0, P.KEY_Y, 0.6), Vector(0, 0, 1))
+    check(vol(parts["tray_r"].common(peg)) > 20.0
+          and vol(parts["tray_l"].common(peg)) < VOID,
+          "a peg keys the front of the joint",
+          "%.0f mm3 of peg, %.3f in the socket"
+          % (vol(parts["tray_r"].common(peg)),
+             vol(parts["tray_l"].common(peg))))
     # Held fore and aft by the nib and the rear stop, so it cannot walk.
     ahead = box(-P.TRAY_X1, P.TRAY_X1, P.DEV_Y0 - 1.0, P.DEV_Y0,
                 P.LAP_T, P.TRAY_T)

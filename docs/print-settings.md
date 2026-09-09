@@ -15,10 +15,10 @@ the bed edge.
 |---|---|---|
 | 1 | `side_l` | 36.7 g |
 | 2 | `side_r` | 36.7 g |
-| 3 | `tray_l`, `top_bar_l` | 57.5 g |
-| 4 | `tray_r`, `top_bar_r` | 61.3 g |
+| 3 | `tray_l`, `top_bar_l` | 59.4 g |
+| 4 | `tray_r`, `top_bar_r` | 63.9 g |
 
-About 192 g and eight or nine hours all told. Figures are from slicing with
+About 197 g and eight or nine hours all told. Figures are from slicing with
 Bambu Studio 2.8.2.61 at its stock `0.20mm Standard @BBL A1M`; every plate
 returns `Success` with no warnings.
 

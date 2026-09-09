@@ -95,19 +95,27 @@ RAIL_VENTS_Y = ((24.0, 52.0), (60.0, 88.0), (96.0, 124.0))  # [design]
 TRAY_X1 = POCKET_HW   # 107, out to the inner face of the side rail
 CENTRE_LAP = 15.0     # [design] half-width of the centre lap
 
-# The halves bolt to each other through tabs that reach forward and back out
-# of the device's footprint, where there is room to work and to drop a nut in.
-TAB_HX = 10.0         # [design] half-width of a tab
-TAB_D = 8.0           # [design] tab depth
-# An M3 nut is 6.35 across the corners and the tray is 6 thick, so the tabs
-# stand proud of it. They can: there is nothing above them at either end.
-TAB_Z1 = 10.0         # [design]
-TRAY_BOLT_Z = 5.0     # [design] 1.8 mm of tab under the nut
-TRAY_BOLT_Y = (TAB_D / 2, DEV_Y1 + TAB_D / 2)
+# The halves bolt to each other behind the device, where there is room for an
+# M6 nut. In front there is only the 8 mm between the rack face and the
+# device, which is not enough in any direction -- an M6 nut wants 10.2 mm of
+# slot and 15.5 mm of height -- so the front of the joint is a dovetail key
+# instead, cut into the lap and pulled tight by the bolts behind it.
+TAB_HX = 10.0         # [design] half-width of the rear tab
+TAB_D = 30.0          # [design] its depth. Two M6 nuts lie along it, and a
+                      # nut slot is 10.2 wide, so this is what they need.
+TAB_Z1 = 16.0         # [design] and its height, 11.55 across corners + walls
+TRAY_BOLT_Z = 8.0     # [design] 2.2 mm of tab under the nut's corner
+TRAY_BOLT_Y = (DEV_Y1 + 8.0, DEV_Y1 + 22.0)  # [design] both behind the device
 
-M3_CLEAR = 3.4        # [design]
-M3_NUT_AF = 5.6       # [design] an M3 nut is 5.5 across the flats
-M3_NUT_D = 2.6        # [design] ... and 2.4 thick
+M6_NUT_AF = 10.2      # [design] an M6 nut is 10.0 across the flats
+M6_NUT_D = 5.2        # [design] ... and 5.0 thick
+
+# The key at the front: a peg on the upper half dropping into a socket in the
+# lower one. It stops the halves hinging apart in plan; the device above and
+# the lap itself are what stop them separating vertically.
+KEY_D = 5.0           # [design] peg diameter
+KEY_FIT = 0.3         # [design] clearance in the socket
+KEY_Y = 4.0           # [design] in the lap, ahead of the device
 
 # ---------------------------------------------------------- the top bar ----
 # Bolted on last, from the front, through the ear and into a hex nut trapped

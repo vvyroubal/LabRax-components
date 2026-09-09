@@ -29,7 +29,7 @@ src/
   model.py        the six bodies
 build.py          writes cad/, export/stl/, export/step/
 tools/
-  verify.py       83 checks against the rack, the device and the printer
+  verify.py       88 checks against the rack, the device and the printer
   measure_rack.py re-derives the [rack] numbers from the Lab Rax mesh files
   preview.py      renders images/ (FreeCAD is headless here)
   plate.py        arranges the STLs onto A1 mini plates as a Bambu 3MF
@@ -72,7 +72,7 @@ Six prints, all distinct, none over a 180 mm bed.
 | part | size (mm) | qty |
 |---|---|---|
 | `side_l` / `side_r` | 29 × 192 × 44.5 | 1 each |
-| `tray_l` / `tray_r` | 122 × 145 × 10 | 1 each |
+| `tray_l` / `tray_r` | 122 × 167 × 16 | 1 each |
 | `top_bar_l` / `top_bar_r` | 111 × 25 × 21 | 1 each |
 
 A **side** is one piece: front ear, side rail, rear ear, the ledge the tray
@@ -97,22 +97,31 @@ meet underneath it.
 |---|---|
 | 12 × M6 × 12 button head | bracket to rack: 3 per ear, 4 ears |
 | 2 × M6 × 20 + 2 × M6 nuts | top bar halves, through the front ears |
-| 2 × M3 × 16 + 2 × M3 nuts | tray halves to each other |
+| 2 × M6 × 20 + 2 × M6 nuts | tray halves to each other |
+
+**M6 throughout — one driver, one box of hardware.**
 
 The rack screws need no nuts — the posts have them. The top-bar screw goes in
 from the front, through the ear, and into a nut trapped in the bar with its
-**pocket facing rear**; drop the nut in before offering the bar up. The tray
-bolts run across the centre joint through tabs that reach forward and back out
-of the device's footprint, where there is room to work and to drop a nut in.
+**pocket facing rear**; drop the nut in before offering the bar up.
+
+The tray bolts run across the centre joint, both of them **behind the device**,
+where a tab 30 mm deep and 16 mm tall has room for an M6 nut dropped in from
+above. They cannot go at the front: there is only the 8 mm between the rack
+face and the device's front there, and an M6 nut wants 10.2 mm of slot and
+15.5 mm of height. The front of the joint gets a ⌀5 peg into a socket instead,
+which stops the halves hinging in plan; the device above and the lap itself
+stop them separating vertically.
 
 ## Assembly
 
 1. Bolt the two sides to the rack — 3 × M6 into each of the four posts, driven
    from outside. Leave them finger-tight until step 4.
-2. Lay the two tray halves in. Each drops onto its side's ledge and laps the
-   other on the centreline; a nib in front and the rear stop behind hold them
-   fore and aft, so they need no fixing to the sides. Bolt the halves to each
-   other, one M3 at the front tab and one at the rear.
+2. Drop two M6 nuts into the slots in the right tray half's rear tab. Lay both
+   halves in — each lands on its side's ledge and laps the other on the
+   centreline, and the peg at the front drops into its socket. A nib in front
+   and the rear stop behind hold them fore and aft, so they need no fixing to
+   the sides. Run the two M6 in from the left.
 3. **Lower the gateway in from above** onto the tray.
 4. Fit the nuts in the top bars, offer each half up into its notch, and run an
    M6 in from the front through the ear. Nip up the rack screws.
@@ -140,20 +149,26 @@ choice around it.
 ## What is checked
 
 `make verify` measures the built solids, not the parameters, so a feature that
-silently does nothing is caught rather than assumed away. 83 checks: that each
+silently does nothing is caught rather than assumed away. 88 checks: that each
 body is one valid solid built from sketches driving pads and pockets; that it
 fits the bed, turning a long part on the diagonal if it has to; that no two
 parts foul each other; that an M6 passes all twelve rack slots; that the
 top-bar screw runs through the ear and its nut both seats and can be fed in
 from the rear; that the tray is solid under the device all the way across,
-that both halves lap rather than butt, and that each is carried by its side's
-ledge; and that the device drops in and is stopped front, rear and above.
+that both halves lap rather than butt, that each is carried by its side's
+ledge, and that a real M6 nut solid seats in each slot and can be dropped in
+from above; and that the device drops in and is stopped front, rear and above.
 
 It has earned its keep. Building this version it caught the top bar
 overrunning the 222.25 mm post opening, a notch cutting the wrong side of its
 sketch plane, a nut slot cut on the wrong side of its bolt, and a malformed
 slot wire whose mismatched endpoints made the sketch solver distort the two
 sides differently.
+
+It does not catch everything. That the tray joint was too small for the M6 it
+was supposed to take was spotted by eye, in the FreeCAD window, not by the
+checks — which is why they now seat a real nut solid rather than trusting a
+dimension.
 
 ## Caveats
 
