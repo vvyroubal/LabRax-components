@@ -177,11 +177,13 @@ def tray(doc, sx, name):
         sk.circle(s, y, P.TRAY_BOLT_Z, P.M6_CLEAR)
     sk.pocket(doc, bd, s, P.TAB_HX)
 
-    # The peg, and the socket it drops into.
+    # Two pegs and the sockets they drop into. Near the edges of the lap, so
+    # they hold the halves square to each other as well as together.
     s = sk.sketch(doc, bd, name + "_Sk_key",
                   sk.plane(Vector(0, 0, P.LAP_T), sk.X, sk.Y))
-    sk.circle(s, 0.0, P.KEY_Y,
-              P.KEY_D if sx > 0 else P.KEY_D + P.KEY_FIT)
+    for kx in (-P.KEY_X, P.KEY_X):
+        sk.circle(s, kx, P.KEY_Y,
+                  P.KEY_D if sx > 0 else P.KEY_D + P.KEY_FIT)
     if sx > 0:
         sk.pad(doc, bd, s, P.LAP_T - 0.6, reversed_=True)
     else:

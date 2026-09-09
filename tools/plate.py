@@ -58,17 +58,16 @@ PLATES = [
     # A side is 192 mm long, so it only goes on the bed turned 45 degrees.
     ("Left side", [("side_l", (90.0, 90.0), [("z", 45)], SUPPORT)]),
     ("Right side", [("side_r", (90.0, 90.0), [("z", 45)], SUPPORT)]),
-    # A tray half leaves a strip down one side, which is where its top bar
-    # goes, stood on end.
-    ("Left tray and top bar", [
-        # The lap strip along each edge stands 3 mm off the bed, so the tray
-        # wants support under its rim. It comes away from the underside.
-        ("tray_l", (66.0, 90.0), [], SUPPORT),
-        ("top_bar_l", (153.0, 90.0), [("x", 180), ("z", 90)], {}),
-    ]),
-    ("Right tray and top bar", [
-        ("tray_r", (66.0, 90.0), [], SUPPORT),
-        ("top_bar_r", (153.0, 90.0), [("x", 180), ("z", 90)], {}),
+    # The lap strip along each tray edge stands 3 mm off the bed, so the tray
+    # wants support under its rim. It comes away from the underside.
+    ("Left tray", [("tray_l", (90.0, 90.0), [], SUPPORT)]),
+    ("Right tray", [("tray_r", (90.0, 90.0), [], SUPPORT)]),
+    # Both bars upside down: the right way up, the rear flange begins 2.8 mm
+    # above the bed with nothing under it. Inverted, the flat face that is the
+    # top of the 1U lies on the bed and everything builds upward.
+    ("Top bars", [
+        ("top_bar_l", (90.0, 62.0), [("x", 180)], {}),
+        ("top_bar_r", (90.0, 118.0), [("x", 180)], {}),
     ]),
 ]
 

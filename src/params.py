@@ -93,7 +93,13 @@ RAIL_VENTS_Y = ((24.0, 52.0), (60.0, 88.0), (96.0, 124.0))  # [design]
 # out around 0.2 mm of deflection -- so the tray does not need stiffening; it
 # needs to be held together and located, which is what the joints below do.
 TRAY_X1 = POCKET_HW   # 107, out to the inner face of the side rail
-CENTRE_LAP = 15.0     # [design] half-width of the centre lap
+# 60 mm of overlap. There is no fastener at the front of this joint and there
+# cannot be: an M6 nut needs 15.5 mm of height once its corners and a wall are
+# counted, the tray is 6 mm thick, and everything above that stands in front
+# of the device's face. So the lap itself does the work -- it is wide, it runs
+# the full depth, the device's weight closes it, and the two M6 behind the
+# device clamp it. The front is located by pegs, not bolted.
+CENTRE_LAP = 30.0     # [design] half-width of the centre lap
 
 # The halves bolt to each other behind the device, where there is room for an
 # M6 nut. In front there is only the 8 mm between the rack face and the
@@ -116,6 +122,8 @@ M6_NUT_D = 5.2        # [design] ... and 5.0 thick
 KEY_D = 5.0           # [design] peg diameter
 KEY_FIT = 0.3         # [design] clearance in the socket
 KEY_Y = 4.0           # [design] in the lap, ahead of the device
+KEY_X = 22.0          # [design] two of them, near the edges of the lap, so
+                      # they locate the halves in rotation as well as position
 
 # ---------------------------------------------------------- the top bar ----
 # Bolted on last, from the front, through the ear and into a hex nut trapped

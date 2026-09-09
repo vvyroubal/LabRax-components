@@ -6,7 +6,7 @@ Sliced for a **Bambu Lab A1 mini** (180 × 180 × 180).
 make plate      # export/3mf/UCG_Fiber_LabRax-A1mini.3mf
 ```
 
-That file is a full Bambu Studio project: four plates, parts rotated into the
+That file is a full Bambu Studio project: five plates, parts rotated into the
 orientation they print in, supports already switched on where they are needed,
 and the A1 mini presets carried with it. Everything sits at least 4 mm from
 the bed edge.
@@ -15,10 +15,11 @@ the bed edge.
 |---|---|---|
 | 1 | `side_l` | 36.7 g |
 | 2 | `side_r` | 36.7 g |
-| 3 | `tray_l`, `top_bar_l` | 59.4 g |
-| 4 | `tray_r`, `top_bar_r` | 63.9 g |
+| 3 | `tray_l` | 52.5 g |
+| 4 | `tray_r` | 60.6 g |
+| 5 | `top_bar_l`, `top_bar_r` | 21.4 g |
 
-About 197 g and eight or nine hours all told. Figures are from slicing with
+About 208 g all told. Figures are from slicing with
 Bambu Studio 2.8.2.61 at its stock `0.20mm Standard @BBL A1M`; every plate
 returns `Success` with no warnings.
 
@@ -49,8 +50,8 @@ the STLs yourself.
 - `tray_l` / `tray_r` — flat, as exported. **Needs support**: the lap strip
   along each edge stands 3 mm off the bed so it can land on the side's ledge.
   The support is a thin rim on the underside and comes away cleanly.
-- `top_bar_l` / `top_bar_r` — **upside down**, and turned 90° in plan to fit
-  beside the tray. The right way up, the bar's rear flange starts 2.8 mm above
+- `top_bar_l` / `top_bar_r` — **upside down**. The right way up, the bar's
+  rear flange starts 2.8 mm above
   the bed with nothing beneath it; inverted, the flat face that is the top of
   the 1U lies on the bed and everything builds upward.
 

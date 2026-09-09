@@ -29,7 +29,7 @@ src/
   model.py        the six bodies
 build.py          writes cad/, export/stl/, export/step/
 tools/
-  verify.py       88 checks against the rack, the device and the printer
+  verify.py       91 checks against the rack, the device and the printer
   measure_rack.py re-derives the [rack] numbers from the Lab Rax mesh files
   preview.py      renders images/ (FreeCAD is headless here)
   plate.py        arranges the STLs onto A1 mini plates as a Bambu 3MF
@@ -72,7 +72,7 @@ Six prints, all distinct, none over a 180 mm bed.
 | part | size (mm) | qty |
 |---|---|---|
 | `side_l` / `side_r` | 29 × 192 × 44.5 | 1 each |
-| `tray_l` / `tray_r` | 122 × 167 × 16 | 1 each |
+| `tray_l` / `tray_r` | 137 × 167 × 16 | 1 each |
 | `top_bar_l` / `top_bar_r` | 111 × 25 × 21 | 1 each |
 
 A **side** is one piece: front ear, side rail, rear ear, the ledge the tray
@@ -107,11 +107,16 @@ from the front, through the ear, and into a nut trapped in the bar with its
 
 The tray bolts run across the centre joint, both of them **behind the device**,
 where a tab 30 mm deep and 16 mm tall has room for an M6 nut dropped in from
-above. They cannot go at the front: there is only the 8 mm between the rack
-face and the device's front there, and an M6 nut wants 10.2 mm of slot and
-15.5 mm of height. The front of the joint gets a ⌀5 peg into a socket instead,
-which stops the halves hinging in plan; the device above and the lap itself
-stop them separating vertically.
+above.
+
+**There is no bolt at the front of that joint, and there cannot be.** An M6
+nut needs 15.5 mm of height once its corners and a wall are counted. The tray
+is 6 mm thick, and anything standing above it there is standing in front of
+the device's face — over the display, or over whichever ports sit low and
+central. So the joint is made to carry the front instead: the lap is **60 mm
+wide** and runs the full depth, the device's own weight closes it, the two M6
+behind the device clamp it, and two ⌀5 pegs hold the halves square at the
+front. Depth was never the problem — there are 16 mm there; height is.
 
 ## Assembly
 
@@ -119,9 +124,9 @@ stop them separating vertically.
    from outside. Leave them finger-tight until step 4.
 2. Drop two M6 nuts into the slots in the right tray half's rear tab. Lay both
    halves in — each lands on its side's ledge and laps the other on the
-   centreline, and the peg at the front drops into its socket. A nib in front
-   and the rear stop behind hold them fore and aft, so they need no fixing to
-   the sides. Run the two M6 in from the left.
+   centreline over 60 mm, and the two pegs at the front drop into their
+   sockets. A nib in front and the rear stop behind hold them fore and aft, so
+   they need no fixing to the sides. Run the two M6 in from the left.
 3. **Lower the gateway in from above** onto the tray.
 4. Fit the nuts in the top bars, offer each half up into its notch, and run an
    M6 in from the front through the ear. Nip up the rack screws.
@@ -149,15 +154,16 @@ choice around it.
 ## What is checked
 
 `make verify` measures the built solids, not the parameters, so a feature that
-silently does nothing is caught rather than assumed away. 88 checks: that each
+silently does nothing is caught rather than assumed away. 91 checks: that each
 body is one valid solid built from sketches driving pads and pockets; that it
 fits the bed, turning a long part on the diagonal if it has to; that no two
 parts foul each other; that an M6 passes all twelve rack slots; that the
 top-bar screw runs through the ear and its nut both seats and can be fed in
 from the rear; that the tray is solid under the device all the way across,
 that both halves lap rather than butt, that each is carried by its side's
-ledge, and that a real M6 nut solid seats in each slot and can be dropped in
-from above; and that the device drops in and is stopped front, rear and above.
+ledge, that a real M6 nut solid seats in each slot and can be dropped in from
+above, and that nothing rises above the tray in front of the device's face;
+and that the device drops in and is stopped front, rear and above.
 
 It has earned its keep. Building this version it caught the top bar
 overrunning the 222.25 mm post opening, a notch cutting the wrong side of its

@@ -252,15 +252,25 @@ def main():
         check(vol(trays.common(feed)) < VOID,
               "it can be dropped in from above at y=%5.1f" % y,
               "%.3f mm3" % vol(trays.common(feed)))
-    # The peg that keys the front of the joint.
-    peg = Part.makeCylinder(P.KEY_D / 2, P.LAP_T,
-                            Vector(0, P.KEY_Y, 0.6), Vector(0, 0, 1))
-    check(vol(parts["tray_r"].common(peg)) > 20.0
-          and vol(parts["tray_l"].common(peg)) < VOID,
-          "a peg keys the front of the joint",
-          "%.0f mm3 of peg, %.3f in the socket"
-          % (vol(parts["tray_r"].common(peg)),
-             vol(parts["tray_l"].common(peg))))
+    # The pegs that key the front of the joint, where no bolt will fit.
+    for kx in (-P.KEY_X, P.KEY_X):
+        peg = Part.makeCylinder(P.KEY_D / 2, P.LAP_T,
+                                Vector(kx, P.KEY_Y, 0.6), Vector(0, 0, 1))
+        check(vol(parts["tray_r"].common(peg)) > 20.0
+              and vol(parts["tray_l"].common(peg)) < VOID,
+              "a peg keys the joint at x=%+6.1f" % kx,
+              "%.0f mm3 of peg, %.3f in the socket"
+              % (vol(parts["tray_r"].common(peg)),
+                 vol(parts["tray_l"].common(peg))))
+    # The lap has to be wide, because it is what holds the front together.
+    check(2 * P.CENTRE_LAP >= 60.0, "the centre lap is at least 60 mm wide",
+          "%.0f mm" % (2 * P.CENTRE_LAP))
+    # And nothing may rise above the tray in front of the device.
+    front = box(-P.DEV_W / 2, P.DEV_W / 2, -P.EAR_T, P.DEV_Y0,
+                P.TRAY_T, P.RACK_U)
+    v = vol(trays.common(front))
+    check(v < VOID, "nothing stands in front of the device's face",
+          "%.3f mm3" % v)
     # Held fore and aft by the nib and the rear stop, so it cannot walk.
     ahead = box(-P.TRAY_X1, P.TRAY_X1, P.DEV_Y0 - 1.0, P.DEV_Y0,
                 P.LAP_T, P.TRAY_T)
