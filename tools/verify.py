@@ -249,6 +249,23 @@ def main():
                P.DEV_Z0, P.DEV_Z1)
     check(vol(asm.common(back)) > 100.0, "stopped at the rear",
           "%.0f mm3" % vol(asm.common(back)))
+    # And it must not be able to leave through the front once the bar is on.
+    # The top bar's end blocks reach down to BAR_END_Z0 and stand directly in
+    # front of the device's face at each end; nothing else does.
+    for push in (1.5, 5.0, 20.0):
+        moved = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0 - push,
+                    P.DEV_Y0 + P.DEV_D - push, P.DEV_Z0, P.DEV_Z1)
+        v = vol(asm.common(moved))
+        check(v > 50.0, "cannot be pushed %.1f mm out of the front" % push,
+              "%.0f mm3 of interference" % v)
+    bars = parts["top_bar_l"].fuse(parts["top_bar_r"])
+    face = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0 - P.BAR_T, P.DEV_Y0,
+               P.DEV_Z0, P.DEV_Z1)
+    per = vol(parts["top_bar_l"].common(face))
+    check(per > 300.0, "the bar's end blocks stand in front of the device",
+          "%.0f mm3 each end, over Z %.1f..%.1f"
+          % (per, P.BAR_END_Z0, P.DEV_Z1))
+
     over = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0, P.DEV_Y0 + P.DEV_D,
                P.DEV_Z1, P.RACK_U)
     bars = parts["top_bar_l"].fuse(parts["top_bar_r"])

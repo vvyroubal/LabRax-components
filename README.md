@@ -30,7 +30,7 @@ src/
   model.py        the six bodies
 build.py          writes cad/, export/stl/, export/step/
 tools/
-  verify.py       100 checks against the rack, the device and the printer
+  verify.py       104 checks against the rack, the device and the printer
   measure_rack.py re-derives the [rack] numbers from the Lab Rax mesh files
   preview.py      renders images/ (FreeCAD is headless here)
   plate.py        arranges the STLs onto A1 mini plates as a Bambu 3MF
@@ -167,7 +167,7 @@ choice around it.
 ## What is checked
 
 `make verify` measures the built solids, not the parameters, so a feature that
-silently does nothing is caught rather than assumed away. 100 checks: that each
+silently does nothing is caught rather than assumed away. 104 checks: that each
 body is one valid solid built from sketches driving pads and pockets; that it
 fits the bed, turning a long part on the diagonal if it has to; that no two
 parts foul each other; that an M6 passes all twelve rack slots; that the
@@ -178,7 +178,7 @@ ledge, that a real M6 nut solid seats in each slot and can be dropped in from
 above, and that nothing rises above the tray in front of the device's face;
 that the top bar's halves lap and bear on each other rather than butting, and
 are held at two widely spaced points so neither can pivot; and that the device
-drops in and is stopped front, rear and above.
+drops in, is stopped rear and above, and cannot be pushed out of the front.
 
 It has earned its keep. Building this version it caught the top bar
 overrunning the 222.25 mm post opening, a notch cutting the wrong side of its
