@@ -55,12 +55,20 @@ GAP = 12.0
 SUPPORT = {"enable_support": "1", "support_type": "normal(auto)"}
 
 PLATES = [
-    # A side is 192 mm long, so it only fits turned 45 degrees on the bed.
+    # A side is 192 mm long, so it only goes on the bed turned 45 degrees.
     ("Left side", [("side_l", (90.0, 90.0), [("z", 45)], SUPPORT)]),
     ("Right side", [("side_r", (90.0, 90.0), [("z", 45)], SUPPORT)]),
-    ("Top bars", [
-        ("top_bar_l", (90.0, 60.0), [("x", 180)], {}),
-        ("top_bar_r", (90.0, 120.0), [("x", 180)], {}),
+    # A tray half leaves a strip down one side, which is where its top bar
+    # goes, stood on end.
+    ("Left tray and top bar", [
+        # The lap strip along each edge stands 3 mm off the bed, so the tray
+        # wants support under its rim. It comes away from the underside.
+        ("tray_l", (66.0, 90.0), [], SUPPORT),
+        ("top_bar_l", (153.0, 90.0), [("x", 180), ("z", 90)], {}),
+    ]),
+    ("Right tray and top bar", [
+        ("tray_r", (66.0, 90.0), [], SUPPORT),
+        ("top_bar_r", (153.0, 90.0), [("x", 180), ("z", 90)], {}),
     ]),
 ]
 

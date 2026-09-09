@@ -64,11 +64,12 @@ EAR_X0 = 98.0      # [design] inboard edge of the ears
 RAIL_T = 3.2       # [design] side rail; 107.0 + 3.2 = 110.2 <= 111.125
 BODY_HW = POCKET_HW + RAIL_T  # 110.2, leaves 0.925 mm per side to the posts
 
-LEDGE_T = 5.0      # [design] the shelf the device sits on
-LEDGE_X0 = 99.0    # [design] how far the shelf reaches under the device
-DEV_Z0 = LEDGE_T           # 5.0
-DEV_Z1 = DEV_Z0 + DEV_H    # 35.0
-POCKET_TOP = DEV_Z1 + CLR_H  # 35.8
+TRAY_T = 6.0       # [design] the tray the device sits on
+LAP_T = TRAY_T / 2  # [design] each half of a step lap
+LEDGE_X0 = 99.0    # [design] where the side's ledge begins
+DEV_Z0 = TRAY_T            # 6.0
+DEV_Z1 = DEV_Z0 + DEV_H    # 36.0
+POCKET_TOP = DEV_Z1 + CLR_H  # 36.8
 RAIL_TOP = 40.3    # [design]
 
 DEV_Y0 = 8.0                    # [design] front face, against the top bar
@@ -81,6 +82,32 @@ STOP_X0 = 99.0     # [design]
 RAIL_VENT_Z0 = 10.0
 RAIL_VENT_Z1 = 30.0
 RAIL_VENTS_Y = ((24.0, 52.0), (60.0, 88.0), (96.0, 124.0))  # [design]
+
+# ------------------------------------------------------------- the tray ----
+# The device stands on a tray, not on the two ledges alone. At 214 mm it will
+# not fit a 180 mm bed in any orientation, so it comes in halves that lap on
+# the centreline. Each half laps the other way onto its side's ledge, and the
+# device's own weight closes both laps.
+#
+# It is a light load over a wide plate -- 734 g on a 214 x 129 x 6 span works
+# out around 0.2 mm of deflection -- so the tray does not need stiffening; it
+# needs to be held together and located, which is what the joints below do.
+TRAY_X1 = POCKET_HW   # 107, out to the inner face of the side rail
+CENTRE_LAP = 15.0     # [design] half-width of the centre lap
+
+# The halves bolt to each other through tabs that reach forward and back out
+# of the device's footprint, where there is room to work and to drop a nut in.
+TAB_HX = 10.0         # [design] half-width of a tab
+TAB_D = 8.0           # [design] tab depth
+# An M3 nut is 6.35 across the corners and the tray is 6 thick, so the tabs
+# stand proud of it. They can: there is nothing above them at either end.
+TAB_Z1 = 10.0         # [design]
+TRAY_BOLT_Z = 5.0     # [design] 1.8 mm of tab under the nut
+TRAY_BOLT_Y = (TAB_D / 2, DEV_Y1 + TAB_D / 2)
+
+M3_CLEAR = 3.4        # [design]
+M3_NUT_AF = 5.6       # [design] an M3 nut is 5.5 across the flats
+M3_NUT_D = 2.6        # [design] ... and 2.4 thick
 
 # ---------------------------------------------------------- the top bar ----
 # Bolted on last, from the front, through the ear and into a hex nut trapped

@@ -52,26 +52,30 @@ holes at **6.35 / 22.225 / 38.1 mm** from the bottom of the U.
 Confirmed independently on the reference faceplate, whose three slots per side
 are centred 6.325 / 22.225 / 38.125 mm up from the bottom of its U.
 
-## Horizontal spacing — 236.525 mm, and the 222.25 mm opening
+## The posts hold the nuts
 
-The post is 30 mm across the mounting face by 35 mm deep. Its equipment holes
-sit at x = 7.862 mm from the post centreline, i.e. **7.138 mm inboard of the
-face that bounds the rack opening**.
+Each equipment hole is ⌀7.60 for the first 2 mm from the post's outer face and
+⌀11.65 for the next 4 mm. That is not a counterbore for a screw head — slicing
+the post across the wider zone gives boundary radii alternating 5.04 and 5.82
+at 30° intervals, which is a **hexagon 10.09 mm across the flats and 11.65
+across the corners**: an M6 nut pocket, 5 mm deep.
 
-That single number ties the two figures together:
+So a rack screw goes in from **outside the rack** and threads into a nut the
+post already holds. Equipment mounted in a Lab Rax needs clearance holes and
+nothing else. `Bolted+Version+Post+Joiner.stl` carries the same trap, which is
+where the figures above were first read off.
 
-```
-236.525 / 2  -  222.25 / 2  =  118.2625 - 111.125  =  7.1375
-```
+An earlier version of this bracket got that wrong, read the pocket as a
+counterbore, and carried nut traps of its own that duplicated the rack's.
 
-So a 236.525 mm column spacing implies a 222.25 mm clear opening, and the post
-measures 7.138 mm against that 7.1375 mm. The documentation's "222 mm" is
-222.25 rounded.
+## Front posts to rear posts — 175.9 mm
 
-Each hole is ⌀7.6 mm for the first 2 mm and ⌀11.65 mm for the next 4 mm — a
-clearance hole with a counterbore for an M6 button head. The frame-assembly
-holes on the post's other face are ⌀6.4 with a ⌀10.9 counterbore, which is the
-same M6 hardware.
+Taken from `Side Panel Half.stl`, which spans the frame front to back and
+measures 175.9 mm. It is the one interface number here that has **not** been
+confirmed against an assembled rack: the 3MF is a print plate, so there is no
+assembled geometry to measure and no rear-post placement to read. The rear
+ears land on this figure; `RACK_D` in `src/params.py` is the single place to
+change it.
 
 ## Faceplate envelope — 254 × 44.45 mm
 

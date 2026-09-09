@@ -1,9 +1,11 @@
 """The bracket, built as PartDesign bodies from sketches.
 
-Four printed parts:
+Six printed parts:
 
     side_l, side_r      one piece each: front ear, side rail, rear ear, the
-                        shelf the device sits on, and the rear stop
+                        ledge the tray lands on, and the rear stop
+    tray_l, tray_r      the floor the device stands on, lapped on the
+                        centreline
     top_bar_l, top_bar_r  the front panel's top bar, in halves
 
 The bracket bolts to all four rack posts. Every rack screw is an M6 driven
@@ -44,9 +46,13 @@ def side(doc, sx, name):
     sk.pad(doc, bd, s, P.EAR_T, reversed_=True)
 
     # --- the shelf the device rests on, and the stop behind it -----------
+    # An L in section: a full-height nib in front of the device, then the
+    # shelf the tray laps onto. The nib and the rear stop between them hold
+    # the tray fore and aft, so it needs no fixing to the side.
     s = sk.sketch(doc, bd, name + "_Sk_ledge",
                   sk.plane(Vector(sx * P.LEDGE_X0, 0, 0), sk.Y, sk.Z))
-    sk.rect(s, P.DEV_Y0, 0.0, P.DEV_Y1, P.LEDGE_T)
+    sk.polygon(s, [(0.0, 0.0), (P.DEV_Y1, 0.0), (P.DEV_Y1, P.LAP_T),
+                   (P.DEV_Y0, P.LAP_T), (P.DEV_Y0, P.TRAY_T), (0.0, P.TRAY_T)])
     sk.pad(doc, bd, s, P.BODY_HW - P.LEDGE_X0, reversed_=out)
 
     s = sk.sketch(doc, bd, name + "_Sk_stop",
@@ -123,11 +129,66 @@ def top_bar(doc, sx, name):
     return bd
 
 
+def tray(doc, sx, name):
+    """Half of the tray.
+
+    The two halves are not mirrors: at the centreline one has to pass under
+    the other. The left half takes the bottom of every lap, the right half the
+    top, which is the only rule needed to read the section below.
+    """
+    bd = sk.body(doc, name)
+    lap = P.CENTRE_LAP
+    if sx < 0:
+        # outer edge laps ON TOP of the ledge; centre tongue runs underneath
+        pts = [(-P.TRAY_X1, P.LAP_T), (-P.LEDGE_X0, P.LAP_T),
+               (-P.LEDGE_X0, 0.0), (lap, 0.0), (lap, P.LAP_T),
+               (-lap, P.LAP_T), (-lap, P.TRAY_T), (-P.TRAY_X1, P.TRAY_T)]
+    else:
+        pts = [(-lap, P.LAP_T), (lap, P.LAP_T), (lap, 0.0),
+               (P.LEDGE_X0, 0.0), (P.LEDGE_X0, P.LAP_T),
+               (P.TRAY_X1, P.LAP_T), (P.TRAY_X1, P.TRAY_T), (-lap, P.TRAY_T)]
+    s = sk.sketch(doc, bd, name + "_Sk_plate",
+                  sk.plane(Vector(0, P.DEV_Y0, 0), sk.X, sk.Z))
+    sk.polygon(s, pts)
+    sk.pad(doc, bd, s, P.DEV_Y1 - P.DEV_Y0, reversed_=True)
+
+    # Tabs fore and aft of the device, where the two halves bolt together.
+    u0, u1 = (sx * P.TAB_HX, 0.0) if sx < 0 else (0.0, sx * P.TAB_HX)
+    for tag, y in (("front", 0.0), ("rear", P.DEV_Y1)):
+        s = sk.sketch(doc, bd, name + "_Sk_tab_" + tag,
+                      sk.plane(Vector(0, y, 0), sk.X, sk.Z))
+        sk.rect(s, u0, 0.0, u1, P.TAB_Z1)
+        sk.pad(doc, bd, s, P.TAB_D if tag == "rear" else P.DEV_Y0,
+               reversed_=True)
+
+    # The bolt runs across the joint. It passes through the left half and
+    # picks up a nut dropped into a slot in the right half.
+    s = sk.sketch(doc, bd, name + "_Sk_boltholes",
+                  sk.plane(Vector(sx * P.TAB_HX if sx < 0 else 0.0, 0, 0),
+                           sk.Y, sk.Z))
+    for y in P.TRAY_BOLT_Y:
+        sk.circle(s, y, P.TRAY_BOLT_Z, P.M3_CLEAR)
+    sk.pocket(doc, bd, s, P.TAB_HX)
+
+    if sx > 0:
+        s = sk.sketch(doc, bd, name + "_Sk_nutslots",
+                      sk.plane(Vector(2.0, 0, 0), sk.Y, sk.Z))
+        for y in P.TRAY_BOLT_Y:
+            sk.rect(s, y - P.M3_NUT_AF / 2, P.TRAY_BOLT_Z - 3.4,
+                    y + P.M3_NUT_AF / 2, P.TAB_Z1 + 1.0)
+        # Explicit: material lies both ways from this plane, so the
+        # automatic choice would happily cut the wrong side of the bolt.
+        sk.pocket(doc, bd, s, P.M3_NUT_D, reversed_=True)
+    return bd
+
+
 def build(doc):
     """Every part, as its own Body. Returns {name: body}."""
     return {
         "side_l": side(doc, -1, "side_l"),
         "side_r": side(doc, +1, "side_r"),
+        "tray_l": tray(doc, -1, "tray_l"),
+        "tray_r": tray(doc, +1, "tray_r"),
         "top_bar_l": top_bar(doc, -1, "top_bar_l"),
         "top_bar_r": top_bar(doc, +1, "top_bar_r"),
     }

@@ -171,14 +171,15 @@ def main():
               P.DEV_Z0, P.DEV_Z1)
     check(vol(asm.common(dev)) < VOID, "device sits without interference",
           "%.3f mm3" % vol(asm.common(dev)))
-    cradle = parts["side_l"].fuse(parts["side_r"])
+    cradle = parts["side_l"].fuse(parts["side_r"]).fuse(
+        parts["tray_l"]).fuse(parts["tray_r"])
     drop = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0, P.DEV_Y0 + P.DEV_D,
                P.DEV_Z0, 400)
     check(vol(cradle.common(drop)) < VOID, "drops in from above between the sides",
           "%.3f mm3" % vol(cradle.common(drop)))
     shelf = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0, P.DEV_Y0 + P.DEV_D,
                 P.DEV_Z0 - 2.0, P.DEV_Z0)
-    check(vol(cradle.common(shelf)) > 1000.0, "the shelf carries it",
+    check(vol(cradle.common(shelf)) > 20000.0, "the tray carries it",
           "%.0f mm3 under it" % vol(cradle.common(shelf)))
     fwd = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0 - P.BAR_T, P.DEV_Y0,
               P.DEV_Z0, P.DEV_Z1)
@@ -193,6 +194,48 @@ def main():
     bars = parts["top_bar_l"].fuse(parts["top_bar_r"])
     check(vol(bars.common(over)) > 100.0, "top bar caps it once fitted",
           "%.0f mm3 over it" % vol(bars.common(over)))
+
+    print("\n[the tray]")
+    trays = parts["tray_l"].fuse(parts["tray_r"]).removeSplitter()
+    # It must be a floor, not two ledges: solid under the device all the way
+    # across, at every depth.
+    for x in (-100.0, -60.0, -16.0, 0.0, 16.0, 60.0, 100.0):
+        col = box(x - 4, x + 4, P.DEV_Y0 + 4, P.DEV_Y1 - 4, 0.0, P.DEV_Z0)
+        v = vol(trays.common(col))
+        check(v > 300.0, "tray carries the device at x=%+7.1f" % x,
+              "%.0f mm3" % v)
+    # Each half laps onto its side's ledge for the whole depth.
+    for sx, side in ((-1, "side_l"), (1, "side_r")):
+        band = box(sx * P.LEDGE_X0, sx * P.TRAY_X1, P.DEV_Y0, P.DEV_Y1,
+                   0.0, P.TRAY_T)
+        vt = vol(trays.common(band))
+        vs = vol(parts[side].common(band))
+        check(vt > 1000.0 and vs > 1000.0, "%s carries the tray's edge" % side,
+              "ledge %.0f mm3 under tray %.0f mm3" % (vs, vt))
+    # The centre lap has to overlap, not just butt.
+    lap = box(-P.CENTRE_LAP, P.CENTRE_LAP, P.DEV_Y0, P.DEV_Y1, 0.0, P.TRAY_T)
+    check(vol(parts["tray_l"].common(lap)) > 1000.0
+          and vol(parts["tray_r"].common(lap)) > 1000.0,
+          "the halves lap on the centreline",
+          "%.0f / %.0f mm3" % (vol(parts["tray_l"].common(lap)),
+                               vol(parts["tray_r"].common(lap))))
+    # Bolted across that lap, with a nut that can be dropped in from above.
+    for y in P.TRAY_BOLT_Y:
+        shank = Part.makeCylinder(1.6, 2 * P.TAB_HX,
+                                  Vector(-P.TAB_HX - 0.05, y, P.TRAY_BOLT_Z),
+                                  Vector(1, 0, 0))
+        check(vol(trays.common(shank)) < VOID,
+              "tray bolt passes both halves at y=%5.1f" % y,
+              "%.3f mm3" % vol(trays.common(shank)))
+        nut = box(2.05, 2.0 + P.M3_NUT_D - 0.05, y - 2.75, y + 2.75,
+                  P.TRAY_BOLT_Z - 3.18, P.TRAY_BOLT_Z + 3.18)
+        check(vol(trays.common(nut)) < VOID, "its nut seats at y=%5.1f" % y,
+              "%.3f mm3" % vol(trays.common(nut)))
+    # Held fore and aft by the nib and the rear stop, so it cannot walk.
+    ahead = box(-P.TRAY_X1, P.TRAY_X1, P.DEV_Y0 - 1.0, P.DEV_Y0,
+                P.LAP_T, P.TRAY_T)
+    check(vol(asm.common(ahead)) > 100.0, "a nib stops the tray sliding forward",
+          "%.0f mm3" % vol(asm.common(ahead)))
 
     print("\n[clearances]")
     check(abs((P.POST_CLEAR_HW - P.BODY_HW) - 0.925) < 1e-9,
