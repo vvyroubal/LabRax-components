@@ -27,10 +27,10 @@ make plates     # slice every plate and check it prints inside the bed
 src/
   params.py       every dimension, tagged [rack] / [dev] / [design]
   sk.py           sketch plumbing: planes, polygons, slots, pads, pockets
-  model.py        the six bodies
+  model.py        the five bodies
 build.py          writes cad/, export/stl/, export/step/
 tools/
-  verify.py       91 checks against the rack, the device and the printer
+  verify.py       92 checks against the rack, the device and the printer
   measure_rack.py re-derives the [rack] numbers from the Lab Rax mesh files
   preview.py      renders images/ (FreeCAD is headless here)
   plate.py        arranges the STLs onto A1 mini plates as a Bambu 3MF
@@ -104,8 +104,11 @@ only ones left in the design. One piece has neither problem.
 | | |
 |---|---|
 | 12 × M6 × 12 button head | bracket to rack: 3 per ear, 4 ears |
-| 2 × M6 × 20 + 2 × M6 nuts | top bar halves, through the front ears |
+| 2 × M6 × 20 + 2 × M6 nuts | top bar, through the front ears |
 | 2 × M6 × 20 + 2 × M6 nuts | tray halves to each other |
+
+16 screws, 4 nuts. The 12 rack screws want button heads; the other four can be
+whatever you have, the heads are not seen.
 
 **M6 throughout — one driver, one box of hardware.**
 
@@ -128,20 +131,77 @@ front. Depth was never the problem — there are 16 mm there; height is.
 
 ## Assembly
 
-1. Bolt the two sides to the rack — 3 × M6 into each of the four posts, driven
-   from outside. Leave them finger-tight until step 4.
-2. Drop two M6 nuts into the slots in the right tray half's rear tab. Lay both
-   halves in — each lands on its side's ledge and laps the other on the
-   centreline over 60 mm, and the two pegs at the front drop into their
-   sockets. A nib in front and the rear stop behind hold them fore and aft, so
-   they need no fixing to the sides. Run the two M6 in from the left.
-3. **Lower the gateway in from above** onto the tray.
-4. Drop an M6 nut into each end of the top bar — the pockets face rear — then
-   offer the bar up into the notches and run an M6 in from the front through
-   each ear. Nip up the rack screws.
+**You need:** the five printed parts, 16 × M6 screws (12 × 10–12 mm button
+head for the rack, 4 × 20 mm for the bracket's own joints), 4 × M6 nuts, a 4 mm
+hex key, and the gateway.
 
-The gateway is held by the tray below, the side rails either side, the top bar
-in front, the rear stops behind, and the top bar's flange above.
+Everything is M6, and every screw turns clockwise into either a nut the rack
+post already holds or a nut you have dropped into a pocket. Nothing is
+self-tapping, so nothing should feel tight until it seats — if it does, back
+it out and check the nut is square in its pocket.
+
+**1 — Nuts first, while you can still see them.**
+
+| nut | where | how it goes in |
+|---|---|---|
+| 2 × M6 | `top_bar`, one at each end | into the hex pocket in the **rear** face |
+| 2 × M6 | `tray_r`, in the rear tab | dropped into the two slots from **above** |
+
+The rack's own posts already hold the nuts for the 12 rack screws, so there is
+nothing to fit there.
+
+**2 — The two sides into the rack.** Each side takes three M6 through its
+front ear and three through its rear ear, all driven **from outside the rack
+inwards** into the posts' own nuts. Leave them finger-tight: the slots give
+±2.3 mm and you want that freedom until the tray is in.
+
+**3 — The tray.** Lay `tray_l` and `tray_r` in from above. Each lands on its
+side's ledge, and they lap over each other across the middle 60 mm — the left
+half passes underneath, the right half on top. The two ⌀5 pegs on the right
+half drop into their sockets in the left. There is 0.4 mm of fore-and-aft fit,
+so it should drop rather than press: a nib in front of the ledge and the rear
+stop behind hold it, and it needs no fixing to the sides at all.
+
+Now run the two M6 × 20 **from the left**, through `tray_l`'s rear tab and
+into the nuts waiting in `tray_r`'s. These are behind the gateway, so you can
+still reach them later.
+
+**4 — The gateway. Lower it straight down** onto the tray. It cannot slide in
+from the rear — the tray's bolt tabs are in the way — and it does not need to.
+Decide which way round you want it first (see *Orientation* below), because
+turning it means taking the bar off again.
+
+**5 — The top bar.** Offer it up from the front so each end drops into the
+notch in its side, and run an M6 × 20 through each front ear into the nuts you
+fitted in step 1. The bar's flange now covers the top front edge of the
+gateway and its end blocks close the front.
+
+**6 — Nip up the twelve rack screws.** Work diagonally, and stop when they
+seat; printed plastic does not want torque.
+
+To take the gateway out, undo only the two screws holding the top bar. The
+tray, the sides and the rack screws all stay put.
+
+### What holds the gateway in
+
+| direction | what stops it | clearance |
+|---|---|---|
+| down | the tray | — |
+| sideways | the two side rails | 0.6 mm a side |
+| up | the top bar's flange | 0.8 mm over the case |
+| back | the ears' rear beam, which runs forward to meet it | — |
+| **forward** | **the top bar's end blocks** | 1.4 mm of travel |
+
+The forward stop is worth spelling out, because it is not what it looks like
+from the front. The top bar is not a cosmetic strip: its two end blocks are
+20.75 mm tall and sit in the 8 mm between the rack face and the device, so
+each covers the outer 10.4 mm of the gateway's face over Z 23.7 – 36. Push the
+gateway and it moves its 1.4 mm of fore-and-aft slack, then stops against
+them, with 537 mm³ of engagement at each end.
+
+**So the bar is structural, not trim.** With it off the gateway lifts straight
+out, which is how it goes in; with it on, the gateway cannot leave through the
+front without the two M6 in the ears coming out first.
 
 ## Orientation
 
@@ -163,7 +223,7 @@ choice around it.
 ## What is checked
 
 `make verify` measures the built solids, not the parameters, so a feature that
-silently does nothing is caught rather than assumed away. 91 checks: that each
+silently does nothing is caught rather than assumed away. 92 checks: that each
 body is one valid solid built from sketches driving pads and pockets; that it
 fits the bed, turning a long part on the diagonal if it has to; that no two
 parts foul each other; that an M6 passes all twelve rack slots; that the

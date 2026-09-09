@@ -93,6 +93,10 @@ RAIL_VENTS_Y = ((24.0, 52.0), (60.0, 88.0), (96.0, 124.0))  # [design]
 # out around 0.2 mm of deflection -- so the tray does not need stiffening; it
 # needs to be held together and located, which is what the joints below do.
 TRAY_X1 = POCKET_HW   # 107, out to the inner face of the side rail
+# The tray drops into the gap between the ledge's front nib and the rear stop.
+# Modelled flush it is exactly as long as that gap, which in printed plastic
+# is an interference fit, so it is made this much shorter.
+TRAY_FIT = 0.4        # [design]
 # 60 mm of overlap. There is no fastener at the front of this joint and there
 # cannot be: an M6 nut needs 15.5 mm of height once its corners and a wall are
 # counted, the tray is 6 mm thick, and everything above that stands in front

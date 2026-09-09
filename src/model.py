@@ -164,7 +164,7 @@ def tray(doc, sx, name):
     s = sk.sketch(doc, bd, name + "_Sk_plate",
                   sk.plane(Vector(0, P.DEV_Y0, 0), sk.X, sk.Z))
     sk.polygon(s, pts)
-    sk.pad(doc, bd, s, P.DEV_Y1 - P.DEV_Y0, reversed_=True)
+    sk.pad(doc, bd, s, P.DEV_Y1 - P.DEV_Y0 - P.TRAY_FIT, reversed_=True)
 
     # Forward of the device the lap simply continues, and a peg keys the two
     # halves together. There is only 8 mm there -- an M6 nut wants 10.2 of
@@ -179,7 +179,7 @@ def tray(doc, sx, name):
     # two M6 running across the joint.
     u0, u1 = (-P.TAB_HX, 0.0) if sx < 0 else (0.0, P.TAB_HX)
     s = sk.sketch(doc, bd, name + "_Sk_tab",
-                  sk.plane(Vector(0, P.DEV_Y1, 0), sk.X, sk.Z))
+                  sk.plane(Vector(0, P.DEV_Y1 - P.TRAY_FIT, 0), sk.X, sk.Z))
     sk.rect(s, u0, 0.0, u1, P.TAB_Z1)
     sk.pad(doc, bd, s, P.TAB_D, reversed_=True)
 

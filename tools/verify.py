@@ -314,6 +314,15 @@ def main():
     v = vol(trays.common(front))
     check(v < VOID, "nothing stands in front of the device's face",
           "%.3f mm3" % v)
+    # It has to be able to drop into the gap between the nib and the rear
+    # stop, which means being shorter than it -- modelled flush, a printed
+    # tray is an interference fit.
+    edge = box(P.LEDGE_X0, P.TRAY_X1, -50, 400, P.LAP_T, P.TRAY_T)
+    got = trays.common(edge).BoundBox.YLength
+    gap = P.DEV_Y1 - P.DEV_Y0
+    check(gap - got >= 0.3, "the tray drops into the gap it has to sit in",
+          "%.2f mm long, %.2f mm gap, %.2f mm of fit" % (got, gap, gap - got))
+
     # Held fore and aft by the nib and the rear stop, so it cannot walk.
     ahead = box(-P.TRAY_X1, P.TRAY_X1, P.DEV_Y0 - 1.0, P.DEV_Y0,
                 P.LAP_T, P.TRAY_T)
