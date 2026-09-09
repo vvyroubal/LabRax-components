@@ -55,15 +55,12 @@ GAP = 12.0
 SUPPORT = {"enable_support": "1", "support_type": "normal(auto)"}
 
 PLATES = [
-    ("Tray", [
-        ("tray", (90.0, 90.0), [], {}),
-    ]),
-    ("Ears and top bar", [
-        ("ear_l", (35.5, 90.0), [], SUPPORT),
-        ("ear_r", (108.5, 90.0), [], SUPPORT),
-        # On edge to fit beside the ears, and upside down: the right way up
-        # its rear flange begins 2.8 mm above the bed with nothing under it.
-        ("top_bar", (162.0, 90.0), [("x", 180), ("z", 90)], {}),
+    # A side is 192 mm long, so it only fits turned 45 degrees on the bed.
+    ("Left side", [("side_l", (90.0, 90.0), [("z", 45)], SUPPORT)]),
+    ("Right side", [("side_r", (90.0, 90.0), [("z", 45)], SUPPORT)]),
+    ("Top bars", [
+        ("top_bar_l", (90.0, 60.0), [("x", 180)], {}),
+        ("top_bar_r", (90.0, 120.0), [("x", 180)], {}),
     ]),
 ]
 

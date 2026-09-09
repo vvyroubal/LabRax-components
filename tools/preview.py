@@ -20,10 +20,10 @@ OUT = os.path.join(ROOT, "images")
 
 # part -> fill hue, so the pieces stay distinguishable in the assembly views
 COLOUR = {
-    "tray": (0.30, 0.44, 0.62),
-    "top_bar": (0.36, 0.52, 0.70),
-    "ear_l": (0.72, 0.44, 0.24),
-    "ear_r": (0.72, 0.44, 0.24),
+    "side_l": (0.72, 0.44, 0.24),
+    "side_r": (0.72, 0.44, 0.24),
+    "top_bar_l": (0.30, 0.44, 0.62),
+    "top_bar_r": (0.30, 0.44, 0.62),
 }
 
 VIEWS = {
