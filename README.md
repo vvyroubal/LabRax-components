@@ -37,6 +37,7 @@ tools/
   checkplates.py  slices all five for real and measures the toolpaths
   a1mini_project.json  the A1 mini preset the 3MF carries to be a project
 docs/
+  bom.md          what to print, what to keep, what to buy
   measurements.md where every number came from
   print-settings.md
 ```
@@ -148,9 +149,10 @@ front. Depth was never the problem — there are 16 mm there; height is.
 
 ## Assembly
 
-**You need:** the eight printed parts, **22 × M6 screws** (12 × 10–12 mm
-button head for the rack, 10 × 20 mm for the bracket's own joints), **10 × M6
-nuts**, a 4 mm hex key, and the gateway.
+**You need:** the eight printed parts, **22 × M6 screws**, **10 × M6 nuts**, a
+4 mm hex key, and the gateway. Sizes and where each one goes are in
+[docs/bom.md](docs/bom.md) — the lengths are not interchangeable, and the rack
+screws in particular have only one size that works.
 
 Everything is M6, and every screw turns clockwise into either a nut the rack
 post already holds or a nut you have dropped into a pocket. Nothing is
