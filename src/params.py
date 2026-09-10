@@ -75,7 +75,19 @@ POCKET_W = DEV_W + CLR_W   # 214.0
 POCKET_HW = POCKET_W / 2   # 107.0
 
 # ------------------------------------------------------------ the sides ----
-EAR_T = 8.0        # [design] front and rear ear plate thickness
+# One screw size for the whole bracket: M6 x 12. That is not a preference,
+# it sets dimensions. The rack post's equipment hole is blind 6 mm deep -- 2 mm
+# of clearance, then a 4 mm hex pocket -- so a 12 mm screw can only work if the
+# ear is thin enough to let it reach the nut and thick enough to stop it
+# bottoming out on the end of the hole. 6.5 mm puts the tip 0.5 mm clear with
+# 3.5 mm of thread in the nut.
+SCREW_LEN = 12.0   # [design] every screw in the bracket
+POST_CLEAR_D = 2.0  # [rack] plain part of the post's hole
+POST_NUT_D = 4.0    # [rack] its hex pocket, 2..6
+POST_HOLE_D = 6.0   # [rack] and the hole is blind there
+M6_HEAD_D = 11.0    # [design] counterbore for a button head
+
+EAR_T = 6.5        # [design] front and rear ear plate thickness
 EAR_X0 = 98.0      # [design] inboard edge of the ears
 RAIL_T = 3.2       # [design] side rail; 107.0 + 3.2 = 110.2 <= 111.125
 BODY_HW = POCKET_HW + RAIL_T  # 110.2, leaves 0.925 mm per side to the posts
@@ -126,6 +138,8 @@ CENTRE_LAP = 30.0     # [design] half-width of the centre lap
 # device, which is not enough in any direction -- an M6 nut wants 10.2 mm of
 # slot and 15.5 mm of height -- so the front of the joint is a dovetail key
 # instead, cut into the lap and pulled tight by the bolts behind it.
+TRAY_CB_D = 5.0       # [design] the tray screw's head sinks this far into
+                      # the left tab, so its 12 mm reaches the nut in the right
 TAB_HX = 10.0         # [design] half-width of the rear tab
 TAB_D = 30.0          # [design] its depth. Two M6 nuts lie along it, and a
                       # nut slot is 10.2 wide, so this is what they need.
@@ -150,6 +164,12 @@ KEY_X = 22.0          # [design] two of them, near the edges of the lap, so
 # in the bar with the pocket facing rear. It nests into a notch in the side so
 # the ear and the rail still meet below it.
 BAR_T = 8.0         # [design] thickness, front to back
+BAR_NUT_Y0 = 3.0    # [design] where the nut's near face sits, 5 mm of nut
+                    # behind it filling the bar to its back face
+BAR_CB_D = 1.0      # [design] the bar screws' heads sink this far into the
+                    # ear. It is the millimetre that lets a 12 mm screw reach
+                    # the nut without moving the nut -- which matters, because
+                    # moving it would make every top bar already printed wrong.
 BAR_X1 = BODY_HW    # [design] outboard end. The bar passes between the posts
                     # like the rails do, so it gets the same 0.925 mm.
 BAR_Z0 = 36.8       # [design] underside over the device

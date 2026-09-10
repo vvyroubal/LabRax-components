@@ -87,12 +87,19 @@ def side(doc, sx, name):
         sk.slot(s, y, P.SPLICE_BOLT_Z, P.SPLICE_SLOT, P.M6_CLEAR)
     sk.pocket(doc, bd, s, P.RAIL_T)
 
-    # Clearance for the two screws that hold the bars on, one high, one low.
+    # Clearance for the two screws that hold the bars on, one high, one low,
+    # each with its head sunk a millimetre so a 12 mm screw reaches its nut.
     s = sk.sketch(doc, bd, name + "_Sk_barscrews",
                   sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
     for z in (P.BAR_SCREW_Z, P.BOT_SCREW_Z):
         sk.circle(s, sx * P.BAR_SCREW_X, z, P.M6_CLEAR)
     sk.pocket(doc, bd, s, P.EAR_T)
+
+    s = sk.sketch(doc, bd, name + "_Sk_barheads",
+                  sk.plane(Vector(0, -P.EAR_T, 0), sk.X, sk.Z))
+    for z in (P.BAR_SCREW_Z, P.BOT_SCREW_Z):
+        sk.circle(s, sx * P.BAR_SCREW_X, z, P.M6_HEAD_D)
+    sk.pocket(doc, bd, s, P.BAR_CB_D)
 
     # The notch the top bar's end sits in. Cut only behind the ear, so the
     # ear and the rail still meet under it.
@@ -211,13 +218,15 @@ def top_bar(doc, name):
                   sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
     for sx in (-1, 1):
         sk.circle(s, sx * P.BAR_SCREW_X, P.BAR_SCREW_Z, P.M6_CLEAR)
-    sk.pocket(doc, bd, s, P.BAR_T - P.M6_HEX_D)
+    sk.pocket(doc, bd, s, P.BAR_NUT_Y0)
 
     s = sk.sketch(doc, bd, name + "_Sk_nuts",
-                  sk.plane(Vector(0, P.BAR_T, 0), sk.X, sk.Z))
+                  sk.plane(Vector(0, P.BAR_NUT_Y0 + P.M6_HEX_D, 0), sk.X, sk.Z))
     for sx in (-1, 1):
         sk.hexagon(s, sx * P.BAR_SCREW_X, P.BAR_SCREW_Z, P.M6_HEX_AF)
-    sk.pocket(doc, bd, s, P.M6_HEX_D)
+    # Explicit: there is bar both sides of this plane now, so the automatic
+    # choice would cut the pocket behind the nut instead of around it.
+    sk.pocket(doc, bd, s, P.M6_HEX_D, reversed_=True)
     return bd
 
 
@@ -248,13 +257,15 @@ def bottom_bar(doc, name):
                   sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
     for sx in (-1, 1):
         sk.circle(s, sx * P.BAR_SCREW_X, P.BOT_SCREW_Z, P.M6_CLEAR)
-    sk.pocket(doc, bd, s, P.BAR_T - P.M6_HEX_D)
+    sk.pocket(doc, bd, s, P.BAR_NUT_Y0)
 
     s = sk.sketch(doc, bd, name + "_Sk_nuts",
-                  sk.plane(Vector(0, P.BAR_T, 0), sk.X, sk.Z))
+                  sk.plane(Vector(0, P.BAR_NUT_Y0 + P.M6_HEX_D, 0), sk.X, sk.Z))
     for sx in (-1, 1):
         sk.hexagon(s, sx * P.BAR_SCREW_X, P.BOT_SCREW_Z, P.M6_HEX_AF)
-    sk.pocket(doc, bd, s, P.M6_HEX_D)
+    # Explicit: there is bar both sides of this plane now, so the automatic
+    # choice would cut the pocket behind the nut instead of around it.
+    sk.pocket(doc, bd, s, P.M6_HEX_D, reversed_=True)
     return bd
 
 
@@ -296,6 +307,15 @@ def tray(doc, sx, name):
     for y in P.TRAY_BOLT_Y:
         sk.circle(s, y, P.TRAY_BOLT_Z, P.M6_CLEAR)
     sk.pocket(doc, bd, s, P.TAB_HX)
+
+    if sx < 0:
+        # The head sinks into this half, or a 12 mm screw would only just
+        # touch the nut in the other one.
+        s = sk.sketch(doc, bd, name + "_Sk_boltcb",
+                      sk.plane(Vector(u0, 0, 0), sk.Y, sk.Z))
+        for y in P.TRAY_BOLT_Y:
+            sk.circle(s, y, P.TRAY_BOLT_Z, P.M6_HEAD_D)
+        sk.pocket(doc, bd, s, P.TRAY_CB_D)
 
     # Two pegs and the sockets they drop into. Near the edges of the lap, so
     # they hold the halves square to each other as well as together. They sit

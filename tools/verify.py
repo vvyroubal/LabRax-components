@@ -439,6 +439,36 @@ def main():
           "the bottom bar stops the tray sliding forward",
           "%.0f mm3" % vol(parts["bottom_bar"].common(ahead)))
 
+    print("\n[one screw size -- every joint takes an M6 x %.0f]" % P.SCREW_LEN)
+
+    def screw(what, grip, nut_at, nut_thick, limit=None):
+        """grip = solid before the nut; nut_at = where its near face is."""
+        reach = P.SCREW_LEN - grip
+        eng = reach - (nut_at - grip)
+        ok = eng >= 3.0 and (limit is None or reach <= limit)
+        check(ok, "%s" % what,
+              "engages %.1f mm%s" % (eng, "" if limit is None
+                                     else ", tip at %.1f of %.1f" % (reach, limit)))
+
+    # Into the rack post's own nut. The hole is blind, so this one can fail
+    # by being too long as well as too short.
+    screw("rack screw reaches the post's nut", P.EAR_T,
+          P.EAR_T + P.POST_CLEAR_D, P.POST_NUT_D,
+          limit=P.EAR_T + P.POST_HOLE_D)
+    screw("top bar screw reaches its nut", P.EAR_T - P.BAR_CB_D,
+          P.EAR_T - P.BAR_CB_D + P.BAR_NUT_Y0, P.M6_HEX_D)
+    screw("bottom bar screw reaches its nut", P.EAR_T - P.BAR_CB_D,
+          P.EAR_T - P.BAR_CB_D + P.BAR_NUT_Y0, P.M6_HEX_D)
+    screw("tray screw reaches its nut", P.TAB_HX - P.TRAY_CB_D,
+          P.TAB_HX - P.TRAY_CB_D + 2.0, P.M6_NUT_D)
+    screw("splice screw reaches its nut", P.RAIL_T,
+          P.RAIL_T + P.SPLICE_BOSS_T - P.M6_HEX_D, P.M6_HEX_D)
+
+    # And the head has somewhere to sit at every one of them.
+    check(P.TRAY_CB_D + 2.0 <= P.TAB_HX,
+          "the tray screw's head is inside its tab",
+          "%.1f mm counterbore in a %.1f mm tab" % (P.TRAY_CB_D, P.TAB_HX))
+
     print("\n[clearances]")
     check(abs((P.POST_CLEAR_HW - P.BODY_HW) - 0.925) < 1e-9,
           "0.925 mm per side between rail and post")

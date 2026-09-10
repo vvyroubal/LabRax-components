@@ -30,7 +30,7 @@ src/
   model.py        the eight bodies
 build.py          writes cad/, export/stl/, export/step/
 tools/
-  verify.py       153 checks against the rack, the device and the printer
+  verify.py       159 checks against the rack, the device and the printer
   measure_rack.py re-derives the [rack] numbers from the Lab Rax mesh files
   preview.py      renders images/ (FreeCAD is headless here)
   plate.py        arranges the STLs onto A1 mini plates as a Bambu 3MF
@@ -121,14 +121,19 @@ rather than four square slabs.
 
 | | |
 |---|---|
-| 12 × M6 × 12 button head | bracket to rack: 3 per ear, 4 ears |
-| 2 × M6 × 20 + 2 × M6 nuts | top bar, through the front ears |
-| 2 × M6 × 20 + 2 × M6 nuts | tray halves to each other |
+| 12 × M6 × 12 | bracket to rack: 3 per ear, 4 ears |
+| 2 × M6 × 12 + 2 nuts | top bar, through the front ears |
+| 2 × M6 × 12 + 2 nuts | bottom bar |
+| 2 × M6 × 12 + 2 nuts | tray halves to each other |
+| 4 × M6 × 12 + 4 nuts | side to rear leg, through the splice slots |
 
 16 screws, 4 nuts. The 12 rack screws want button heads; the other four can be
 whatever you have, the heads are not seen.
 
-**M6 throughout — one driver, one box of hardware.**
+**M6 × 12 throughout — one screw, one nut, one driver.** The lengths are
+not a coincidence: the rack post's hole is blind at 6 mm, which fixes the ear
+at 6.5 mm, and the other four joints are counterbored to suit. See
+[docs/bom.md](docs/bom.md).
 
 The rack screws need no nuts — the posts have them. The top-bar screw goes in
 from the front, through the ear, and into a nut trapped in the bar with its
@@ -149,10 +154,9 @@ front. Depth was never the problem — there are 16 mm there; height is.
 
 ## Assembly
 
-**You need:** the eight printed parts, **22 × M6 screws**, **10 × M6 nuts**, a
-4 mm hex key, and the gateway. Sizes and where each one goes are in
-[docs/bom.md](docs/bom.md) — the lengths are not interchangeable, and the rack
-screws in particular have only one size that works.
+**You need:** the eight printed parts, **22 × M6 × 12 screws**, **10 × M6 nuts**, a
+4 mm hex key, and the gateway. Every screw is the same: **M6 × 12**. Where each goes is in
+[docs/bom.md](docs/bom.md).
 
 Everything is M6, and every screw turns clockwise into either a nut the rack
 post already holds or a nut you have dropped into a pocket. Nothing is
@@ -252,7 +256,7 @@ choice around it.
 ## What is checked
 
 `make verify` measures the built solids, not the parameters, so a feature that
-silently does nothing is caught rather than assumed away. 153 checks: that each
+silently does nothing is caught rather than assumed away. 159 checks: that each
 body is one valid solid built from sketches driving pads and pockets; that it
 fits the bed, turning a long part on the diagonal if it has to; that no two
 parts foul each other; that an M6 passes all twelve rack slots; that the
@@ -262,7 +266,9 @@ that both halves lap rather than butt, that each is carried by its side's
 ledge, that a real M6 nut solid seats in each slot and can be dropped in from
 above, and that nothing rises above the tray in front of the device's face;
 that the top bar is one solid spanning the whole opening, with an M6 at each
-end whose nut seats and can be fitted; and that the device drops in, is
+end whose nut seats and can be fitted; that every one of the five joints takes
+the same M6 × 12 with at least 3 mm of thread in its nut, and that the rack
+screw does not bottom out in the post's blind hole; and that the device drops in, is
 stopped rear and above, and cannot be pushed out of the front.
 
 It has earned its keep. Building this version it caught the top bar
