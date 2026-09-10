@@ -18,6 +18,7 @@ feature.
 make            # build the model and its exports, verify, render, plate
 make verify     # re-check the solids against the rack, device and bed
 make plate      # export/3mf/UCG_Fiber_LabRax-A1mini.3mf, for Bambu Studio
+make assembly   # put real M6 x 12 screws, nuts and washers in and check them
 make plates     # slice every plate and check it prints inside the bed
 ```
 
@@ -34,7 +35,8 @@ tools/
   measure_rack.py re-derives the [rack] numbers from the Lab Rax mesh files
   preview.py      renders images/ (FreeCAD is headless here)
   plate.py        arranges the STLs onto A1 mini plates as a Bambu 3MF
-  checkplates.py  slices all five for real and measures the toolpaths
+  assembly.py     checks all 22 fasteners as solids against the built parts
+  checkplates.py  slices every plate for real and measures the toolpaths
   a1mini_project.json  the A1 mini preset the 3MF carries to be a project
 docs/
   bom.md          what to print, what to keep, what to buy
@@ -119,101 +121,40 @@ rather than four square slabs.
 
 ## Fasteners
 
-| | |
+**One screw for the whole bracket: M6 × 12.**
+
+| qty | item |
 |---|---|
-| 12 × M6 × 12 | bracket to rack: 3 per ear, 4 ears |
-| 2 × M6 × 12 + 2 nuts | top bar, through the front ears |
-| 2 × M6 × 12 + 2 nuts | bottom bar |
-| 2 × M6 × 12 + 2 nuts | tray halves to each other |
-| 4 × M6 × 12 + 4 nuts | side to rear leg, through the splice slots |
+| 22 | M6 × 12 button head |
+| 10 | M6 nut — DIN 934, 10 mm across the flats, 5 mm thick |
+| 16 | M6 washer — DIN 125 form A, ⌀12.5 |
 
-16 screws, 4 nuts. The 12 rack screws want button heads; the other four can be
-whatever you have, the heads are not seen.
+| qty | where | nut | washer |
+|---|---|---|---|
+| 12 | bracket to rack: 3 per ear, 4 ears | none — in the post | yes |
+| 2 | top bar, through each front ear | 2 × M6 | no |
+| 2 | bottom bar, through each front ear | 2 × M6 | no |
+| 2 | tray halves to each other, at the rear tab | 2 × M6 | no |
+| 4 | side to rear leg, through the splice slots | 4 × M6 | yes |
 
-**M6 × 12 throughout — one screw, one nut, one driver.** The lengths are
-not a coincidence: the rack post's hole is blind at 6 mm, which fixes the ear
-at 6.5 mm, and the other four joints are counterbored to suit. See
-[docs/bom.md](docs/bom.md).
+The rack screws need no nuts — the Lab Rax posts already hold them, in a hex
+pocket behind a ⌀7.6 clearance hole.
 
-The rack screws need no nuts — the posts have them. The top-bar screw goes in
-from the front, through the ear, and into a nut trapped in the bar with its
-**pocket facing rear**; drop the nut in before offering the bar up.
+**The length is not a free choice.** The post's hole is **blind at 6 mm**, so
+a screw that goes more than 6 mm past the ear hits the end and never clamps,
+and one that goes much less than 5 mm barely catches the nut. That fixes the
+ear at **6.5 mm**: a 12 mm screw then enters 5.5 mm, with 3.5 mm of thread in
+the nut and half a millimetre to spare. The other four joints were arranged
+around the same 12 mm — the bar screws' heads sink 1 mm into the ear, the tray
+screw's sinks 5 mm into its tab, and the splice needed nothing.
 
-The tray bolts run across the centre joint, both of them **behind the device**,
-where a tab 30 mm deep and 16 mm tall has room for an M6 nut dropped in from
-above.
+**The sixteen washers are not optional.** Those screws go through slots, and
+an M6 head is wider than a slot is: without a washer it lands on two crescents
+of about 25 mm² and will bury itself in PETG. A washer takes that to 46–60
+mm², which is what the six screws in round counterbored holes already have.
 
-**There is no bolt at the front of that joint, and there cannot be.** An M6
-nut needs 15.5 mm of height once its corners and a wall are counted. The tray
-is 6 mm thick, and anything standing above it there is standing in front of
-the device's face — over the display, or over whichever ports sit low and
-central. So the joint is made to carry the front instead: the lap is **60 mm
-wide** and runs the full depth, the device's own weight closes it, the two M6
-behind the device clamp it, and two ⌀5 pegs hold the halves square at the
-front. Depth was never the problem — there are 16 mm there; height is.
-
-## Assembly
-
-**You need:** the eight printed parts, **22 × M6 × 12 screws**, **10 × M6 nuts**, a
-4 mm hex key, and the gateway. Every screw is the same: **M6 × 12**. Where each goes is in
-[docs/bom.md](docs/bom.md).
-
-Everything is M6, and every screw turns clockwise into either a nut the rack
-post already holds or a nut you have dropped into a pocket. Nothing is
-self-tapping, so nothing should feel tight until it seats — if it does, back
-it out and check the nut is square in its pocket.
-
-**1 — Nuts first, while you can still see them.**
-
-| nut | where | how it goes in |
-|---|---|---|
-| 2 × M6 | `top_bar`, one at each end | into the hex pocket in the **rear** face |
-| 2 × M6 | `bottom_bar`, one at each end | the same, in its **rear** face |
-| 2 × M6 | `tray_r`, in the rear tab | dropped into the two slots from **above** |
-| 4 × M6 | `leg_l` and `leg_r`, two each | into the pockets on the **inboard** face |
-
-The rack's own posts already hold the nuts for the 12 rack screws, so there is
-nothing to fit there.
-
-**2 — The sides, then the legs.** Bolt each side to a front post — three M6
-through its front ear, driven **from outside the rack inwards** into the
-post's own nut. Then lap a leg onto the inside of each side's rail and run two
-M6 through the slots, finger-tight only.
-
-**Now set the depth:** slide the legs back until the rear ears sit flat
-against the rear posts, bolt each rear ear to its post with three M6 from
-behind, and only then nip up the four splice bolts. This is the step that
-makes the rack's exact depth not matter.
-
-Leave the twelve rack screws finger-tight until step 6 — their slots give
-±2.3 mm and you want that freedom while things go together.
-
-**3 — The tray.** Lay `tray_l` and `tray_r` in from above. Each lands on its
-side's ledge, and they lap over each other across the middle 60 mm — the left
-half passes underneath, the right half on top. The two ⌀5 pegs on the right
-half drop into their sockets in the left. There is 0.4 mm of fore-and-aft fit,
-so it should drop rather than press: a nib in front of the ledge and the rear
-stop behind hold it, and it needs no fixing to the sides at all.
-
-Now run the two M6 × 20 **from the left**, through `tray_l`'s rear tab and
-into the nuts waiting in `tray_r`'s. These are behind the gateway, so you can
-still reach them later.
-
-**4 — The gateway. Lower it straight down** onto the tray. It cannot slide in
-from the rear — the tray's bolt tabs are in the way — and it does not need to.
-Decide which way round you want it first (see *Orientation* below), because
-turning it means taking the bar off again.
-
-**5 — The two bars.** Offer each up from the front so its ends drop into the
-notches in the sides, and run an M6 × 20 through each front ear into the nuts
-you fitted in step 1. The top bar's flange covers the gateway's top front
-edge; between them, the four end blocks close the front and hold it in.
-
-**6 — Nip up the twelve rack screws.** Work diagonally, and stop when they
-seat; printed plastic does not want torque.
-
-To take the gateway out, undo the two screws holding the top bar. The bottom
-bar, the tray, the sides, the legs and the rack screws all stay put.
+The nuts all go in before the parts meet, and two of them are unreachable
+afterwards — see the assembly order below.
 
 ### What holds the gateway in
 
@@ -255,6 +196,8 @@ choice around it.
 
 ## What is checked
 
+Two tools, and they check different things.
+
 `make verify` measures the built solids, not the parameters, so a feature that
 silently does nothing is caught rather than assumed away. 159 checks: that each
 body is one valid solid built from sketches driving pads and pockets; that it
@@ -277,10 +220,20 @@ sketch plane, a nut slot cut on the wrong side of its bolt, and a malformed
 slot wire whose mismatched endpoints made the sketch solver distort the two
 sides differently.
 
-It does not catch everything. That the tray joint was too small for the M6 it
+`make assembly` is less forgiving, because arithmetic can agree with itself
+while the hole is somewhere else entirely. It places a real M6 × 12, a real
+nut and a real washer at every one of the twenty-two positions and asks
+whether they fit what was actually built — 122 checks: that each shank is
+clear the whole way, that each head has something to bear on and how much,
+that each nut sits in its pocket, and that no fastener touches the gateway.
+
+That is what found the washers. The heads at the sixteen slotted positions had
+25 mm² of plastic under them and nothing had noticed, because no dimension was
+wrong — the slot and the head were each exactly as intended.
+
+Neither catches everything. That the tray joint was too small for the M6 it
 was supposed to take was spotted by eye, in the FreeCAD window, not by the
-checks — which is why they now seat a real nut solid rather than trusting a
-dimension.
+checks.
 
 ## Caveats
 

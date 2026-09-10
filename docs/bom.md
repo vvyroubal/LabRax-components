@@ -43,19 +43,32 @@ would foul the bottom bar.
 
 ## Buy
 
-**22 × M6 × 12 screws and 10 × M6 nuts.** One length, everywhere. The twelve
-rack screws need no nuts — the Lab Rax posts already hold them.
+| qty | item |
+|---|---|
+| **22** | **M6 × 12 button head** |
+| **10** | **M6 nut** (DIN 934, 10 mm across the flats, 5 mm thick) |
+| **16** | **M6 washer** (DIN 125 form A, ⌀12.5, 1.6 thick) |
 
-| qty | where | nut |
-|---|---|---|
-| 12 | bracket to rack: 3 per ear, 4 ears | none — in the post |
-| 2 | top bar, through each front ear | 2 × M6 |
-| 2 | bottom bar, through each front ear | 2 × M6 |
-| 2 | tray halves to each other, at the rear tab | 2 × M6 |
-| 4 | side to rear leg, through the splice slots | 4 × M6 |
+One screw length for the whole bracket. The twelve rack screws need no nuts —
+the Lab Rax posts already hold them.
 
-Button heads throughout. The nuts are plain M6 — DIN 934, 10 mm across the
-flats, 5 mm thick — the same nut the rack itself uses.
+| qty | where | nut | washer |
+|---|---|---|---|
+| 12 | bracket to rack: 3 per ear, 4 ears | none — in the post | yes |
+| 2 | top bar, through each front ear | 2 × M6 | no |
+| 2 | bottom bar, through each front ear | 2 × M6 | no |
+| 2 | tray halves to each other, at the rear tab | 2 × M6 | no |
+| 4 | side to rear leg, through the splice slots | 4 × M6 | yes |
+
+**The sixteen washers are not optional.** Every one of those screws goes
+through a slot — 6.6 mm wide for the rack, 6.4 for the splice — and an M6
+button head is 10.5 across. Without a washer the head lands on two thin
+crescents beside the slot, about 25 mm² of PETG, and tightening will bury it.
+A ⌀12.5 washer spreads that to 46–60 mm², which is what the six screws in
+round counterbored holes already have.
+
+`make assembly` measures this: it puts a real screw, nut and washer at all
+twenty-two positions and reports the seat area at each.
 
 ### Why 12 mm, and how the design was made to suit it
 
