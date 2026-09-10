@@ -92,6 +92,20 @@ def hexnut3(cx, cz, af, y0, y1):
         Vector(0, y1 - y0, 0))
 
 
+def hexnut4(sx, y, z, af):
+    """An M6 nut in a splice boss, axis along X."""
+    r = af / math.sqrt(3.0)
+    x0 = sx * (P.POCKET_HW - P.SPLICE_BOSS_T) + sx * 0.05
+    x1 = x0 + sx * (P.M6_HEX_D - 0.1)
+    # Same phase as sk.hexagon, which is what cut the pocket: vertices along
+    # Y, flats top and bottom. Thirty degrees out and the corners foul.
+    pts = [Vector(x0, y + r * math.cos(math.radians(a)),
+                  z + r * math.sin(math.radians(a)))
+           for a in (0, 60, 120, 180, 240, 300)]
+    return Part.Face(Part.makePolygon(pts + [pts[0]])).extrude(
+        Vector(x1 - x0, 0, 0))
+
+
 def fits_bed(b):
     """A long thin part can go on the bed diagonally."""
     w, d = b.XLength, b.YLength
@@ -150,7 +164,8 @@ def main():
           % (hw, P.POST_CLEAR_HW, P.POST_CLEAR_HW - hw))
 
     print("\n[rack screws -- M6 from outside into the post's own nut]")
-    for tag, y_out, into in (("front", -P.EAR_T, +1), ("rear", P.RACK_D + P.EAR_T, -1)):
+    for tag, y_out, into in (("front", -P.EAR_T, +1),
+                             ("rear", P.RACK_D + P.EAR_T, -1)):
         for sx in (-1, 1):
             for z in P.EIA_Z:
                 x = sx * P.SCREW_X
@@ -166,6 +181,57 @@ def main():
         check(vol(asm.common(head)) > VOID,
               "M6 head bears on the front ear at x=%+8.3f" % (sx * P.SCREW_X),
               "%.1f mm3" % vol(asm.common(head)))
+
+    print("\n[the rear legs -- reaching the back posts]")
+    check(abs(P.RACK_D - (P.RACK_INNER + 70.0)) < 1e-9,
+          "outer depth is the inner depth plus both posts",
+          "%.1f = %.1f + 2 x 35" % (P.RACK_D, P.RACK_INNER))
+    for sx, nm in ((-1, "leg_l"), (1, "leg_r")):
+        lg = parts[nm]
+        b = lg.BoundBox
+        check(abs(b.YMax - (P.RACK_D + P.EAR_T)) < 1e-6,
+              "%s reaches the back of the rear post" % nm,
+              "ends at Y %.1f, post rear face at %.1f" % (b.YMax, P.RACK_D))
+        # It has to lap the side over a real length, not just touch it.
+        lap = box(sx * P.POCKET_HW, sx * (P.POCKET_HW - P.SPLICE_T),
+                  P.SPLICE_Y0, P.SPLICE_Y1, 0.0, P.RAIL_TOP)
+        vl = vol(lg.common(lap))
+        side = parts["side_l" if sx < 0 else "side_r"]
+        vs = vol(side.common(box(sx * P.POCKET_HW, sx * P.BODY_HW,
+                                 P.SPLICE_Y0, P.SPLICE_Y1, 0.0, P.RAIL_TOP)))
+        check(vl > 3000.0 and vs > 3000.0, "%s laps the side over %.0f mm"
+              % (nm, P.SPLICE_Y1 - P.SPLICE_Y0),
+              "%.0f mm3 of leg against %.0f mm3 of rail" % (vl, vs))
+        check(vol(lg.common(side)) < VOID, "%s does not foul the side" % nm,
+              "%.3f mm3" % vol(lg.common(side)))
+    # The splice bolts, and the range they give.
+    adj = (P.SPLICE_SLOT - P.M6_CLEAR) / 2.0
+    check(adj >= 8.0, "the splice adjusts enough to cover both readings",
+          "+/-%.1f mm, so %.1f..%.1f outer depth" % (adj, P.RACK_D - adj,
+                                                     P.RACK_D + adj))
+    for sx in (-1, 1):
+        lg = parts["leg_l" if sx < 0 else "leg_r"]
+        side = parts["side_l" if sx < 0 else "side_r"]
+        for y in P.SPLICE_BOLT_Y:
+            shank = Part.makeCylinder(
+                3.0, P.RAIL_T + P.SPLICE_T + P.SPLICE_BOSS_T,
+                Vector(sx * P.BODY_HW, y, P.SPLICE_BOLT_Z), Vector(-sx, 0, 0))
+            v = vol(side.common(shank)) + vol(lg.common(shank))
+            check(v < VOID, "splice M6 passes both at y=%5.1f" % y,
+                  "%.3f mm3" % v)
+            n = hexnut4(sx, y, P.SPLICE_BOLT_Z, 10.0)
+            check(vol(lg.common(n)) < VOID, "its nut seats at y=%5.1f" % y,
+                  "%.3f mm3" % vol(lg.common(n)))
+        # And the slot really is a slot, not a hole.
+        for y in P.SPLICE_BOLT_Y:
+            for d in (-adj, adj):
+                sh = Part.makeCylinder(3.0, P.RAIL_T + 0.2,
+                                       Vector(sx * P.BODY_HW, y + d,
+                                              P.SPLICE_BOLT_Z),
+                                       Vector(-sx, 0, 0))
+                check(vol(side.common(sh)) < VOID,
+                      "slot still clears at y=%5.1f%+5.1f" % (y, d),
+                      "%.3f mm3" % vol(side.common(sh)))
 
     print("\n[top bar -- one piece, no joint to open]")
     bar = parts["top_bar"]

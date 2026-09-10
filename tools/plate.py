@@ -65,9 +65,13 @@ NO_BRIM = {"brim_type": "no_brim"}
 TRAY = dict(SUPPORT, **NO_BRIM)
 
 PLATES = [
-    # A side is 192 mm long, so it only goes on the bed turned 45 degrees.
+    # A side is 214 mm long, so it only goes on the bed turned 45 degrees.
     ("Left side", [("side_l", (90.0, 90.0), [("z", 45)], SUPPORT)]),
     ("Right side", [("side_r", (90.0, 90.0), [("z", 45)], SUPPORT)]),
+    ("Rear legs", [
+        ("leg_l", (90.0, 55.0), [("z", 90)], SUPPORT),
+        ("leg_r", (90.0, 125.0), [("z", 90)], SUPPORT),
+    ]),
     # The lap strip along each tray edge stands 3 mm off the bed, so the tray
     # wants support under its rim. It comes away from the underside.
     ("Left tray", [("tray_l", (90.0, 92.5), [], TRAY)]),

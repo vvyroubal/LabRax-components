@@ -1,9 +1,12 @@
 """The bracket, built as PartDesign bodies from sketches.
 
-Five printed parts:
+Seven printed parts:
 
-    side_l, side_r      one piece each: front ear, side rail, rear ear, the
-                        ledge the tray lands on, and the rear stop
+    side_l, side_r      front ear, side rail, the ledge the tray lands on,
+                        and the rear stop
+    leg_l, leg_r        the rear legs, which reach the back posts and carry
+                        the rear ears. Spliced to the sides through slots, so
+                        the rack's depth is set by sliding them
     tray_l, tray_r      the floor the device stands on, lapped on the
                         centreline
     top_bar             the front panel's top bar, in one piece
@@ -31,7 +34,7 @@ def side(doc, sx, name):
     # --- the rail that spans front to back -------------------------------
     s = sk.sketch(doc, bd, name + "_Sk_rail",
                   sk.plane(Vector(sx * P.POCKET_HW, 0, 0), sk.Y, sk.Z))
-    sk.rect(s, 0.0, 0.0, P.RACK_D, P.RAIL_TOP)
+    sk.rect(s, 0.0, 0.0, P.SPLICE_Y1, P.RAIL_TOP)
     sk.pad(doc, bd, s, P.RAIL_T, reversed_=out)
 
     # --- the two ears ----------------------------------------------------
@@ -39,11 +42,6 @@ def side(doc, sx, name):
                   sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
     sk.rect(s, sx * P.EAR_X0, 0.0, sx * P.FACE_HW, P.RACK_U)
     sk.pad(doc, bd, s, P.EAR_T)
-
-    s = sk.sketch(doc, bd, name + "_Sk_ear_rear",
-                  sk.plane(Vector(0, P.RACK_D, 0), sk.X, sk.Z))
-    sk.rect(s, sx * P.EAR_X0, 0.0, sx * P.FACE_HW, P.RACK_U)
-    sk.pad(doc, bd, s, P.EAR_T, reversed_=True)
 
     # --- the shelf the device rests on, and the stop behind it -----------
     # An L in section: a full-height nib in front of the device, then the
@@ -63,12 +61,20 @@ def side(doc, sx, name):
     # --- what gets taken away --------------------------------------------
     # The rack screws: three slots per ear, on the EIA pitch. Slotted because
     # a printed rack's posts do not land on the nominal pitch every time.
-    for tag, y in (("front", 0.0), ("rear", P.RACK_D)):
-        s = sk.sketch(doc, bd, name + "_Sk_slots_" + tag,
-                      sk.plane(Vector(0, y, 0), sk.X, sk.Z))
-        for z in P.EIA_Z:
-            sk.slot(s, sx * P.SCREW_X, z, P.SLOT_W, P.SLOT_H)
-        sk.pocket(doc, bd, s, P.EAR_T)
+    s = sk.sketch(doc, bd, name + "_Sk_slots",
+                  sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
+    for z in P.EIA_Z:
+        sk.slot(s, sx * P.SCREW_X, z, P.SLOT_W, P.SLOT_H)
+    sk.pocket(doc, bd, s, P.EAR_T)
+
+    # Slots for the rear leg, so the depth is set by sliding it. The rack's
+    # own numbers disagree by about 6 mm -- the side panel says 245.9 outer,
+    # the depth members say 240 -- and this covers both.
+    s = sk.sketch(doc, bd, name + "_Sk_splice",
+                  sk.plane(Vector(sx * P.POCKET_HW, 0, 0), sk.Y, sk.Z))
+    for y in P.SPLICE_BOLT_Y:
+        sk.slot(s, y, P.SPLICE_BOLT_Z, P.SPLICE_SLOT, P.M6_CLEAR)
+    sk.pocket(doc, bd, s, P.RAIL_T)
 
     # Clearance for the screw that holds the top bar on.
     s = sk.sketch(doc, bd, name + "_Sk_barscrew",
@@ -93,6 +99,62 @@ def side(doc, sx, name):
     for y0, y1 in P.RAIL_VENTS_Y:
         sk.rect(s, y0, P.RAIL_VENT_Z0, y1, P.RAIL_VENT_Z1)
     sk.pocket(doc, bd, s, P.RAIL_T)
+    return bd
+
+
+def leg(doc, sx, name):
+    """A rear leg: the tie from the side back to the rear posts.
+
+    It carries no device weight -- the tray lands on the sides' ledges, well
+    forward of here -- so this is a tie, not a beam. What it does is stop the
+    bracket hanging off the front posts alone.
+
+    It laps on the inner face of the side's rail and bolts through the slots
+    there, which is where the rack's depth is finally set: nothing in this
+    part depends on RACK_D being exactly right.
+    """
+    bd = sk.body(doc, name)
+    inward = sx > 0
+
+    s = sk.sketch(doc, bd, name + "_Sk_plate",
+                  sk.plane(Vector(sx * P.POCKET_HW, 0, 0), sk.Y, sk.Z))
+    sk.rect(s, P.SPLICE_Y0, 0.0, P.RACK_D, P.RAIL_TOP)
+    sk.pad(doc, bd, s, P.SPLICE_T, reversed_=inward)
+
+    # The rear ear, on the far side of the rear posts: the screws go into
+    # them from outside the rack, like every other one.
+    s = sk.sketch(doc, bd, name + "_Sk_ear",
+                  sk.plane(Vector(0, P.RACK_D, 0), sk.X, sk.Z))
+    sk.rect(s, sx * P.EAR_X0, 0.0, sx * P.FACE_HW, P.RACK_U)
+    sk.pad(doc, bd, s, P.EAR_T, reversed_=True)
+
+    s = sk.sketch(doc, bd, name + "_Sk_slots",
+                  sk.plane(Vector(0, P.RACK_D + P.EAR_T, 0), sk.X, sk.Z))
+    for z in P.EIA_Z:
+        sk.slot(s, sx * P.SCREW_X, z, P.SLOT_W, P.SLOT_H)
+    sk.pocket(doc, bd, s, P.EAR_T)
+
+    # A boss at each splice bolt, thick enough to trap an M6 nut. They sit
+    # behind the device, where there is nothing to foul.
+    x_in = sx * (P.POCKET_HW - P.SPLICE_BOSS_T)
+    s = sk.sketch(doc, bd, name + "_Sk_bosses",
+                  sk.plane(Vector(sx * P.POCKET_HW, 0, 0), sk.Y, sk.Z))
+    for y in P.SPLICE_BOLT_Y:
+        sk.rect(s, y - P.SPLICE_SLOT / 2 - 4.0, P.SPLICE_BOLT_Z - P.SPLICE_BOSS_H / 2,
+                y + P.SPLICE_SLOT / 2 + 4.0, P.SPLICE_BOLT_Z + P.SPLICE_BOSS_H / 2)
+    sk.pad(doc, bd, s, P.SPLICE_BOSS_T, reversed_=inward)
+
+    s = sk.sketch(doc, bd, name + "_Sk_boltholes",
+                  sk.plane(Vector(x_in, 0, 0), sk.Y, sk.Z))
+    for y in P.SPLICE_BOLT_Y:
+        sk.circle(s, y, P.SPLICE_BOLT_Z, P.M6_CLEAR)
+    sk.pocket(doc, bd, s, P.SPLICE_BOSS_T)
+
+    s = sk.sketch(doc, bd, name + "_Sk_nuts",
+                  sk.plane(Vector(x_in, 0, 0), sk.Y, sk.Z))
+    for y in P.SPLICE_BOLT_Y:
+        sk.hexagon(s, y, P.SPLICE_BOLT_Z, P.M6_HEX_AF)
+    sk.pocket(doc, bd, s, P.M6_HEX_D, reversed_=inward)
     return bd
 
 
@@ -220,6 +282,8 @@ def build(doc):
     return {
         "side_l": side(doc, -1, "side_l"),
         "side_r": side(doc, +1, "side_r"),
+        "leg_l": leg(doc, -1, "leg_l"),
+        "leg_r": leg(doc, +1, "leg_r"),
         "tray_l": tray(doc, -1, "tray_l"),
         "tray_r": tray(doc, +1, "tray_r"),
         "top_bar": top_bar(doc, "top_bar"),

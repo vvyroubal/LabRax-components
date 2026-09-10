@@ -33,7 +33,7 @@ import params as P  # noqa: E402
 import model  # noqa: E402
 
 DOC = "UCG_Fiber_LabRax"
-PARTS = ("side_l", "side_r", "tray_l", "tray_r", "top_bar")
+PARTS = ("side_l", "side_r", "leg_l", "leg_r", "tray_l", "tray_r", "top_bar")
 
 
 def main():

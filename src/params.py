@@ -38,11 +38,27 @@ POST_CLEAR_W = 222.25  # [rack] clear width between the posts
 POST_CLEAR_HW = POST_CLEAR_W / 2
 POST_DEPTH = 35.0  # [rack] post cross-section front-to-back
 
-# Front-to-back over the frame: the front posts' front face to the rear posts'
-# rear face. Taken from the side panel, which spans the frame and measures
-# 175.9 mm. The rear ears land on this, so if a rack comes out different this
-# is the one number to change.
-RACK_D = 175.9  # [rack]
+# Front to back. The side panel is 175.9 mm and fits BETWEEN the posts, so
+# that is the INNER depth -- reading it as the outer one is what made the
+# first bracket 27 mm too short. Outer, front post face to rear post face:
+RACK_INNER = 175.9              # [rack] side panel, between the posts
+RACK_D = RACK_INNER + 2 * 35.0  # [rack] 245.9, front face to rear face
+
+# 245.9 + two 8 mm ears is 261.9 mm, and a 180 mm bed takes 225.6 mm even
+# cornerwise, so each side is two pieces: a front section carrying everything
+# that touches the device, and a rear leg that reaches the back posts. They
+# splice behind the device, where there is nothing in the way, and the splice
+# is slotted -- so the depth is set by sliding it rather than by trusting the
+# number above. That matters: the rack's own depth members are 170 mm, which
+# would imply 240 rather than 245.9, and the slot covers both.
+SPLICE_Y0 = 146.0     # [design] front of the overlap, behind the device
+SPLICE_Y1 = 206.0     # [design] rear end of the front section
+SPLICE_T = 3.2        # [design] the leg's lap plate, same as the rail
+SPLICE_BOLT_Y = (161.0, 191.0)  # [design] nominal; the slots move +/-10
+SPLICE_BOLT_Z = 20.0  # [design]
+SPLICE_SLOT = 26.0    # [design] slot length -> +/-10 mm of adjustment
+SPLICE_BOSS_T = 8.0   # [design] the leg thickens here to hold an M6 nut
+SPLICE_BOSS_H = 18.0  # [design] and is this tall around each one
 
 # --------------------------------------------------------------- device ----
 # UniFi Cloud Gateway Fiber. Fanless: vents underneath and on both sides.

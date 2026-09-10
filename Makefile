@@ -5,7 +5,7 @@ ROOT    := $(CURDIR)
 STL   := export/stl
 STEP  := export/step
 CAD   := cad/UCG_Fiber_LabRax.FCStd
-PARTS := side_l side_r tray_l tray_r top_bar
+PARTS := side_l side_r leg_l leg_r tray_l tray_r top_bar
 STLS  := $(addprefix $(STL)/,$(addsuffix .stl,$(PARTS)))
 
 .PHONY: all model verify images plate plates clean
