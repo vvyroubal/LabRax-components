@@ -272,6 +272,49 @@ def main():
           "M6 at x = +/-%.0f, %.0f mm apart" % (P.BAR_SCREW_X,
                                                 2 * P.BAR_SCREW_X))
 
+    print("\n[the front face]")
+    top, bot = parts["top_bar"], parts["bottom_bar"]
+    check(len(bot.Solids) == 1 and bot.BoundBox.XLength > 2 * P.POCKET_HW,
+          "the bottom bar spans the whole opening in one piece",
+          "%.1f mm wide" % bot.BoundBox.XLength)
+    # An even border: as much bracket below the device as above it.
+    above = P.RACK_U - P.BAR_Z0
+    below = P.BOT_BAR_Z1
+    check(abs(above - below) < 1e-6, "the border is the same above and below",
+          "%.2f mm each" % above)
+    # Both bars in one plane, a consistent reveal behind the ears.
+    for nm, pt in (("top", top), ("bottom", bot)):
+        b = pt.BoundBox
+        check(abs(b.YMin - 0.0) < 1e-6,
+              "the %s bar sits in the same plane" % nm,
+              "front face at Y %.2f, ears at Y %.2f, reveal %.1f mm"
+              % (b.YMin, -P.EAR_T, P.EAR_T))
+    # Nothing may stick out in front of them.
+    ahead = box(-P.FACE_HW, P.FACE_HW, -P.EAR_T + 0.01, 0.0, 0.0, P.RACK_U)
+    stray = [n for n in names
+             if n not in ("side_l", "side_r") and vol(parts[n].common(ahead)) > VOID]
+    check(not stray, "nothing protrudes into the reveal",
+          ", ".join(stray) if stray else "clear")
+    # The bottom bar catches the device's lower corners, as the top one does
+    # its upper corners.
+    face = box(-P.DEV_W / 2, 0.0, P.DEV_Y0 - P.BAR_T, P.DEV_Y0,
+               P.DEV_Z0, P.DEV_Z1)
+    check(vol(bot.common(face)) > 200.0,
+          "the bottom bar catches the device's lower corners",
+          "%.0f mm3 each end" % vol(bot.common(face)))
+    for sx in (-1, 1):
+        x = sx * P.BAR_SCREW_X
+        n = hexnut3(x, P.BOT_SCREW_Z, 10.0,
+                    P.BAR_T + 0.05, P.BAR_T + P.M6_HEX_D - 0.05)
+        check(vol(bot.common(n)) < VOID,
+              "its M6 nut seats at x=%+7.2f" % x, "%.3f mm3" % vol(bot.common(n)))
+        through = Part.makeCylinder(3.0, P.EAR_T + P.BAR_T - P.M6_HEX_D + 0.1,
+                                    Vector(x, -P.EAR_T - 0.05, P.BOT_SCREW_Z),
+                                    Vector(0, 1, 0))
+        check(vol(asm.common(through)) < VOID,
+              "and the screw reaches it through the ear at x=%+7.2f" % x,
+              "%.3f mm3" % vol(asm.common(through)))
+
     print("\n[device]")
     dev = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0, P.DEV_Y0 + P.DEV_D,
               P.DEV_Z0, P.DEV_Z1)
@@ -389,11 +432,12 @@ def main():
     check(gap - got >= 0.3, "the tray drops into the gap it has to sit in",
           "%.2f mm long, %.2f mm gap, %.2f mm of fit" % (got, gap, gap - got))
 
-    # Held fore and aft by the nib and the rear stop, so it cannot walk.
+    # Held fore and aft by the bottom bar and the rear stop, so it cannot walk.
     ahead = box(-P.TRAY_X1, P.TRAY_X1, P.DEV_Y0 - 1.0, P.DEV_Y0,
-                P.LAP_T, P.TRAY_T)
-    check(vol(asm.common(ahead)) > 100.0, "a nib stops the tray sliding forward",
-          "%.0f mm3" % vol(asm.common(ahead)))
+                0.0, P.TRAY_T)
+    check(vol(parts["bottom_bar"].common(ahead)) > 100.0,
+          "the bottom bar stops the tray sliding forward",
+          "%.0f mm3" % vol(parts["bottom_bar"].common(ahead)))
 
     print("\n[clearances]")
     check(abs((P.POST_CLEAR_HW - P.BODY_HW) - 0.925) < 1e-9,

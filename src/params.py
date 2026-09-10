@@ -141,7 +141,7 @@ M6_NUT_D = 5.2        # [design] ... and 5.0 thick
 # the lap itself are what stop them separating vertically.
 KEY_D = 5.0           # [design] peg diameter
 KEY_FIT = 0.3         # [design] clearance in the socket
-KEY_Y = 4.0           # [design] in the lap, ahead of the device
+KEY_Y = 20.0          # [design] in the lap, just inside the device
 KEY_X = 22.0          # [design] two of them, near the edges of the lap, so
                       # they locate the halves in rotation as well as position
 
@@ -161,6 +161,19 @@ BAR_FLANGE_Z0 = BAR_Z0      # flush with the bar's underside
 
 BAR_SCREW_X = 103.0   # [design] inboard of the rack slots, inside the ear
 BAR_SCREW_Z = 30.16   # [design] midway between two EIA holes
+
+# The bottom bar mirrors the top one about the middle of the U, so the device
+# sits in an even border: 7.65 mm of bracket above it and 7.65 below. Both sit
+# 8 mm behind the ears' front faces -- a consistent reveal all the way round,
+# rather than the top bar being recessed and nothing being below it.
+BOT_BAR_Z1 = RACK_U - BAR_Z0        # 7.65, what you see below the device
+BOT_END_Z1 = RACK_U - BAR_END_Z0    # 20.75, the taller ends that hold a nut
+BOT_SCREW_Z = RACK_U - BAR_SCREW_Z  # 14.29
+
+# The ears' outer corners are cut back, so the front reads as a shape rather
+# than as four square slabs.
+EAR_CHAMFER = 4.0     # [design]
+
 
 # The bar is one piece. At 220.4 x 20 mm it will not fit a 180 mm bed square
 # on, but turned 45 degrees its bounding box is 170 mm and it does -- and the

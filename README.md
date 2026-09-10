@@ -27,10 +27,10 @@ make plates     # slice every plate and check it prints inside the bed
 src/
   params.py       every dimension, tagged [rack] / [dev] / [design]
   sk.py           sketch plumbing: planes, polygons, slots, pads, pockets
-  model.py        the five bodies
+  model.py        the eight bodies
 build.py          writes cad/, export/stl/, export/step/
 tools/
-  verify.py       92 checks against the rack, the device and the printer
+  verify.py       153 checks against the rack, the device and the printer
   measure_rack.py re-derives the [rack] numbers from the Lab Rax mesh files
   preview.py      renders images/ (FreeCAD is headless here)
   plate.py        arranges the STLs onto A1 mini plates as a Bambu 3MF
@@ -55,7 +55,7 @@ taken from prose, because the published figures are rounded. The rack's own
 | Hole heights in the U | 6.35 / 22.225 / 38.1 mm | EIA-310, confirmed on the posts |
 | Screws | M6 | Lab Rax uses M6 throughout |
 | Clear width between posts | 222.25 mm | derived from the post holes |
-| Front posts to rear posts | 175.9 mm | side panel |
+| Front posts to rear posts | 245.9 mm outer | side panel (175.9 inner) + 2 posts |
 | Device | 212.8 × 127.6 × 30 mm | Ubiquiti UCG-Fiber spec |
 
 **The rack posts already hold the nuts.** Measured from a post's outer face:
@@ -69,17 +69,28 @@ stock Lab Rax faceplates slot their holes for the same reason.
 
 ## Parts
 
-Five prints, all distinct, none over a 180 mm bed.
+Eight prints, none over a 180 mm bed.
 
 | part | size (mm) | qty |
 |---|---|---|
-| `side_l` / `side_r` | 29 × 192 × 44.5 | 1 each |
-| `tray_l` / `tray_r` | 137 × 167 × 16 | 1 each |
+| `side_l` / `side_r` | 29 × 214 × 44.5 | 1 each |
+| `leg_l` / `leg_r` | 29 × 110 × 44.5 | 1 each |
+| `tray_l` / `tray_r` | 137 × 159 × 16 | 1 each |
 | `top_bar` | 220 × 20 × 21 | 1 |
+| `bottom_bar` | 220 × 8 × 21 | 1 |
 
-A **side** is one piece: front ear, side rail, rear ear, the ledge the tray
-lands on, and the rear stop. It reaches all the way from the front posts to
-the rear ones, so the bracket is held at four points and is not a cantilever.
+A **side** carries everything that touches the device: front ear, side rail,
+the ledge the tray lands on, and the rear stop. A **rear leg** laps 60 mm onto
+the inner face of its rail, bolts through two M6, and carries the rear ear out
+to the back posts — so the bracket is held at four points and is not a
+cantilever.
+
+**That splice is slotted, and it is where the rack's depth gets set.** The
+rack's own parts disagree about how deep it is: the side panel gives 245.9 mm
+outer, while the top edge and the handle are both 170 mm, which gives 240. The
+slots allow ±9.8 mm, covering 236.1 – 255.7, so you slide the legs until the
+rear ears meet the posts and then tighten. Do not trust the number; use the
+slot.
 
 The **tray** is the floor the gateway stands on. At 214 mm it will not fit the
 bed in any orientation, so it comes in halves that lap on the centreline. Each
@@ -87,15 +98,21 @@ half laps the other way onto its side's ledge. It is a light load over a wide
 plate — 734 g over a 214 × 129 × 6 span works out around 0.2 mm of deflection
 — so it does not need stiffening, only holding together and locating.
 
-The **top bar** closes the front over the device, and is **one piece**. At
+The **top bar** and the **bottom bar** frame the device, each one piece. At
 220 × 20 mm it will not fit the bed square on, but turned 45° its footprint is
 168 mm and it does — and printed upside down, the face that was the top of the
 1U lies flat on the bed, so it needs neither support nor a brim. Each end
 nests into a notch in the side, so the ear and the rail still meet underneath.
 
-It was two halves once. Butted, each hung off the single M6 at its own end —
-a pivot, and the seam opened. Lapping them fixed that but needed two M3, the
-only ones left in the design. One piece has neither problem.
+The bottom bar mirrors the top one about the middle of the U, so there is
+7.65 mm of bracket above the device and 7.65 below. Both sit 8 mm behind the
+ears' front faces — **a consistent reveal all the way round** rather than a
+recessed bar above and a gap below. It is also what stops the tray sliding
+forward, and its end blocks catch the device's lower front corners the way the
+top bar's catch the upper ones.
+
+The ears have their outer corners cut back 4 mm, so the front reads as a shape
+rather than four square slabs.
 
 ![iso](images/assembly-iso.png)
 
@@ -131,9 +148,9 @@ front. Depth was never the problem — there are 16 mm there; height is.
 
 ## Assembly
 
-**You need:** the five printed parts, 16 × M6 screws (12 × 10–12 mm button
-head for the rack, 4 × 20 mm for the bracket's own joints), 4 × M6 nuts, a 4 mm
-hex key, and the gateway.
+**You need:** the eight printed parts, **22 × M6 screws** (12 × 10–12 mm
+button head for the rack, 10 × 20 mm for the bracket's own joints), **10 × M6
+nuts**, a 4 mm hex key, and the gateway.
 
 Everything is M6, and every screw turns clockwise into either a nut the rack
 post already holds or a nut you have dropped into a pocket. Nothing is
@@ -145,15 +162,25 @@ it out and check the nut is square in its pocket.
 | nut | where | how it goes in |
 |---|---|---|
 | 2 × M6 | `top_bar`, one at each end | into the hex pocket in the **rear** face |
+| 2 × M6 | `bottom_bar`, one at each end | the same, in its **rear** face |
 | 2 × M6 | `tray_r`, in the rear tab | dropped into the two slots from **above** |
+| 4 × M6 | `leg_l` and `leg_r`, two each | into the pockets on the **inboard** face |
 
 The rack's own posts already hold the nuts for the 12 rack screws, so there is
 nothing to fit there.
 
-**2 — The two sides into the rack.** Each side takes three M6 through its
-front ear and three through its rear ear, all driven **from outside the rack
-inwards** into the posts' own nuts. Leave them finger-tight: the slots give
-±2.3 mm and you want that freedom until the tray is in.
+**2 — The sides, then the legs.** Bolt each side to a front post — three M6
+through its front ear, driven **from outside the rack inwards** into the
+post's own nut. Then lap a leg onto the inside of each side's rail and run two
+M6 through the slots, finger-tight only.
+
+**Now set the depth:** slide the legs back until the rear ears sit flat
+against the rear posts, bolt each rear ear to its post with three M6 from
+behind, and only then nip up the four splice bolts. This is the step that
+makes the rack's exact depth not matter.
+
+Leave the twelve rack screws finger-tight until step 6 — their slots give
+±2.3 mm and you want that freedom while things go together.
 
 **3 — The tray.** Lay `tray_l` and `tray_r` in from above. Each lands on its
 side's ledge, and they lap over each other across the middle 60 mm — the left
@@ -171,16 +198,16 @@ from the rear — the tray's bolt tabs are in the way — and it does not need t
 Decide which way round you want it first (see *Orientation* below), because
 turning it means taking the bar off again.
 
-**5 — The top bar.** Offer it up from the front so each end drops into the
-notch in its side, and run an M6 × 20 through each front ear into the nuts you
-fitted in step 1. The bar's flange now covers the top front edge of the
-gateway and its end blocks close the front.
+**5 — The two bars.** Offer each up from the front so its ends drop into the
+notches in the sides, and run an M6 × 20 through each front ear into the nuts
+you fitted in step 1. The top bar's flange covers the gateway's top front
+edge; between them, the four end blocks close the front and hold it in.
 
 **6 — Nip up the twelve rack screws.** Work diagonally, and stop when they
 seat; printed plastic does not want torque.
 
-To take the gateway out, undo only the two screws holding the top bar. The
-tray, the sides and the rack screws all stay put.
+To take the gateway out, undo the two screws holding the top bar. The bottom
+bar, the tray, the sides, the legs and the rack screws all stay put.
 
 ### What holds the gateway in
 
@@ -190,7 +217,7 @@ tray, the sides and the rack screws all stay put.
 | sideways | the two side rails | 0.6 mm a side |
 | up | the top bar's flange | 0.8 mm over the case |
 | back | the ears' rear beam, which runs forward to meet it | — |
-| **forward** | **the top bar's end blocks** | 1.4 mm of travel |
+| **forward** | **the two bars' end blocks**, four of them | 1.4 mm of travel |
 
 The forward stop is worth spelling out, because it is not what it looks like
 from the front. The top bar is not a cosmetic strip: its two end blocks are
@@ -223,7 +250,7 @@ choice around it.
 ## What is checked
 
 `make verify` measures the built solids, not the parameters, so a feature that
-silently does nothing is caught rather than assumed away. 92 checks: that each
+silently does nothing is caught rather than assumed away. 153 checks: that each
 body is one valid solid built from sketches driving pads and pockets; that it
 fits the bed, turning a long part on the diagonal if it has to; that no two
 parts foul each other; that an M6 passes all twelve rack slots; that the
@@ -249,10 +276,11 @@ dimension.
 
 ## Caveats
 
-- **`RACK_D` (175.9 mm), front posts to rear posts, is inferred** from the
-  side panel rather than measured on an assembled rack — the 3MF is a print
-  plate, not an assembly. The rear ears land on it. If your rack differs, it
-  is the one number to change.
+- **The rack's depth is set by the slotted splice, not by `RACK_D`.** The
+  first build of this bracket read the side panel's 175.9 mm as the outer
+  depth when it is the inner one, and came out 27 mm short. The number is now
+  245.9, but the parts it came from disagree — 240 by another reading — so the
+  splice adjusts ±9.8 mm and you set it by fitting.
 - **0.925 mm per side between the rails and the posts is the tightest
   dimension**, and the top bar now takes the same. Print one side first and
   offer it up before committing to the rest.

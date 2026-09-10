@@ -1,6 +1,6 @@
 """The bracket, built as PartDesign bodies from sketches.
 
-Seven printed parts:
+Eight printed parts:
 
     side_l, side_r      front ear, side rail, the ledge the tray lands on,
                         and the rear stop
@@ -9,7 +9,8 @@ Seven printed parts:
                         the rack's depth is set by sliding them
     tray_l, tray_r      the floor the device stands on, lapped on the
                         centreline
-    top_bar             the front panel's top bar, in one piece
+    top_bar             the bar above the device, in one piece
+    bottom_bar          the bar below it, mirroring it
 
 The bracket bolts to all four rack posts. Every rack screw is an M6 driven
 from outside the rack inwards into the hex nut the post already holds, so the
@@ -26,6 +27,17 @@ import params as P
 import sk
 
 
+def _ear_outline(sx):
+    """A rack ear, with its two outer corners cut back."""
+    c = P.EAR_CHAMFER
+    return [(sx * P.EAR_X0, 0.0),
+            (sx * (P.FACE_HW - c), 0.0),
+            (sx * P.FACE_HW, c),
+            (sx * P.FACE_HW, P.RACK_U - c),
+            (sx * (P.FACE_HW - c), P.RACK_U),
+            (sx * P.EAR_X0, P.RACK_U)]
+
+
 def side(doc, sx, name):
     """One side of the bracket, front ear through to rear ear."""
     bd = sk.body(doc, name)
@@ -40,17 +52,16 @@ def side(doc, sx, name):
     # --- the two ears ----------------------------------------------------
     s = sk.sketch(doc, bd, name + "_Sk_ear_front",
                   sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
-    sk.rect(s, sx * P.EAR_X0, 0.0, sx * P.FACE_HW, P.RACK_U)
+    sk.polygon(s, _ear_outline(sx))
     sk.pad(doc, bd, s, P.EAR_T)
 
     # --- the shelf the device rests on, and the stop behind it -----------
-    # An L in section: a full-height nib in front of the device, then the
-    # shelf the tray laps onto. The nib and the rear stop between them hold
-    # the tray fore and aft, so it needs no fixing to the side.
+    # The shelf the tray laps onto. It starts where the bottom bar ends: that
+    # bar is what stops the tray sliding forward now, so the ledge needs no
+    # nib of its own.
     s = sk.sketch(doc, bd, name + "_Sk_ledge",
                   sk.plane(Vector(sx * P.LEDGE_X0, 0, 0), sk.Y, sk.Z))
-    sk.polygon(s, [(0.0, 0.0), (P.DEV_Y1, 0.0), (P.DEV_Y1, P.LAP_T),
-                   (P.DEV_Y0, P.LAP_T), (P.DEV_Y0, P.TRAY_T), (0.0, P.TRAY_T)])
+    sk.rect(s, P.DEV_Y0, 0.0, P.DEV_Y1, P.LAP_T)
     sk.pad(doc, bd, s, P.BODY_HW - P.LEDGE_X0, reversed_=out)
 
     s = sk.sketch(doc, bd, name + "_Sk_stop",
@@ -76,10 +87,11 @@ def side(doc, sx, name):
         sk.slot(s, y, P.SPLICE_BOLT_Z, P.SPLICE_SLOT, P.M6_CLEAR)
     sk.pocket(doc, bd, s, P.RAIL_T)
 
-    # Clearance for the screw that holds the top bar on.
-    s = sk.sketch(doc, bd, name + "_Sk_barscrew",
+    # Clearance for the two screws that hold the bars on, one high, one low.
+    s = sk.sketch(doc, bd, name + "_Sk_barscrews",
                   sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
-    sk.circle(s, sx * P.BAR_SCREW_X, P.BAR_SCREW_Z, P.M6_CLEAR)
+    for z in (P.BAR_SCREW_Z, P.BOT_SCREW_Z):
+        sk.circle(s, sx * P.BAR_SCREW_X, z, P.M6_CLEAR)
     sk.pocket(doc, bd, s, P.EAR_T)
 
     # The notch the top bar's end sits in. Cut only behind the ear, so the
@@ -91,6 +103,12 @@ def side(doc, sx, name):
                   sk.plane(Vector(0, P.BAR_T, 0), sk.X, sk.Z))
     sk.rect(s, sx * (P.BAR_END_X0 - 2.0), P.BAR_END_Z0,
             sx * (P.BAR_X1 + 0.4), P.RACK_U)
+    sk.pocket(doc, bd, s, P.BAR_T, reversed_=True)
+
+    s = sk.sketch(doc, bd, name + "_Sk_botnotch",
+                  sk.plane(Vector(0, P.BAR_T, 0), sk.X, sk.Z))
+    sk.rect(s, sx * (P.BAR_END_X0 - 2.0), 0.0,
+            sx * (P.BAR_X1 + 0.4), P.BOT_END_Z1 + 0.4)
     sk.pocket(doc, bd, s, P.BAR_T, reversed_=True)
 
     # The device vents through its sides, so the rails are windowed.
@@ -125,7 +143,7 @@ def leg(doc, sx, name):
     # them from outside the rack, like every other one.
     s = sk.sketch(doc, bd, name + "_Sk_ear",
                   sk.plane(Vector(0, P.RACK_D, 0), sk.X, sk.Z))
-    sk.rect(s, sx * P.EAR_X0, 0.0, sx * P.FACE_HW, P.RACK_U)
+    sk.polygon(s, _ear_outline(sx))
     sk.pad(doc, bd, s, P.EAR_T, reversed_=True)
 
     s = sk.sketch(doc, bd, name + "_Sk_slots",
@@ -203,6 +221,43 @@ def top_bar(doc, name):
     return bd
 
 
+def bottom_bar(doc, name):
+    """The bar below the device, mirroring the top one.
+
+    It closes the bottom of the opening so the device sits in an even border
+    instead of having a bar above it and a gap below. It is also what stops
+    the tray sliding forward -- the ledge used to have a nib for that -- and
+    its end blocks catch the device's lower front corners, the same way the
+    top bar's catch the upper ones.
+    """
+    bd = sk.body(doc, name)
+
+    s = sk.sketch(doc, bd, name + "_Sk_web",
+                  sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
+    sk.polygon(s, [(-P.BAR_X1, 0.0),
+                   (P.BAR_X1, 0.0),
+                   (P.BAR_X1, P.BOT_END_Z1),
+                   (P.BAR_END_X0, P.BOT_END_Z1),
+                   (P.BAR_END_X0, P.BOT_BAR_Z1),
+                   (-P.BAR_END_X0, P.BOT_BAR_Z1),
+                   (-P.BAR_END_X0, P.BOT_END_Z1),
+                   (-P.BAR_X1, P.BOT_END_Z1)])
+    sk.pad(doc, bd, s, P.BAR_T, reversed_=True)
+
+    s = sk.sketch(doc, bd, name + "_Sk_screws",
+                  sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
+    for sx in (-1, 1):
+        sk.circle(s, sx * P.BAR_SCREW_X, P.BOT_SCREW_Z, P.M6_CLEAR)
+    sk.pocket(doc, bd, s, P.BAR_T - P.M6_HEX_D)
+
+    s = sk.sketch(doc, bd, name + "_Sk_nuts",
+                  sk.plane(Vector(0, P.BAR_T, 0), sk.X, sk.Z))
+    for sx in (-1, 1):
+        sk.hexagon(s, sx * P.BAR_SCREW_X, P.BOT_SCREW_Z, P.M6_HEX_AF)
+    sk.pocket(doc, bd, s, P.M6_HEX_D)
+    return bd
+
+
 def tray(doc, sx, name):
     """Half of the tray.
 
@@ -228,15 +283,6 @@ def tray(doc, sx, name):
     sk.polygon(s, pts)
     sk.pad(doc, bd, s, P.DEV_Y1 - P.DEV_Y0 - P.TRAY_FIT, reversed_=True)
 
-    # Forward of the device the lap simply continues, and a peg keys the two
-    # halves together. There is only 8 mm there -- an M6 nut wants 10.2 of
-    # slot and 15.5 of height -- so the bolts cannot go at this end.
-    s = sk.sketch(doc, bd, name + "_Sk_frontlap",
-                  sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
-    z0, z1 = (0.0, P.LAP_T) if sx < 0 else (P.LAP_T, P.TRAY_T)
-    sk.rect(s, -P.CENTRE_LAP, z0, P.CENTRE_LAP, z1)
-    sk.pad(doc, bd, s, P.DEV_Y0, reversed_=True)
-
     # Behind it there is room to work: one tab per half, side by side, with
     # two M6 running across the joint.
     u0, u1 = (-P.TAB_HX, 0.0) if sx < 0 else (0.0, P.TAB_HX)
@@ -252,7 +298,9 @@ def tray(doc, sx, name):
     sk.pocket(doc, bd, s, P.TAB_HX)
 
     # Two pegs and the sockets they drop into. Near the edges of the lap, so
-    # they hold the halves square to each other as well as together.
+    # they hold the halves square to each other as well as together. They sit
+    # inside the device's footprint now -- the tray no longer reaches forward
+    # of it, because the bottom bar occupies that space.
     s = sk.sketch(doc, bd, name + "_Sk_key",
                   sk.plane(Vector(0, 0, P.LAP_T), sk.X, sk.Y))
     for kx in (-P.KEY_X, P.KEY_X):
@@ -287,4 +335,5 @@ def build(doc):
         "tray_l": tray(doc, -1, "tray_l"),
         "tray_r": tray(doc, +1, "tray_r"),
         "top_bar": top_bar(doc, "top_bar"),
+        "bottom_bar": bottom_bar(doc, "bottom_bar"),
     }

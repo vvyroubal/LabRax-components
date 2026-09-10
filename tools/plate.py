@@ -80,6 +80,9 @@ PLATES = [
     # that was the top of the 1U then lies flat on the bed, which is the whole
     # of its underside, so it needs no support and no brim.
     ("Top bar", [("top_bar", (90.0, 90.0), [("x", 180), ("z", 45)], NO_BRIM)]),
+    # Same trick: inverted, its whole top face is on the bed.
+    ("Bottom bar", [("bottom_bar", (90.0, 90.0),
+                     [("x", 180), ("z", 45)], NO_BRIM)]),
 ]
 
 
