@@ -1,6 +1,6 @@
 """The bracket, built as PartDesign bodies from sketches.
 
-Eight printed parts:
+Seven printed parts:
 
     side_l, side_r      front ear, side rail, the ledge the tray lands on,
                         and the rear stop
@@ -9,8 +9,8 @@ Eight printed parts:
                         the rack's depth is set by sliding them
     tray_l, tray_r      the floor the device stands on, lapped on the
                         centreline
-    top_bar             the bar above the device, in one piece
-    bottom_bar          the bar below it, mirroring it
+    faceplate           the front, in one piece, with a window for the
+                        gateway's display
 
 The bracket bolts to all four rack posts. Every rack screw is an M6 driven
 from outside the rack inwards into the hex nut the post already holds, so the
@@ -106,18 +106,9 @@ def side(doc, sx, name):
     # Sketched on the bar's rear face and cut forward, so it takes the rail
     # and never the ear -- the two directions both have material to remove,
     # so this one cannot be left to the automatic choice.
-    s = sk.sketch(doc, bd, name + "_Sk_barnotch",
-                  sk.plane(Vector(0, P.BAR_T, 0), sk.X, sk.Z))
-    sk.rect(s, sx * (P.BAR_END_X0 - 2.0), P.BAR_END_Z0,
-            sx * (P.BAR_X1 + 0.4), P.RACK_U)
-    sk.pocket(doc, bd, s, P.BAR_T, reversed_=True)
-
-    s = sk.sketch(doc, bd, name + "_Sk_botnotch",
-                  sk.plane(Vector(0, P.BAR_T, 0), sk.X, sk.Z))
-    sk.rect(s, sx * (P.BAR_END_X0 - 2.0), 0.0,
-            sx * (P.BAR_X1 + 0.4), P.BOT_END_Z1 + 0.4)
-    sk.pocket(doc, bd, s, P.BAR_T, reversed_=True)
-
+    # No notch for the faceplate: it stops at the rail's inner face, so the
+    # ear and the rail still meet over their whole height. Cutting one full
+    # height, as the two bars needed, would have severed them.
     # The device vents through its sides, so the rails are windowed.
     s = sk.sketch(doc, bd, name + "_Sk_vents",
                   sk.plane(Vector(sx * P.POCKET_HW, 0, 0), sk.Y, sk.Z))
@@ -183,87 +174,52 @@ def leg(doc, sx, name):
     return bd
 
 
-def top_bar(doc, name):
-    """The front panel's top bar, in one piece.
+def faceplate(doc, name):
+    """The front of the bracket: one plate across the whole opening.
 
-    It spans the whole opening, so there is no joint in it to open up and no
-    half of it that can pivot on its own screw. Its two end blocks reach down
-    to BAR_END_Z0 and stand in the 8 mm between the rack face and the device:
-    they are what stops the gateway coming out of the front.
+    It replaces the bar above the device and the bar below it. Being one piece
+    it has no joint to open, it stops the gateway across its whole face rather
+    than at four corner blocks, and it stops the tray sliding forward. The
+    window is the gateway's display; the rest of the face is covered, which is
+    why the ports have to be at the back.
+
+    It stops at the rails' inner faces rather than spanning the full opening,
+    so the sides need no notch cut in them -- one cut full height would have
+    separated each ear from its rail.
     """
     bd = sk.body(doc, name)
 
-    # The web, with a taller block at each end where it meets an ear.
-    s = sk.sketch(doc, bd, name + "_Sk_web",
+    s = sk.sketch(doc, bd, name + "_Sk_plate",
                   sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
-    sk.polygon(s, [(-P.BAR_X1, P.BAR_END_Z0),
-                   (-P.BAR_END_X0, P.BAR_END_Z0),
-                   (-P.BAR_END_X0, P.BAR_Z0),
-                   (P.BAR_END_X0, P.BAR_Z0),
-                   (P.BAR_END_X0, P.BAR_END_Z0),
-                   (P.BAR_X1, P.BAR_END_Z0),
-                   (P.BAR_X1, P.RACK_U),
-                   (-P.BAR_X1, P.RACK_U)])
+    sk.rect(s, -P.POCKET_HW, 0.0, P.POCKET_HW, P.RACK_U)
     sk.pad(doc, bd, s, P.BAR_T, reversed_=True)
 
-    # The flange behind it, reaching back over the device so it cannot lift.
+    s = sk.sketch(doc, bd, name + "_Sk_window",
+                  sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
+    sk.slot(s, 0.0, P.WIN_Z, P.WIN_W, P.WIN_H)
+    sk.pocket(doc, bd, s, P.BAR_T)
+
+    # The flange over the top of the gateway, so it cannot lift.
     s = sk.sketch(doc, bd, name + "_Sk_flange",
                   sk.plane(Vector(0, P.BAR_T, 0), sk.X, sk.Z))
     sk.rect(s, -P.POCKET_HW, P.BAR_FLANGE_Z0, P.POCKET_HW, P.RACK_U)
     sk.pad(doc, bd, s, P.BAR_FLANGE_D, reversed_=True)
 
-    # An M6 at each end: clearance from the front, then the nut, its pocket
-    # facing rear so it goes in before the bar is offered up.
+    # Four M6, at the same places the two bars used, so the ears do not
+    # change: clearance from the front, then the nut, its pocket facing rear.
     s = sk.sketch(doc, bd, name + "_Sk_screws",
                   sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
     for sx in (-1, 1):
-        sk.circle(s, sx * P.BAR_SCREW_X, P.BAR_SCREW_Z, P.M6_CLEAR)
+        for z in (P.BAR_SCREW_Z, P.BOT_SCREW_Z):
+            sk.circle(s, sx * P.BAR_SCREW_X, z, P.M6_CLEAR)
     sk.pocket(doc, bd, s, P.BAR_NUT_Y0)
 
     s = sk.sketch(doc, bd, name + "_Sk_nuts",
                   sk.plane(Vector(0, P.BAR_NUT_Y0 + P.M6_HEX_D, 0), sk.X, sk.Z))
     for sx in (-1, 1):
-        sk.hexagon(s, sx * P.BAR_SCREW_X, P.BAR_SCREW_Z, P.M6_HEX_AF)
-    # Explicit: there is bar both sides of this plane now, so the automatic
-    # choice would cut the pocket behind the nut instead of around it.
-    sk.pocket(doc, bd, s, P.M6_HEX_D, reversed_=True)
-    return bd
-
-
-def bottom_bar(doc, name):
-    """The bar below the device, mirroring the top one.
-
-    It closes the bottom of the opening so the device sits in an even border
-    instead of having a bar above it and a gap below. It is also what stops
-    the tray sliding forward -- the ledge used to have a nib for that -- and
-    its end blocks catch the device's lower front corners, the same way the
-    top bar's catch the upper ones.
-    """
-    bd = sk.body(doc, name)
-
-    s = sk.sketch(doc, bd, name + "_Sk_web",
-                  sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
-    sk.polygon(s, [(-P.BAR_X1, 0.0),
-                   (P.BAR_X1, 0.0),
-                   (P.BAR_X1, P.BOT_END_Z1),
-                   (P.BAR_END_X0, P.BOT_END_Z1),
-                   (P.BAR_END_X0, P.BOT_BAR_Z1),
-                   (-P.BAR_END_X0, P.BOT_BAR_Z1),
-                   (-P.BAR_END_X0, P.BOT_END_Z1),
-                   (-P.BAR_X1, P.BOT_END_Z1)])
-    sk.pad(doc, bd, s, P.BAR_T, reversed_=True)
-
-    s = sk.sketch(doc, bd, name + "_Sk_screws",
-                  sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
-    for sx in (-1, 1):
-        sk.circle(s, sx * P.BAR_SCREW_X, P.BOT_SCREW_Z, P.M6_CLEAR)
-    sk.pocket(doc, bd, s, P.BAR_NUT_Y0)
-
-    s = sk.sketch(doc, bd, name + "_Sk_nuts",
-                  sk.plane(Vector(0, P.BAR_NUT_Y0 + P.M6_HEX_D, 0), sk.X, sk.Z))
-    for sx in (-1, 1):
-        sk.hexagon(s, sx * P.BAR_SCREW_X, P.BOT_SCREW_Z, P.M6_HEX_AF)
-    # Explicit: there is bar both sides of this plane now, so the automatic
+        for z in (P.BAR_SCREW_Z, P.BOT_SCREW_Z):
+            sk.hexagon(s, sx * P.BAR_SCREW_X, z, P.M6_HEX_AF)
+    # Explicit: there is plate both sides of this plane, so the automatic
     # choice would cut the pocket behind the nut instead of around it.
     sk.pocket(doc, bd, s, P.M6_HEX_D, reversed_=True)
     return bd
@@ -354,6 +310,5 @@ def build(doc):
         "leg_r": leg(doc, +1, "leg_r"),
         "tray_l": tray(doc, -1, "tray_l"),
         "tray_r": tray(doc, +1, "tray_r"),
-        "top_bar": top_bar(doc, "top_bar"),
-        "bottom_bar": bottom_bar(doc, "bottom_bar"),
+        "faceplate": faceplate(doc, "faceplate"),
     }

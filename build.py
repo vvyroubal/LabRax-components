@@ -34,7 +34,7 @@ import model  # noqa: E402
 
 DOC = "UCG_Fiber_LabRax"
 PARTS = ("side_l", "side_r", "leg_l", "leg_r", "tray_l", "tray_r",
-         "top_bar", "bottom_bar")
+         "faceplate")
 
 
 def main():

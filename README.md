@@ -28,10 +28,10 @@ make plates     # slice every plate and check it prints inside the bed
 src/
   params.py       every dimension, tagged [rack] / [dev] / [design]
   sk.py           sketch plumbing: planes, polygons, slots, pads, pockets
-  model.py        the eight bodies
+  model.py        the seven bodies
 build.py          writes cad/, export/stl/, export/step/
 tools/
-  verify.py       159 checks against the rack, the device and the printer
+  verify.py       143 checks against the rack, the device and the printer
   measure_rack.py re-derives the [rack] numbers from the Lab Rax mesh files
   preview.py      renders images/ (FreeCAD is headless here)
   plate.py        arranges the STLs onto A1 mini plates as a Bambu 3MF
@@ -72,15 +72,14 @@ stock Lab Rax faceplates slot their holes for the same reason.
 
 ## Parts
 
-Eight prints, none over a 180 mm bed.
+Seven prints, none over a 180 mm bed.
 
 | part | size (mm) | qty |
 |---|---|---|
-| `side_l` / `side_r` | 29 × 214 × 44.5 | 1 each |
-| `leg_l` / `leg_r` | 29 × 110 × 44.5 | 1 each |
+| `side_l` / `side_r` | 29 × 212.5 × 44.5 | 1 each |
+| `leg_l` / `leg_r` | 29 × 108 × 44.5 | 1 each |
 | `tray_l` / `tray_r` | 137 × 159 × 16 | 1 each |
-| `top_bar` | 220 × 20 × 21 | 1 |
-| `bottom_bar` | 220 × 8 × 21 | 1 |
+| `faceplate` | 214 × 20 × 44.5 | 1 |
 
 A **side** carries everything that touches the device: front ear, side rail,
 the ledge the tray lands on, and the rear stop. A **rear leg** laps 60 mm onto
@@ -101,21 +100,27 @@ half laps the other way onto its side's ledge. It is a light load over a wide
 plate — 734 g over a 214 × 129 × 6 span works out around 0.2 mm of deflection
 — so it does not need stiffening, only holding together and locating.
 
-The **top bar** and the **bottom bar** frame the device, each one piece. At
-220 × 20 mm it will not fit the bed square on, but turned 45° its footprint is
-168 mm and it does — and printed upside down, the face that was the top of the
-1U lies flat on the bed, so it needs neither support nor a brim. Each end
-nests into a notch in the side, so the ear and the rail still meet underneath.
+The **faceplate** is the front, in one piece, with a window for the gateway's
+display. It replaces the bar that used to sit above the device and the bar
+below it, so there is no joint in it to open and nothing to line up. It stops
+the gateway across its whole face rather than at four corner blocks, and it is
+what stops the tray sliding forward.
 
-The bottom bar mirrors the top one about the middle of the U, so there is
-7.65 mm of bracket above the device and 7.65 below. Both sit 8 mm behind the
-ears' front faces — **a consistent reveal all the way round** rather than a
-recessed bar above and a gap below. It is also what stops the tray sliding
-forward, and its end blocks catch the device's lower front corners the way the
-top bar's catch the upper ones.
+At 214 × 44.5 mm it will not lie flat on a 180 mm bed — 187 mm on the diagonal
+— so it prints **stood on edge and upside down**, 165.5 mm cornerwise. Upside
+down matters: the right way up, the flange that reaches over the gateway is a
+12 mm shelf hanging over nothing. Inverted, that flange lies on the bed and
+the part needs no support at all.
 
-The ears have their outer corners cut back 4 mm, so the front reads as a shape
-rather than four square slabs.
+The window is a **22.5 × 11.0 mm** stadium, centred, its centre 20 mm up the
+U. The display it shows is 21.0 × 10.0, centred on the case, 14 mm above the
+case's bottom — and the case's bottom sits on the tray, so that height is
+fixed rather than floating. The window is 1.5 mm larger all round because the
+gateway can shift 0.6 mm either way between the rails, and showing a hair of
+white case is better than clipping the display.
+
+**The faceplate commits you to ports-at-the-back.** The face is closed apart
+from the window.
 
 ![iso](images/assembly-iso.png)
 
@@ -132,8 +137,7 @@ rather than four square slabs.
 | qty | where | nut | washer |
 |---|---|---|---|
 | 12 | bracket to rack: 3 per ear, 4 ears | none — in the post | yes |
-| 2 | top bar, through each front ear | 2 × M6 | no |
-| 2 | bottom bar, through each front ear | 2 × M6 | no |
+| 4 | faceplate, through the front ears | 4 × M6 | no |
 | 2 | tray halves to each other, at the rear tab | 2 × M6 | no |
 | 4 | side to rear leg, through the splice slots | 4 × M6 | yes |
 
@@ -164,7 +168,7 @@ afterwards — see the assembly order below.
 | sideways | the two side rails | 0.6 mm a side |
 | up | the top bar's flange | 0.8 mm over the case |
 | back | the ears' rear beam, which runs forward to meet it | — |
-| **forward** | **the two bars' end blocks**, four of them | 1.4 mm of travel |
+| **forward** | **the faceplate**, across its whole face | 1.4 mm of travel |
 
 The forward stop is worth spelling out, because it is not what it looks like
 from the front. The top bar is not a cosmetic strip: its two end blocks are
@@ -199,7 +203,7 @@ choice around it.
 Two tools, and they check different things.
 
 `make verify` measures the built solids, not the parameters, so a feature that
-silently does nothing is caught rather than assumed away. 159 checks: that each
+silently does nothing is caught rather than assumed away. 143 checks: that each
 body is one valid solid built from sketches driving pads and pockets; that it
 fits the bed, turning a long part on the diagonal if it has to; that no two
 parts foul each other; that an M6 passes all twelve rack slots; that the
@@ -223,7 +227,7 @@ sides differently.
 `make assembly` is less forgiving, because arithmetic can agree with itself
 while the hole is somewhere else entirely. It places a real M6 × 12, a real
 nut and a real washer at every one of the twenty-two positions and asks
-whether they fit what was actually built — 122 checks: that each shank is
+whether they fit what was actually built — 115 checks: that each shank is
 clear the whole way, that each head has something to bear on and how much,
 that each nut sits in its pocket, and that no fastener touches the gateway.
 

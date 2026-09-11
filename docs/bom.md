@@ -6,17 +6,16 @@ screw lengths with the arithmetic set out at the bottom.
 
 ## Print
 
-Seven plates, eight parts, about **247 g** and **11½ hours** in total.
+Six plates, seven parts, about **263 g** and **11½ hours** in total.
 
 | plate | part | size (mm) | filament | time | support |
 |---|---|---|---|---|---|
-| 1 | `side_l` | 29 × 212.5 × 44.5 | 34.9 g | 1 h 55 | yes |
-| 2 | `side_r` | 29 × 212.5 × 44.5 | 34.8 g | 1 h 56 | yes |
-| 3 | `leg_l` + `leg_r` | 29 × 108 × 44.5 each | 38.6 g | 1 h 55 | yes |
+| 1 | `side_l` | 29 × 212.5 × 44.5 | 35.3 g | 1 h 56 | yes |
+| 2 | `side_r` | 29 × 212.5 × 44.5 | 35.3 g | 1 h 56 | yes |
+| 3 | `leg_l` + `leg_r` | 29 × 108 × 44.5 each | 38.7 g | 1 h 53 | yes |
 | 4 | `tray_l` | 137 × 159 × 16 | 51.5 g | 1 h 57 | yes |
 | 5 | `tray_r` | 137 × 159 × 16 | 58.8 g | 2 h 18 | yes |
-| 6 | `top_bar` | 220 × 20 × 21 | 18.1 g | 55 m | no |
-| 7 | `bottom_bar` | 220 × 8 × 21 | 10.1 g | 40 m | no |
+| 6 | `faceplate` | 214 × 20 × 44.5 | 43.2 g | 1 h 46 | no |
 
 PETG, 0.2 mm layers, and the plated 3MF already carries the orientations and
 the per-part support and brim settings — see
@@ -26,20 +25,16 @@ the per-part support and brim settings — see
 
 Comparing the STLs you printed against the current ones, byte for byte:
 
-| part | verdict | why |
-|---|---|---|
-| `top_bar` | **keep** | identical, not touched since |
-| `side_l`, `side_r` | reprint | 21 mm longer, rear ear removed, splice slots added, ledge nib gone, ears chamfered and thinned to 6.5 mm |
-| `tray_l`, `tray_r` | reprint | 8 mm shorter at the front — the bottom bar occupies that space now — and the locating pegs moved back into the lap |
-| `leg_l`, `leg_r` | print | new: they carry the rear ears to the back posts |
-| `bottom_bar` | print | new |
+| part | verdict |
+|---|---|
+| `side_l`, `side_r` | reprint — 21 mm longer, rear ear removed, splice slots added, ears thinned to 6.5 mm and moved in to x = ±94 |
+| `tray_l`, `tray_r` | reprint — 8 mm shorter at the front, pegs moved, screw counterbored |
+| `top_bar` | **gone** — it and the bottom bar are now one faceplate |
 
-So of the five parts on your bench, **one is still good**. That leaves
-**7 plates minus plate 6** — about 229 g and 10½ hours.
-
-The old sides and trays are not adjustable into the new ones; the sides are
-short by the amount that put them 27 mm clear of the rear posts, and the trays
-would foul the bottom bar.
+**Nothing from the last print carries over.** The top bar survived the last two
+rounds of changes and was the one part worth keeping; replacing both bars with
+a single faceplate has taken that away too. If you have not yet printed the
+bottom bar and the legs, you have lost nothing by waiting.
 
 ## Buy
 
@@ -55,8 +50,7 @@ the Lab Rax posts already hold them.
 | qty | where | nut | washer |
 |---|---|---|---|
 | 12 | bracket to rack: 3 per ear, 4 ears | none — in the post | yes |
-| 2 | top bar, through each front ear | 2 × M6 | no |
-| 2 | bottom bar, through each front ear | 2 × M6 | no |
+| 4 | faceplate, through the front ears | 4 × M6 | no |
 | 2 | tray halves to each other, at the rear tab | 2 × M6 | no |
 | 4 | side to rear leg, through the splice slots | 4 × M6 | yes |
 
@@ -88,7 +82,7 @@ Everything else was then arranged around the same 12 mm:
 | joint | how it is made to fit | engagement |
 |---|---|---|
 | rack | ear 6.5 mm, into the post's own nut | 3.5 mm |
-| top and bottom bar | head sunk 1 mm into the ear | 3.5 mm |
+| faceplate | head sunk 1 mm into the ear | 3.5 mm |
 | tray halves | head sunk 5 mm into the left tab | 5.0 mm |
 | side to leg | nothing — it already fitted | 5.8 mm |
 

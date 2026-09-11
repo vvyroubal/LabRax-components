@@ -65,7 +65,7 @@ NO_BRIM = {"brim_type": "no_brim"}
 TRAY = dict(SUPPORT, **NO_BRIM)
 
 PLATES = [
-    # A side is 214 mm long, so it only goes on the bed turned 45 degrees.
+    # A side is 212 mm long, so it only goes on the bed turned 45 degrees.
     ("Left side", [("side_l", (90.0, 90.0), [("z", 45)], SUPPORT)]),
     ("Right side", [("side_r", (90.0, 90.0), [("z", 45)], SUPPORT)]),
     ("Rear legs", [
@@ -76,13 +76,11 @@ PLATES = [
     # wants support under its rim. It comes away from the underside.
     ("Left tray", [("tray_l", (90.0, 92.5), [], TRAY)]),
     ("Right tray", [("tray_r", (90.0, 92.5), [], TRAY)]),
-    # The bar is 220 mm long and only fits cornerwise. Upside down: the face
-    # that was the top of the 1U then lies flat on the bed, which is the whole
-    # of its underside, so it needs no support and no brim.
-    ("Top bar", [("top_bar", (90.0, 90.0), [("x", 180), ("z", 45)], NO_BRIM)]),
-    # Same trick: inverted, its whole top face is on the bed.
-    ("Bottom bar", [("bottom_bar", (90.0, 90.0),
-                     [("x", 180), ("z", 45)], NO_BRIM)]),
+    # The faceplate stands on edge -- 214 mm will not lie flat on this bed --
+    # and upside down, which puts the flange on the bed instead of leaving it
+    # as a 12 mm shelf hanging over nothing. Whole top face down, no support.
+    ("Faceplate", [("faceplate", (90.0, 90.0),
+                    [("x", 180), ("z", 45)], NO_BRIM)]),
 ]
 
 

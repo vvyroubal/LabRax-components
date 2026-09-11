@@ -146,7 +146,8 @@ def fasteners():
                                 (sx * P.SCREW_X, P.RACK_D + P.EAR_T, z),
                                 (0, -1, 0), washer=True))
     for sx in (-1, 1):
-        for z, tag in ((P.BAR_SCREW_Z, "top bar"), (P.BOT_SCREW_Z, "bottom bar")):
+        for z, tag in ((P.BAR_SCREW_Z, "faceplate hi"),
+                       (P.BOT_SCREW_Z, "faceplate lo")):
             out.append(Fastener(
                 "%s x%+.0f" % (tag, sx * P.BAR_SCREW_X),
                 (sx * P.BAR_SCREW_X, -P.EAR_T + P.BAR_CB_D, z), (0, 1, 0),

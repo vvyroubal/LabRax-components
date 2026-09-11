@@ -88,7 +88,8 @@ POST_HOLE_D = 6.0   # [rack] and the hole is blind there
 M6_HEAD_D = 11.0    # [design] counterbore for a button head
 
 EAR_T = 6.5        # [design] front and rear ear plate thickness
-EAR_X0 = 98.0      # [design] inboard edge of the ears
+EAR_X0 = 94.0      # [design] inboard edge of the ears. Far enough in
+                   # that a screw head at BAR_SCREW_X bears fully on it.
 RAIL_T = 3.2       # [design] side rail; 107.0 + 3.2 = 110.2 <= 111.125
 BODY_HW = POCKET_HW + RAIL_T  # 110.2, leaves 0.925 mm per side to the posts
 
@@ -179,7 +180,33 @@ BAR_FLANGE_D = 12.0  # [design] how far it reaches back over the device.
                      # Every millimetre here costs 0.7 mm of bed diagonal.
 BAR_FLANGE_Z0 = BAR_Z0      # flush with the bar's underside
 
-BAR_SCREW_X = 103.0   # [design] inboard of the rack slots, inside the ear
+BAR_SCREW_X = 100.0   # [design] inboard of the rack slots. Its nut is
+                      # 5.77 from the centre to a corner, and the faceplate
+                      # ends at POCKET_HW, so this cannot go further out.
+BAR_SCREW_Z = 30.16   # [design] midway between two EIA holes
+
+# The bar above the device and the bar below it are one part: a faceplate
+# across the whole opening, with a window for the gateway's display. It takes
+# the same four screws the two bars did, at the same four places, so the ears
+# are unchanged.
+BOT_SCREW_Z = RACK_U - BAR_SCREW_Z  # 14.29, the lower pair
+
+# The display, measured on the device: a 21.0 x 10.0 stadium, centred on the
+# case's width, its centre 14.0 above the case's bottom. The window is a
+# little larger -- the gateway can shift 0.6 mm either way between the rails,
+# and clipping the display would be worse than showing a hair of white case.
+WIN_W = 22.5          # [dev] 21.0 plus the float
+WIN_H = 11.0          # [dev] 10.0 plus a little
+WIN_Z = DEV_Z0 + 14.0  # 20.0, measured from the case's bottom, which sits on
+                       # the tray at DEV_Z0
+
+# The ears' outer corners are cut back, so the front reads as a shape rather
+# than as four square slabs.
+EAR_CHAMFER = 4.0     # [design]
+
+BAR_SCREW_X = 100.0   # [design] inboard of the rack slots. Its nut is
+                      # 5.77 from the centre to a corner, and the faceplate
+                      # ends at POCKET_HW, so this cannot go further out.
 BAR_SCREW_Z = 30.16   # [design] midway between two EIA holes
 
 # The bottom bar mirrors the top one about the middle of the U, so the device

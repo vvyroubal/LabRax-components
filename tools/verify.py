@@ -106,6 +106,17 @@ def hexnut4(sx, y, z, af):
         Vector(x1 - x0, 0, 0))
 
 
+def stadium(cx, cz, w, h, y0, y1):
+    """A slot-shaped solid bored along +Y: `w` long, `h` across, round ends."""
+    r = h / 2.0
+    flat = w - h
+    sol = box(cx - flat / 2, cx + flat / 2, y0, y1, cz - r, cz + r)
+    for x in (cx - flat / 2, cx + flat / 2):
+        sol = sol.fuse(Part.makeCylinder(r, y1 - y0, Vector(x, y0, cz),
+                                         Vector(0, 1, 0)))
+    return sol
+
+
 def fits_bed(b):
     """A long thin part can go on the bed diagonally."""
     w, d = b.XLength, b.YLength
@@ -233,87 +244,57 @@ def main():
                       "slot still clears at y=%5.1f%+5.1f" % (y, d),
                       "%.3f mm3" % vol(side.common(sh)))
 
-    print("\n[top bar -- one piece, no joint to open]")
-    bar = parts["top_bar"]
-    check(len(bar.Solids) == 1 and bar.BoundBox.XLength > 2 * P.POCKET_HW,
-          "the bar spans the whole opening in one piece",
-          "%.1f mm wide" % bar.BoundBox.XLength)
+    print("\n[the front face -- one plate, with a window for the display]")
+    fp = parts["faceplate"]
+    check(len(fp.Solids) == 1, "the faceplate is one solid", "%d" % len(fp.Solids))
+    b = fp.BoundBox
+    check(abs(b.ZMin) < 1e-6 and abs(b.ZMax - P.RACK_U) < 1e-6,
+          "it covers the whole height of the U", "Z %.2f..%.2f" % (b.ZMin, b.ZMax))
+    check(b.XLength >= P.DEV_W, "and the whole width of the gateway's face",
+          "%.1f mm across a %.1f mm face" % (b.XLength, P.DEV_W))
     for sx in (-1, 1):
-        x = sx * P.BAR_SCREW_X
-        shank = Part.makeCylinder(3.0, P.BAR_T - P.M6_HEX_D + 0.1,
-                                  Vector(x, -0.05, P.BAR_SCREW_Z),
-                                  Vector(0, 1, 0))
-        check(vol(bar.common(shank)) < VOID,
-              "M6 passes the bar at x=%+7.2f" % x,
-              "%.3f mm3" % vol(bar.common(shank)))
-        n = hexnut3(x, P.BAR_SCREW_Z, 10.0,
-                    P.BAR_T + 0.05, P.BAR_T + P.M6_HEX_D - 0.05)
-        check(vol(bar.common(n)) < VOID,
-              "and its nut seats facing rear at x=%+7.2f" % x,
-              "%.3f mm3" % vol(bar.common(n)))
-        feed = hexnut3(x, P.BAR_SCREW_Z, 10.0,
-                       P.BAR_T + P.M6_HEX_D - 0.05, P.BAR_T + 25.0)
-        check(vol(bar.common(feed)) < VOID,
-              "and can be put in from behind at x=%+7.2f" % x,
-              "%.3f mm3" % vol(bar.common(feed)))
-        # The whole screw, from outside the rack through the ear into the nut.
-        through = Part.makeCylinder(3.0, P.EAR_T + P.BAR_T - P.M6_HEX_D + 0.1,
-                                    Vector(x, -P.EAR_T - 0.05, P.BAR_SCREW_Z),
-                                    Vector(0, 1, 0))
-        check(vol(asm.common(through)) < VOID,
-              "the screw reaches it through the ear at x=%+7.2f" % x,
-              "%.3f mm3" % vol(asm.common(through)))
-        side = parts["side_l" if sx < 0 else "side_r"]
-        check(vol(side.common(bar)) < VOID,
-              "the bar nests in the side's notch at x=%+7.2f" % x,
-              "%.3f mm3" % vol(side.common(bar)))
-    # Held at both ends of one beam, so no part of it can pivot.
-    check(2 * P.BAR_SCREW_X > 150.0, "it is held at two widely spaced points",
-          "M6 at x = +/-%.0f, %.0f mm apart" % (P.BAR_SCREW_X,
-                                                2 * P.BAR_SCREW_X))
-
-    print("\n[the front face]")
-    top, bot = parts["top_bar"], parts["bottom_bar"]
-    check(len(bot.Solids) == 1 and bot.BoundBox.XLength > 2 * P.POCKET_HW,
-          "the bottom bar spans the whole opening in one piece",
-          "%.1f mm wide" % bot.BoundBox.XLength)
-    # An even border: as much bracket below the device as above it.
-    above = P.RACK_U - P.BAR_Z0
-    below = P.BOT_BAR_Z1
-    check(abs(above - below) < 1e-6, "the border is the same above and below",
-          "%.2f mm each" % above)
-    # Both bars in one plane, a consistent reveal behind the ears.
-    for nm, pt in (("top", top), ("bottom", bot)):
-        b = pt.BoundBox
-        check(abs(b.YMin - 0.0) < 1e-6,
-              "the %s bar sits in the same plane" % nm,
-              "front face at Y %.2f, ears at Y %.2f, reveal %.1f mm"
-              % (b.YMin, -P.EAR_T, P.EAR_T))
-    # Nothing may stick out in front of them.
+        rail = box(sx * P.POCKET_HW, sx * P.BODY_HW, -1.0, P.RACK_D,
+                   0.0, P.RAIL_TOP)
+        check(vol(fp.common(rail)) < VOID,
+              "it clears the rail at x=%+6.1f" % (sx * P.POCKET_HW),
+              "%.3f mm3" % vol(fp.common(rail)))
+    # The window, against the display it has to show: a 21.0 x 10.0 stadium,
+    # centred on the case, its centre 14.0 above the case's bottom. Modelled
+    # as the stadium it is -- a sharp-cornered rectangle would report the
+    # window's own radii as clipping.
+    win = stadium(0.0, P.WIN_Z, 21.0, 10.0, -1.0, P.BAR_T + 1.0)
+    check(vol(fp.common(win)) < VOID, "the display is not clipped",
+          "%.3f mm3 across the 21.0 x 10.0 panel" % vol(fp.common(win)))
+    check(P.WIN_W > 21.0 and P.WIN_H > 10.0,
+          "the window is larger than the display it shows",
+          "%.1f x %.1f against 21.0 x 10.0" % (P.WIN_W, P.WIN_H))
+    check(P.WIN_Z - P.WIN_H / 2 > P.DEV_Z0 and P.WIN_Z + P.WIN_H / 2 < P.DEV_Z1,
+          "and lies within the gateway's face",
+          "Z %.1f..%.1f inside %.0f..%.0f"
+          % (P.WIN_Z - P.WIN_H / 2, P.WIN_Z + P.WIN_H / 2, P.DEV_Z0, P.DEV_Z1))
     ahead = box(-P.FACE_HW, P.FACE_HW, -P.EAR_T + 0.01, 0.0, 0.0, P.RACK_U)
     stray = [n for n in names
-             if n not in ("side_l", "side_r") and vol(parts[n].common(ahead)) > VOID]
+             if n not in ("side_l", "side_r")
+             and vol(parts[n].common(ahead)) > VOID]
     check(not stray, "nothing protrudes into the reveal",
           ", ".join(stray) if stray else "clear")
-    # The bottom bar catches the device's lower corners, as the top one does
-    # its upper corners.
-    face = box(-P.DEV_W / 2, 0.0, P.DEV_Y0 - P.BAR_T, P.DEV_Y0,
-               P.DEV_Z0, P.DEV_Z1)
-    check(vol(bot.common(face)) > 200.0,
-          "the bottom bar catches the device's lower corners",
-          "%.0f mm3 each end" % vol(bot.common(face)))
     for sx in (-1, 1):
-        x = sx * P.BAR_SCREW_X
-        n = hexnut3(x, P.BOT_SCREW_Z, 10.0,
-                    P.BAR_T + 0.05, P.BAR_T + P.M6_HEX_D - 0.05)
-        check(vol(bot.common(n)) < VOID,
-              "its M6 nut seats at x=%+7.2f" % x, "%.3f mm3" % vol(bot.common(n)))
-        through = Part.makeCylinder(3.0, P.EAR_T + P.BAR_T - P.M6_HEX_D + 0.1,
-                                    Vector(x, -P.EAR_T - 0.05, P.BOT_SCREW_Z),
-                                    Vector(0, 1, 0))
-        check(vol(asm.common(through)) < VOID,
-              "and the screw reaches it through the ear at x=%+7.2f" % x,
-              "%.3f mm3" % vol(asm.common(through)))
+        for z in (P.BAR_SCREW_Z, P.BOT_SCREW_Z):
+            x = sx * P.BAR_SCREW_X
+            # Against the whole assembly, not just the plate the pocket is
+            # in: a nut can sit happily in its pocket and still foul the rail
+            # beside it.
+            n = hexnut3(x, z, 10.0, P.BAR_NUT_Y0 + 0.05,
+                        P.BAR_NUT_Y0 + P.M6_HEX_D - 0.05)
+            check(vol(asm.common(n)) < VOID,
+                  "M6 nut seats clear of everything at x=%+7.2f z=%5.2f" % (x, z),
+                  "%.3f mm3" % vol(asm.common(n)))
+            through = Part.makeCylinder(3.0, P.EAR_T + P.BAR_NUT_Y0 + 0.1,
+                                        Vector(x, -P.EAR_T - 0.05, z),
+                                        Vector(0, 1, 0))
+            check(vol(asm.common(through)) < VOID,
+                  "its screw reaches through the ear at x=%+7.2f z=%5.2f"
+                  % (x, z), "%.3f mm3" % vol(asm.common(through)))
 
     print("\n[device]")
     dev = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0, P.DEV_Y0 + P.DEV_D,
@@ -351,15 +332,14 @@ def main():
                P.DEV_Z0, P.DEV_Z1)
     half = box(-P.DEV_W / 2, 0.0, P.DEV_Y0 - P.BAR_T, P.DEV_Y0,
                P.DEV_Z0, P.DEV_Z1)
-    per = vol(bar.common(face.common(half)))
-    check(per > 300.0, "the bar's end blocks stand in front of the device",
-          "%.0f mm3 each end, over Z %.1f..%.1f"
-          % (per, P.BAR_END_Z0, P.DEV_Z1))
+    per = vol(fp.common(half))
+    check(per > 3000.0, "the faceplate stands across the gateway's face",
+          "%.0f mm3 of it on each half" % per)
 
     over = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0, P.DEV_Y0 + P.DEV_D,
                P.DEV_Z1, P.RACK_U)
-    check(vol(bar.common(over)) > 100.0, "top bar caps it once fitted",
-          "%.0f mm3 over it" % vol(bar.common(over)))
+    check(vol(fp.common(over)) > 100.0, "the faceplate's flange caps it",
+          "%.0f mm3 over it" % vol(fp.common(over)))
 
     print("\n[the tray]")
     trays = parts["tray_l"].fuse(parts["tray_r"]).removeSplitter()
@@ -435,9 +415,9 @@ def main():
     # Held fore and aft by the bottom bar and the rear stop, so it cannot walk.
     ahead = box(-P.TRAY_X1, P.TRAY_X1, P.DEV_Y0 - 1.0, P.DEV_Y0,
                 0.0, P.TRAY_T)
-    check(vol(parts["bottom_bar"].common(ahead)) > 100.0,
-          "the bottom bar stops the tray sliding forward",
-          "%.0f mm3" % vol(parts["bottom_bar"].common(ahead)))
+    check(vol(fp.common(ahead)) > 100.0,
+          "the faceplate stops the tray sliding forward",
+          "%.0f mm3" % vol(fp.common(ahead)))
 
     print("\n[one screw size -- every joint takes an M6 x %.0f]" % P.SCREW_LEN)
 
@@ -455,9 +435,7 @@ def main():
     screw("rack screw reaches the post's nut", P.EAR_T,
           P.EAR_T + P.POST_CLEAR_D, P.POST_NUT_D,
           limit=P.EAR_T + P.POST_HOLE_D)
-    screw("top bar screw reaches its nut", P.EAR_T - P.BAR_CB_D,
-          P.EAR_T - P.BAR_CB_D + P.BAR_NUT_Y0, P.M6_HEX_D)
-    screw("bottom bar screw reaches its nut", P.EAR_T - P.BAR_CB_D,
+    screw("faceplate screw reaches its nut", P.EAR_T - P.BAR_CB_D,
           P.EAR_T - P.BAR_CB_D + P.BAR_NUT_Y0, P.M6_HEX_D)
     screw("tray screw reaches its nut", P.TAB_HX - P.TRAY_CB_D,
           P.TAB_HX - P.TRAY_CB_D + 2.0, P.M6_NUT_D)
