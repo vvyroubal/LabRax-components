@@ -6,7 +6,7 @@ screw lengths with the arithmetic set out at the bottom.
 
 ## Print
 
-Six plates, seven parts, about **259 g** and **11 hours** in total.
+Six plates, seven parts, about **259 g** and **11 h 24** in total.
 
 | plate | part | size (mm) | filament | time | support |
 |---|---|---|---|---|---|
@@ -116,10 +116,10 @@ off on first tightening. The halves are now keyed by four ⌀5 pegs and held by
 their 60 mm lap, the rails, the faceplate and the rear stops — see
 [measurements.md](measurements.md).
 
-The 1 mm counterbore for the bar screws is worth noticing: the alternative was
-moving the nut 1 mm forward in the bar, which would have made every top bar
-already printed wrong. Taking the millimetre out of the ear instead — a part
-that had to be reprinted anyway — leaves the bar untouched.
+The 1 mm counterbore for the faceplate screws is worth noticing: the
+alternative was moving the nut 1 mm further back, into an 8 mm plate that
+already has a window through it. Taking the millimetre out of the ear instead
+keeps the nut pocket clear of the window.
 
 `make verify` checks all of them, on every build: that each screw reaches its nut
 with at least 3 mm of thread, and that the rack screw does not bottom out.
