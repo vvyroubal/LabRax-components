@@ -32,7 +32,7 @@ src/
   model.py        the seven bodies
 build.py          writes cad/, export/stl/, export/step/
 tools/
-  verify.py       140 checks against the rack, the device and the printer
+  verify.py       147 checks against the rack, the device and the printer
   measure_rack.py re-derives the [rack] numbers from the Lab Rax mesh files
   preview.py      renders images/ (FreeCAD is headless here)
   plate.py        arranges the STLs onto A1 mini plates as a Bambu 3MF
@@ -79,7 +79,7 @@ Seven prints, none over a 180 mm bed.
 |---|---|---|
 | `side_l` / `side_r` | 33 × 212.5 × 44.5 | 1 each |
 | `leg_l` / `leg_r` | 33 × 108 × 44.5 | 1 each |
-| `tray_l` / `tray_r` | 137 × 128.6 × 6 | 1 each |
+| `tray_l` / `tray_r` | 137 × 131.6 × 9 | 1 each |
 | `faceplate` | 214 × 20 × 44.5 | 1 |
 
 A **side** carries everything that touches the device: front ear, side rail,
@@ -98,8 +98,23 @@ slot.
 The **tray** is the floor the gateway stands on. At 214 mm it will not fit the
 bed in any orientation, so it comes in halves that lap on the centreline. Each
 half laps the other way onto its side's ledge. It is a light load over a wide
-plate — 734 g over a 214 × 129 × 6 span works out around 0.2 mm of deflection
+plate — 734 g over a 214 × 132 × 6 span works out around 0.2 mm of deflection
 — so it does not need stiffening, only holding together and locating.
+
+**The tray has a lip across its back**, 3 mm proud and running the full
+198 mm between the sides' rear stops. It catches the bottom edge of the
+gateway's back panel, so the case cannot slide backwards when you push a plug
+into a socket. Before it existed the only things behind the gateway were those
+two stops, and they reach in just 7.4 mm at each end — **7% of a 212.8 mm rear
+face**, leaving the other 93% open.
+
+The lip is deliberately **low**. The ports are on that face, so it stands 3 mm
+and no more: it catches the case below the port openings and leaves everything
+above it open, which `verify` measures rather than assumes. If your unit has
+anything in the bottom 3 mm of its back panel, drop `REAR_LIP_H` — 1 mm still
+stops it. 3 mm is not thin for the job: the load is a plug being pushed home,
+order 30 N over 198 mm of lip, about 3 MPa even taken as a point load on
+20 mm of it.
 
 **The two halves take no screw.** Four ⌀5 pegs on the right half drop into
 sockets in the left and key them; the 60 mm lap, the two side rails, the
@@ -178,7 +193,7 @@ afterwards — see the assembly order below.
 | down | the tray | — |
 | sideways | the two side rails | 0.6 mm a side |
 | up | the top bar's flange | 0.8 mm over the case |
-| back | the ears' rear beam, which runs forward to meet it | — |
+| back | **the tray's rear lip**, plus the two rear stops on the sides | 1.0 mm of travel |
 | **forward** | **the faceplate**, across its whole face | 1.4 mm of travel |
 
 The forward stop is worth spelling out, because it is not what it looks like
@@ -214,7 +229,7 @@ choice around it.
 Two tools, and they check different things.
 
 `make verify` measures the built solids, not the parameters, so a feature that
-silently does nothing is caught rather than assumed away. 140 checks: that each
+silently does nothing is caught rather than assumed away. 147 checks: that each
 body is one valid solid built from sketches driving pads and pockets; that it
 fits the bed, turning a long part on the diagonal if it has to; that no two
 parts foul each other; that an M6 passes all twelve rack slots; that the
@@ -222,13 +237,22 @@ top-bar screw runs through the ear and its nut both seats and can be fed in
 from the rear; that the tray is solid under the device all the way across,
 that both halves lap rather than butt, that each is carried by its side's
 ledge, that all four pegs meet a socket with clearance to spare, that nothing
-rises above the tray in front of the device's face, and that nothing at all
-stands in the 25 mm behind the gateway's rear ports;
+rises above the tray in front of the device's face, that the rear lip stands
+behind the device rather than under it, and that nothing at all stands in the
+25 mm behind the gateway's rear ports above the lip;
 that the top bar is one solid spanning the whole opening, with an M6 at each
 end whose nut seats and can be fitted; that every one of the four bolted joints takes
 the same M6 × 12 with at least 3 mm of thread in its nut, and that the rack
 screw does not bottom out in the post's blind hole; and that the device drops in, is
 stopped rear and above, and cannot be pushed out of the front.
+
+One check earns its keep by walking the device's rear face millimetre by
+millimetre and asking, at each of 213 positions, whether *anything* is behind
+it. Run against the geometry before the lip was added, **198 of those 213
+positions come back empty**. Every other check passed on that geometry: the
+parts fitted, nothing overlapped, the tray carried the device everywhere. A
+whole face being open is not a dimension that can be wrong, which is why
+measuring coverage directly is the only thing that finds it.
 
 It has earned its keep. Building this version it caught the top bar
 overrunning the 222.25 mm post opening, a notch cutting the wrong side of its

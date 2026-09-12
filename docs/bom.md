@@ -6,15 +6,15 @@ screw lengths with the arithmetic set out at the bottom.
 
 ## Print
 
-Six plates, seven parts, about **256 g** and **11 hours** in total.
+Six plates, seven parts, about **259 g** and **11 hours** in total.
 
 | plate | part | size (mm) | filament | time | support |
 |---|---|---|---|---|---|
 | 1 | `side_l` | 33 × 212.5 × 44.5 | 35.3 g | 1 h 56 | yes |
-| 2 | `side_r` | 33 × 212.5 × 44.5 | 35.3 g | 1 h 57 | yes |
+| 2 | `side_r` | 33 × 212.5 × 44.5 | 35.4 g | 1 h 57 | yes |
 | 3 | `leg_l` + `leg_r` | 33 × 108 × 44.5 each | 38.7 g | 1 h 53 | yes |
-| 4 | `tray_l` | 137 × 128.6 × 6 | 48.2 g | 1 h 41 | yes |
-| 5 | `tray_r` | 137 × 128.6 × 6 | 55.7 g | 2 h 02 | yes |
+| 4 | `tray_l` | 137 × 131.6 × 9 | 49.2 g | 1 h 45 | yes |
+| 5 | `tray_r` | 137 × 131.6 × 9 | 57.5 g | 2 h 07 | yes |
 | 6 | `faceplate` | 214 × 20 × 44.5 | 43.0 g | 1 h 46 | no |
 
 PETG, 0.2 mm layers, and the plated 3MF already carries the orientations and
@@ -28,7 +28,7 @@ Comparing the STLs you printed against the current ones, byte for byte:
 | part | verdict |
 |---|---|
 | `side_l`, `side_r` | reprint — 21 mm longer, rear ear removed, splice slots added, ears thinned to 6.5 mm and moved in to x = ±94 |
-| `tray_l`, `tray_r` | reprint — 8 mm shorter at the front, centre bolt tab deleted, four pegs instead of two |
+| `tray_l`, `tray_r` | reprint — centre bolt tab deleted, four pegs instead of two, rear lip added |
 | `top_bar` | **gone** — it and the bottom bar are now one faceplate |
 
 **Nothing from the last print carries over.** The top bar survived the last two

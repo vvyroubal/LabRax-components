@@ -389,12 +389,69 @@ def main():
                                vol(parts["tray_r"].common(lap))))
     # No bolt across this joint: the tab that used to carry one snapped off
     # both halves when it was tightened. Nothing may stand behind the gateway
-    # where it did, either -- that is where its rear ports are.
-    behind = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0 + P.DEV_D,
-                 P.DEV_Y0 + P.DEV_D + 25.0, P.DEV_Z0, P.DEV_Z1)
-    v = vol(trays.common(behind))
-    check(v < VOID, "the tray leaves the gateway's rear ports clear",
-          "%.3f mm3 in the 25 mm behind them" % v)
+    # where it did, either -- that is where its rear ports are. The rear lip
+    # is the one thing allowed back there, and only below the ports, so the
+    # clear volume is measured from the top of the lip upwards.
+    # Measured between the sides' rear stops: the outer 7.4 mm at each end is
+    # covered full height by the stop and the rear leg behind it, and always
+    # has been. Everything in from there must stay open above the lip.
+    ports_z0 = P.DEV_Z0 + P.REAR_LIP_H
+    behind = box(-P.REAR_LIP_X, P.REAR_LIP_X, P.DEV_Y0 + P.DEV_D,
+                 P.DEV_Y0 + P.DEV_D + 25.0, ports_z0, P.DEV_Z1)
+    v = vol(asm.common(behind))
+    check(v < VOID, "the gateway's rear ports are clear above the lip",
+          "%.3f mm3 in the 25 mm behind the middle %.0f mm, above z=%.1f"
+          % (v, 2 * P.REAR_LIP_X, ports_z0))
+
+    # And say plainly how much of each end is blocked, so the one thing this
+    # bracket does cover is a number rather than a surprise.
+    ends = box(P.REAR_LIP_X, P.DEV_W / 2, P.DEV_Y0 + P.DEV_D,
+               P.DEV_Y0 + P.DEV_D + 25.0, ports_z0, P.DEV_Z1)
+    check(vol(asm.common(ends)) > VOID,
+          "the outer %.1f mm of each end is blocked by the stop and leg"
+          % (P.DEV_W / 2 - P.REAR_LIP_X),
+          "keep plugs out of the last %.1f mm" % (P.DEV_W / 2 - P.REAR_LIP_X))
+
+    check(P.REAR_LIP_H <= 3.0, "the rear lip stays low enough to miss a port",
+          "%.1f mm above the tray" % P.REAR_LIP_H)
+
+    # --- the lip that stops the gateway sliding back ----------------------
+    # Before this existed the only thing behind the gateway was the two rear
+    # stops on the sides, reaching in to x = +/-99: 7.4 mm of overlap at each
+    # end of a 212.8 mm rear face. The lip covers what is between them.
+    lip = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0 + P.DEV_D,
+              P.DEV_Y0 + P.DEV_D + 25.0, P.DEV_Z0, P.DEV_Z0 + P.REAR_LIP_H)
+    v = vol(trays.common(lip))
+    check(v > 1000.0, "the tray has a lip behind the gateway",
+          "%.0f mm3 of it" % v)
+
+    # Walk the rear face and ask, at each x, whether ANYTHING is behind it.
+    # This is the check that would have caught the missing lip: the parts all
+    # fitted, nothing overlapped, and 93% of the back was still open.
+    gaps = []
+    for i in range(0, 213):
+        x = -P.DEV_W / 2 + i
+        probe = box(x - 0.4, x + 0.4, P.DEV_Y0 + P.DEV_D + 0.05,
+                    P.DEV_Y0 + P.DEV_D + P.REAR_LIP_H + 2.0,
+                    P.DEV_Z0 + 0.2, P.DEV_Z0 + P.REAR_LIP_H - 0.2)
+        if vol(asm.common(probe)) < VOID:
+            gaps.append(x)
+    check(not gaps, "something is behind the gateway across its whole width",
+          "unbacked at x = %s" % (gaps[:6] if gaps else "nowhere"))
+
+    # The lip must not foul the sides' rear stops, which start where it ends.
+    v = vol(trays.common(parts["side_l"].fuse(parts["side_r"])))
+    check(v < VOID, "the tray's lip clears the sides' rear stops",
+          "%.3f mm3 shared" % v)
+
+    # It has to be behind the gateway, not under it: the case sits on the
+    # tray, so a lip that started too far forward would hold it off the floor.
+    for nm in ("tray_l", "tray_r"):
+        under = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0,
+                    P.DEV_Y0 + P.DEV_D, P.DEV_Z0 + 0.05, P.DEV_Z1)
+        v = vol(parts[nm].common(under))
+        check(v < VOID, "%s stays below the gateway it carries" % nm,
+              "%.3f mm3 in the way" % v)
 
     # Four pegs key the halves instead.
     # The pegs that key the front of the joint, where no bolt will fit.

@@ -152,6 +152,27 @@ KEY_X = 22.0          # [design] near the edges of the lap, so a pair holds the
 KEY_Y = (20.0, 116.0)  # [design] one pair just inside the gateway's front edge,
                        # one pair near its back
 
+# The lip across the back of the tray. Without it the only thing behind the
+# gateway is the two rear stops on the sides, and those reach in only to
+# x = +/-99 -- 7.4 mm of overlap at each end, 7% of a 212.8 mm rear face. Push
+# a plug into a socket in the middle and the case slides back on 93% of its
+# width with nothing behind it.
+#
+# It is deliberately LOW. The ports are on this face, so the lip clears the
+# tray by 3 mm and no more: it catches the bottom edge of the case, below the
+# port openings, and everything above DEV_Z0 + REAR_LIP_H is left open -- which
+# `verify` checks. If your unit has anything in the bottom 3 mm of its back,
+# drop REAR_LIP_H; 1 mm still stops it.
+#
+# 3 mm is not thin for the job. The load is a plug being pushed home, order
+# 30 N spread over the lip's 198 mm; even taken as a point load on 20 mm of
+# lip that is about 3 MPa against PETG's ~50. This is nothing like the bolt
+# tab that broke -- that one carried 1700 N of preload on a 3 mm neck.
+REAR_LIP_H = 3.0      # [design] how far it stands above the tray
+REAR_LIP_T = 3.0      # [design] thickness, fore and aft
+REAR_LIP_X = STOP_X0  # [design] it stops where the sides' rear stops start,
+                      # so the two together span the full rear face
+
 # ---------------------------------------------------------- the top bar ----
 # Bolted on last, from the front, through the ear and into a hex nut trapped
 # in the bar with the pocket facing rear. It nests into a notch in the side so

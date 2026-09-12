@@ -280,6 +280,28 @@ def tray(doc, sx, name):
     else:
         sk.pocket(doc, bd, s, P.LAP_T)
 
+    # --- the lip across the back ------------------------------------------
+    # Raised off the tray's own rear face and padded backwards, so it lands
+    # 1 mm behind the gateway and catches the bottom of its back panel. The
+    # two halves carry it between them: the left from the side's rear stop to
+    # the near edge of the lap, the right from there to the other stop. Each
+    # follows its own half's section, so the lip is a continuation of the
+    # plate rather than a tab stuck on it.
+    top = P.TRAY_T + P.REAR_LIP_H
+    lap = P.CENTRE_LAP
+    if sx < 0:
+        pts = [(-P.REAR_LIP_X, 0.0), (-lap, 0.0), (-lap, top),
+               (-P.REAR_LIP_X, top)]
+    else:
+        # Steps down at the edge of the lap, where this half is only the top
+        # 3 mm of the tray -- there is no material below it to stand on.
+        pts = [(-lap, P.LAP_T), (lap, P.LAP_T), (lap, 0.0),
+               (P.REAR_LIP_X, 0.0), (P.REAR_LIP_X, top), (-lap, top)]
+    s = sk.sketch(doc, bd, name + "_Sk_rearlip",
+                  sk.plane(Vector(0, P.DEV_Y1 - P.TRAY_FIT, 0), sk.X, sk.Z))
+    sk.polygon(s, pts)
+    sk.pad(doc, bd, s, P.REAR_LIP_T, reversed_=True)
+
     return bd
 
 
