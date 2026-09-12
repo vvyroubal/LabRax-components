@@ -23,18 +23,42 @@ the per-part support and brim settings — see
 
 ## Keep what you already printed
 
-Comparing the STLs you printed against the current ones, byte for byte:
+**Only the trays have changed since the faceplate went in.** `side_l`,
+`side_r`, `leg_l` and `leg_r` are byte-identical to the STLs published with
+"One faceplate instead of two bars" (`50ea387`), and `faceplate` to `b406e4b`.
+So if your sides, legs and faceplate came from that version or later, reprint
+the two trays and nothing else.
 
 | part | verdict |
 |---|---|
-| `side_l`, `side_r` | reprint — 21 mm longer, rear ear removed, splice slots added, ears thinned to 6.5 mm and moved in to x = ±94 |
-| `tray_l`, `tray_r` | reprint — centre bolt tab deleted, four pegs instead of two, rear lip added |
-| `top_bar` | **gone** — it and the bottom bar are now one faceplate |
+| `side_l`, `side_r` | **keep**, if printed since `50ea387` |
+| `leg_l`, `leg_r` | **keep**, if printed since `50ea387` |
+| `faceplate` | **keep** — even a `50ea387` one fits; the only later change is the window's round-over, 514 mm³ of cosmetics with no interface in it |
+| `tray_l`, `tray_r` | **reprint, both** — centre bolt tab deleted, four pegs instead of two, rear lip added |
+| `top_bar`, bottom bar | **gone** — replaced by the faceplate |
 
-**Nothing from the last print carries over.** The top bar survived the last two
-rounds of changes and was the one part worth keeping; replacing both bars with
-a single faceplate has taken that away too. If you have not yet printed the
-bottom bar and the legs, you have lost nothing by waiting.
+**Reprint the trays as a pair.** An old half will not mate with a new one:
+the old pair has two pegs and the bolt tab, the new pair has four pegs, no tab
+and the rear lip. About 107 g and 3 h 50 for the two.
+
+### Which sides do you have?
+
+Two things tell them apart without a calliper on anything subtle:
+
+- **The ear.** Measure from the outer edge of the ear inwards to where it
+  stops. Current sides: **33 mm**. The older ones: **29 mm** — their ears
+  reached in only to x = ±98 rather than ±94.
+- **The notch.** The older sides have notches cut in the front for a separate
+  top bar and bottom bar. The current ones have **none** — the faceplate stops
+  at the rail's inner face instead.
+
+If yours are the older ones you need the sides, legs and faceplate too, since
+those sides expect two bars that no longer exist.
+
+The tray-to-side joint itself has not moved: the new trays were tested against
+the pre-faceplate sides and share 0.0 mm³ with them, sitting on the same
+3096 mm³ of ledge. It is the rest of the assembly that would stop you, not the
+tray.
 
 ## Buy
 
