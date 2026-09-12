@@ -126,39 +126,31 @@ TRAY_X1 = POCKET_HW   # 107, out to the inner face of the side rail
 # Modelled flush it is exactly as long as that gap, which in printed plastic
 # is an interference fit, so it is made this much shorter.
 TRAY_FIT = 0.4        # [design]
-# 60 mm of overlap. There is no fastener at the front of this joint and there
-# cannot be: an M6 nut needs 15.5 mm of height once its corners and a wall are
-# counted, the tray is 6 mm thick, and everything above that stands in front
-# of the device's face. So the lap itself does the work -- it is wide, it runs
-# the full depth, the device's weight closes it, and the two M6 behind the
-# device clamp it. The front is located by pegs, not bolted.
+# 60 mm of overlap, and no fastener anywhere in this joint.
+#
+# There was one: a tab behind the device carrying two M6. Both tabs snapped
+# off the moment the bolts were tightened. The tab hung off a 10 x 3 mm neck
+# with the bolt 6.5 mm above it and up to 22 mm behind, so nearly all of the
+# preload arrived as bending. CalculiX puts the tabs at 26 N and 33 N against
+# roughly 1700 N from an M6 at 2 N-m -- fifty times over. That is not a part
+# that was over-tightened; 26 N is about 0.03 N-m at the key.
+#
+# A bigger tab is not the answer either: nothing that clamps two 6 mm printed
+# plates edge-on survives an M6. The joint does not need one. The lap is 60 mm
+# wide and runs the whole depth; the rails hold the halves sideways; the
+# faceplate and the rear stop hold them fore and aft; and the gateway's weight
+# sits on the lap and closes it. Four pegs keep them square to each other.
+#
+# Removing it also clears the space behind the gateway's rear ports, which is
+# exactly where that tab stood -- 1 mm behind the face, across the middle 20 mm.
 CENTRE_LAP = 30.0     # [design] half-width of the centre lap
 
-# The halves bolt to each other behind the device, where there is room for an
-# M6 nut. In front there is only the 8 mm between the rack face and the
-# device, which is not enough in any direction -- an M6 nut wants 10.2 mm of
-# slot and 15.5 mm of height -- so the front of the joint is a dovetail key
-# instead, cut into the lap and pulled tight by the bolts behind it.
-TRAY_CB_D = 5.0       # [design] the tray screw's head sinks this far into
-                      # the left tab, so its 12 mm reaches the nut in the right
-TAB_HX = 10.0         # [design] half-width of the rear tab
-TAB_D = 30.0          # [design] its depth. Two M6 nuts lie along it, and a
-                      # nut slot is 10.2 wide, so this is what they need.
-TAB_Z1 = 16.0         # [design] and its height, 11.55 across corners + walls
-TRAY_BOLT_Z = 8.0     # [design] 2.2 mm of tab under the nut's corner
-TRAY_BOLT_Y = (DEV_Y1 + 8.0, DEV_Y1 + 22.0)  # [design] both behind the device
-
-M6_NUT_AF = 10.2      # [design] an M6 nut is 10.0 across the flats
-M6_NUT_D = 5.2        # [design] ... and 5.0 thick
-
-# The key at the front: a peg on the upper half dropping into a socket in the
-# lower one. It stops the halves hinging apart in plan; the device above and
-# the lap itself are what stop them separating vertically.
 KEY_D = 5.0           # [design] peg diameter
-KEY_FIT = 0.3         # [design] clearance in the socket
-KEY_Y = 20.0          # [design] in the lap, just inside the device
-KEY_X = 22.0          # [design] two of them, near the edges of the lap, so
-                      # they locate the halves in rotation as well as position
+KEY_FIT = 0.3         # [design] clearance in its socket
+KEY_X = 22.0          # [design] near the edges of the lap, so a pair holds the
+                      # halves square as well as together
+KEY_Y = (20.0, 116.0)  # [design] one pair just inside the gateway's front edge,
+                       # one pair near its back
 
 # ---------------------------------------------------------- the top bar ----
 # Bolted on last, from the front, through the ear and into a hex nut trapped

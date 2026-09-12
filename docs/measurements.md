@@ -101,10 +101,12 @@ so `DEV_Z0` fixes it.
 
 ## Why the tray's bolt tab went
 
-Both tabs snapped off when their M6 was tightened. `make fem` meshes the rear
-of each tray half and loads the fastener where it actually bears; the analysis
-is saved as `cad/fem_tray_l.FCStd` and `cad/fem_tray_r.FCStd`, which open in
-the FEM workbench with the result colour map on them.
+Both tabs snapped off when their M6 was tightened. A CalculiX study meshed the
+rear of each tray half and loaded the fastener where it actually bears. The
+tool and the saved analyses are not in the working tree any more — the tab
+they studied no longer exists — but they are in the history at commit
+`581951b`, and `git show 581951b:tools/fem.py > tools/fem.py` brings the study
+back if another part ever needs one.
 
 | | tray_l | tray_r |
 |---|---|---|
@@ -120,6 +122,14 @@ the preload arrived as bending. At 100 N a bolt the model deflects 4.2 mm.
 
 26 N of preload is about 0.03 N·m at the key. That is not a part that was
 over-tightened; it is a part that could not be tightened at all.
+
+**The bolts are gone rather than bigger.** Nothing that clamps two 6 mm
+printed plates edge-on survives an M6, and the joint does not need one: the
+lap is 60 mm wide and runs the full depth, the rails hold the halves sideways,
+the faceplate and the rear stop hold them fore and aft, and the gateway's own
+weight sits on the lap and closes it. Four pegs — one pair near the gateway's
+front edge, one near its back — keep the halves square. It also cleared the
+25 mm behind the gateway's rear ports, which is where that tab stood.
 
 ## A note on `cloud-gateway-1u-lab-rax.stl`
 

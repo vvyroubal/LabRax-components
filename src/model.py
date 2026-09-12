@@ -242,10 +242,9 @@ def tray(doc, sx, name):
     """Half of the tray.
 
     The two halves are not mirrors: at the centreline one has to pass under
-    the other. The left half takes the bottom of every lap, the right half the
+    the other. The left half takes the bottom of the lap, the right half the
     top, which is the only rule needed to read the section below -- and it is
-    also why the right half carries the peg and the nuts, and the left half
-    the socket and the bolt clearance.
+    also why the right half carries the pegs and the left half the sockets.
     """
     bd = sk.body(doc, name)
     lap = P.CENTRE_LAP
@@ -263,54 +262,24 @@ def tray(doc, sx, name):
     sk.polygon(s, pts)
     sk.pad(doc, bd, s, P.DEV_Y1 - P.DEV_Y0 - P.TRAY_FIT, reversed_=True)
 
-    # Behind it there is room to work: one tab per half, side by side, with
-    # two M6 running across the joint.
-    u0, u1 = (-P.TAB_HX, 0.0) if sx < 0 else (0.0, P.TAB_HX)
-    s = sk.sketch(doc, bd, name + "_Sk_tab",
-                  sk.plane(Vector(0, P.DEV_Y1 - P.TRAY_FIT, 0), sk.X, sk.Z))
-    sk.rect(s, u0, 0.0, u1, P.TAB_Z1)
-    sk.pad(doc, bd, s, P.TAB_D, reversed_=True)
-
-    s = sk.sketch(doc, bd, name + "_Sk_boltholes",
-                  sk.plane(Vector(u0, 0, 0), sk.Y, sk.Z))
-    for y in P.TRAY_BOLT_Y:
-        sk.circle(s, y, P.TRAY_BOLT_Z, P.M6_CLEAR)
-    sk.pocket(doc, bd, s, P.TAB_HX)
-
-    if sx < 0:
-        # The head sinks into this half, or a 12 mm screw would only just
-        # touch the nut in the other one.
-        s = sk.sketch(doc, bd, name + "_Sk_boltcb",
-                      sk.plane(Vector(u0, 0, 0), sk.Y, sk.Z))
-        for y in P.TRAY_BOLT_Y:
-            sk.circle(s, y, P.TRAY_BOLT_Z, P.M6_HEAD_D)
-        sk.pocket(doc, bd, s, P.TRAY_CB_D)
-
-    # Two pegs and the sockets they drop into. Near the edges of the lap, so
-    # they hold the halves square to each other as well as together. They sit
-    # inside the device's footprint now -- the tray no longer reaches forward
-    # of it, because the bottom bar occupies that space.
-    s = sk.sketch(doc, bd, name + "_Sk_key",
+    # Four pegs key the two halves to each other. There is no bolt: the one
+    # that used to be here hung off a 10 x 3 mm neck and snapped off both
+    # halves the first time it was tightened. The lap does the work -- 60 mm
+    # wide, the full depth, closed by the gateway's weight -- and the pegs
+    # stop the halves shifting or going out of square.
+    s = sk.sketch(doc, bd, name + "_Sk_keys",
                   sk.plane(Vector(0, 0, P.LAP_T), sk.X, sk.Y))
     for kx in (-P.KEY_X, P.KEY_X):
-        sk.circle(s, kx, P.KEY_Y,
-                  P.KEY_D if sx > 0 else P.KEY_D + P.KEY_FIT)
+        for ky in P.KEY_Y:
+            sk.circle(s, kx, ky,
+                      P.KEY_D if sx > 0 else P.KEY_D + P.KEY_FIT)
     if sx > 0:
-        # Down to Z=0, so the peg stands on the bed when the half is printed
-        # and fills the socket to the full depth when it is assembled.
+        # Down to Z=0, so each peg stands on the bed when this half is
+        # printed and fills its socket to full depth when it is assembled.
         sk.pad(doc, bd, s, P.LAP_T, reversed_=True)
     else:
         sk.pocket(doc, bd, s, P.LAP_T)
 
-    if sx > 0:
-        s = sk.sketch(doc, bd, name + "_Sk_nutslots",
-                      sk.plane(Vector(2.0, 0, 0), sk.Y, sk.Z))
-        for y in P.TRAY_BOLT_Y:
-            sk.rect(s, y - P.M6_NUT_AF / 2, P.TRAY_BOLT_Z - 5.8,
-                    y + P.M6_NUT_AF / 2, P.TAB_Z1 + 1.0)
-        # Explicit: material lies both ways from this plane, so the
-        # automatic choice would happily cut the wrong side of the bolt.
-        sk.pocket(doc, bd, s, P.M6_NUT_D, reversed_=True)
     return bd
 
 

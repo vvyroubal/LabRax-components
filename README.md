@@ -19,7 +19,6 @@ make            # build the model and its exports, verify, render, plate
 make verify     # re-check the solids against the rack, device and bed
 make plate      # export/3mf/UCG_Fiber_LabRax-A1mini.3mf, for Bambu Studio
 make assembly   # put real M6 x 12 screws, nuts and washers in and check them
-make fem        # stress the tray's bolt tab with CalculiX, into cad/fem_*.FCStd
 make plates     # slice every plate and check it prints inside the bed
 ```
 
@@ -33,13 +32,11 @@ src/
   model.py        the seven bodies
 build.py          writes cad/, export/stl/, export/step/
 tools/
-  verify.py       146 checks against the rack, the device and the printer
+  verify.py       140 checks against the rack, the device and the printer
   measure_rack.py re-derives the [rack] numbers from the Lab Rax mesh files
   preview.py      renders images/ (FreeCAD is headless here)
   plate.py        arranges the STLs onto A1 mini plates as a Bambu 3MF
   assembly.py     checks all 22 fasteners as solids against the built parts
-  fem.py          CalculiX study of the tray's bolt tab, saved as its own
-                  document so it can be opened and looked at
   checkplates.py  slices every plate for real and measures the toolpaths
   a1mini_project.json  the A1 mini preset the 3MF carries to be a project
 docs/
@@ -80,9 +77,9 @@ Seven prints, none over a 180 mm bed.
 
 | part | size (mm) | qty |
 |---|---|---|
-| `side_l` / `side_r` | 29 × 212.5 × 44.5 | 1 each |
-| `leg_l` / `leg_r` | 29 × 108 × 44.5 | 1 each |
-| `tray_l` / `tray_r` | 137 × 159 × 16 | 1 each |
+| `side_l` / `side_r` | 33 × 212.5 × 44.5 | 1 each |
+| `leg_l` / `leg_r` | 33 × 108 × 44.5 | 1 each |
+| `tray_l` / `tray_r` | 137 × 128.6 × 6 | 1 each |
 | `faceplate` | 214 × 20 × 44.5 | 1 |
 
 A **side** carries everything that touches the device: front ear, side rail,
@@ -103,6 +100,14 @@ bed in any orientation, so it comes in halves that lap on the centreline. Each
 half laps the other way onto its side's ledge. It is a light load over a wide
 plate — 734 g over a 214 × 129 × 6 span works out around 0.2 mm of deflection
 — so it does not need stiffening, only holding together and locating.
+
+**The two halves take no screw.** Four ⌀5 pegs on the right half drop into
+sockets in the left and key them; the 60 mm lap, the two side rails, the
+faceplate in front and the rear stops behind do the rest, and the gateway's
+weight sits on the lap and closes it. There was a bolted tab once, on the
+centreline behind the device. It snapped off both halves the first time the
+screws were tightened — see [docs/measurements.md](docs/measurements.md) — and
+it also stood 1 mm behind the gateway's rear ports. It is gone, not larger.
 
 The **faceplate** is the front, in one piece, with a window for the gateway's
 display. It replaces the bar that used to sit above the device and the bar
@@ -137,15 +142,14 @@ from the window.
 
 | qty | item |
 |---|---|
-| 22 | M6 × 12 button head |
-| 10 | M6 nut — DIN 934, 10 mm across the flats, 5 mm thick |
+| 20 | M6 × 12 button head |
+| 8 | M6 nut — DIN 934, 10 mm across the flats, 5 mm thick |
 | 16 | M6 washer — DIN 125 form A, ⌀12.5 |
 
 | qty | where | nut | washer |
 |---|---|---|---|
 | 12 | bracket to rack: 3 per ear, 4 ears | none — in the post | yes |
 | 4 | faceplate, through the front ears | 4 × M6 | no |
-| 2 | tray halves to each other, at the rear tab | 2 × M6 | no |
 | 4 | side to rear leg, through the splice slots | 4 × M6 | yes |
 
 The rack screws need no nuts — the Lab Rax posts already hold them, in a hex
@@ -156,8 +160,8 @@ a screw that goes more than 6 mm past the ear hits the end and never clamps,
 and one that goes much less than 5 mm barely catches the nut. That fixes the
 ear at **6.5 mm**: a 12 mm screw then enters 5.5 mm, with 3.5 mm of thread in
 the nut and half a millimetre to spare. The other four joints were arranged
-around the same 12 mm — the bar screws' heads sink 1 mm into the ear, the tray
-screw's sinks 5 mm into its tab, and the splice needed nothing.
+around the same 12 mm — the bar screws' heads sink 1 mm into the ear, and the
+splice needed nothing.
 
 **The sixteen washers are not optional.** Those screws go through slots, and
 an M6 head is wider than a slot is: without a washer it lands on two crescents
@@ -210,17 +214,18 @@ choice around it.
 Two tools, and they check different things.
 
 `make verify` measures the built solids, not the parameters, so a feature that
-silently does nothing is caught rather than assumed away. 146 checks: that each
+silently does nothing is caught rather than assumed away. 140 checks: that each
 body is one valid solid built from sketches driving pads and pockets; that it
 fits the bed, turning a long part on the diagonal if it has to; that no two
 parts foul each other; that an M6 passes all twelve rack slots; that the
 top-bar screw runs through the ear and its nut both seats and can be fed in
 from the rear; that the tray is solid under the device all the way across,
 that both halves lap rather than butt, that each is carried by its side's
-ledge, that a real M6 nut solid seats in each slot and can be dropped in from
-above, and that nothing rises above the tray in front of the device's face;
+ledge, that all four pegs meet a socket with clearance to spare, that nothing
+rises above the tray in front of the device's face, and that nothing at all
+stands in the 25 mm behind the gateway's rear ports;
 that the top bar is one solid spanning the whole opening, with an M6 at each
-end whose nut seats and can be fitted; that every one of the five joints takes
+end whose nut seats and can be fitted; that every one of the four bolted joints takes
 the same M6 × 12 with at least 3 mm of thread in its nut, and that the rack
 screw does not bottom out in the post's blind hole; and that the device drops in, is
 stopped rear and above, and cannot be pushed out of the front.
@@ -233,8 +238,8 @@ sides differently.
 
 `make assembly` is less forgiving, because arithmetic can agree with itself
 while the hole is somewhere else entirely. It places a real M6 × 12, a real
-nut and a real washer at every one of the twenty-two positions and asks
-whether they fit what was actually built — 115 checks: that each shank is
+nut and a real washer at every one of the twenty positions and asks
+whether they fit what was actually built — 107 checks: that each shank is
 clear the whole way, that each head has something to bear on and how much,
 that each nut sits in its pocket, and that no fastener touches the gateway.
 
@@ -242,9 +247,12 @@ That is what found the washers. The heads at the sixteen slotted positions had
 25 mm² of plastic under them and nothing had noticed, because no dimension was
 wrong — the slot and the head were each exactly as intended.
 
-Neither catches everything. That the tray joint was too small for the M6 it
-was supposed to take was spotted by eye, in the FreeCAD window, not by the
-checks.
+Neither catches everything, and both missed the one thing that actually broke.
+The tray's centre bolt tab passed every geometric check — the screw fitted,
+the nut seated, nothing fouled — and snapped off both halves on first
+tightening, because no check asked what the stress would be. A CalculiX run
+afterwards put the tab's yield load at 26 N against roughly 1700 N of preload.
+Geometry that fits is not geometry that holds.
 
 ## Caveats
 

@@ -152,11 +152,6 @@ def fasteners():
                 "%s x%+.0f" % (tag, sx * P.BAR_SCREW_X),
                 (sx * P.BAR_SCREW_X, -P.EAR_T + P.BAR_CB_D, z), (0, 1, 0),
                 nut_at=P.EAR_T - P.BAR_CB_D + P.BAR_NUT_Y0, sunk=P.BAR_CB_D))
-    for y in P.TRAY_BOLT_Y:
-        out.append(Fastener(
-            "tray y%.0f" % y,
-            (-P.TAB_HX + P.TRAY_CB_D, y, P.TRAY_BOLT_Z), (1, 0, 0),
-            nut_at=P.TAB_HX - P.TRAY_CB_D + 2.0, phase=30.0, sunk=P.TRAY_CB_D))
     for sx in (-1, 1):
         for y in P.SPLICE_BOLT_Y:
             out.append(Fastener(

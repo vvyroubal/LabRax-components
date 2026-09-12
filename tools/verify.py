@@ -387,35 +387,29 @@ def main():
           "the halves lap on the centreline",
           "%.0f / %.0f mm3" % (vol(parts["tray_l"].common(lap)),
                                vol(parts["tray_r"].common(lap))))
-    # Bolted across that lap with M6, behind the device where a nut fits.
-    for y in P.TRAY_BOLT_Y:
-        check(y > P.DEV_Y1, "tray bolt at y=%5.1f is clear of the device" % y,
-              "device ends at %.1f" % P.DEV_Y1)
-        shank = Part.makeCylinder(3.0, 2 * P.TAB_HX,
-                                  Vector(-P.TAB_HX - 0.05, y, P.TRAY_BOLT_Z),
-                                  Vector(1, 0, 0))
-        check(vol(trays.common(shank)) < VOID,
-              "M6 passes both halves at y=%5.1f" % y,
-              "%.3f mm3" % vol(trays.common(shank)))
-        # A real M6 nut: 10.0 across the flats, 11.55 across the corners.
-        nut = hexnut2(y, P.TRAY_BOLT_Z, 10.0, 2.05, 2.0 + P.M6_NUT_D - 0.05)
-        check(vol(trays.common(nut)) < VOID, "its M6 nut seats at y=%5.1f" % y,
-              "%.3f mm3" % vol(trays.common(nut)))
-        feed = box(2.05, 2.0 + P.M6_NUT_D - 0.05, y - 5.0, y + 5.0,
-                   P.TRAY_BOLT_Z, P.TAB_Z1 + 5.0)
-        check(vol(trays.common(feed)) < VOID,
-              "it can be dropped in from above at y=%5.1f" % y,
-              "%.3f mm3" % vol(trays.common(feed)))
+    # No bolt across this joint: the tab that used to carry one snapped off
+    # both halves when it was tightened. Nothing may stand behind the gateway
+    # where it did, either -- that is where its rear ports are.
+    behind = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0 + P.DEV_D,
+                 P.DEV_Y0 + P.DEV_D + 25.0, P.DEV_Z0, P.DEV_Z1)
+    v = vol(trays.common(behind))
+    check(v < VOID, "the tray leaves the gateway's rear ports clear",
+          "%.3f mm3 in the 25 mm behind them" % v)
+
+    # Four pegs key the halves instead.
     # The pegs that key the front of the joint, where no bolt will fit.
     for kx in (-P.KEY_X, P.KEY_X):
-        peg = Part.makeCylinder(P.KEY_D / 2, P.LAP_T - 0.1,
-                                Vector(kx, P.KEY_Y, 0.05), Vector(0, 0, 1))
-        check(vol(parts["tray_r"].common(peg)) > 20.0
-              and vol(parts["tray_l"].common(peg)) < VOID,
-              "a peg keys the joint at x=%+6.1f" % kx,
-              "%.0f mm3 of peg, %.3f in the socket"
-              % (vol(parts["tray_r"].common(peg)),
-                 vol(parts["tray_l"].common(peg))))
+        for ky in P.KEY_Y:
+            peg = Part.makeCylinder(P.KEY_D / 2, P.LAP_T - 0.1,
+                                    Vector(kx, ky, 0.05), Vector(0, 0, 1))
+            check(vol(parts["tray_r"].common(peg)) > 20.0
+                  and vol(parts["tray_l"].common(peg)) < VOID,
+                  "a peg keys the joint at x=%+6.1f y=%5.1f" % (kx, ky),
+                  "%.0f mm3 of peg, %.3f in the socket"
+                  % (vol(parts["tray_r"].common(peg)),
+                     vol(parts["tray_l"].common(peg))))
+    check(len(P.KEY_Y) >= 2, "pegs at the front and the back of the lap",
+          "rows at y = %s" % ", ".join("%.0f" % y for y in P.KEY_Y))
     # The lap has to be wide, because it is what holds the front together.
     check(2 * P.CENTRE_LAP >= 60.0, "the centre lap is at least 60 mm wide",
           "%.0f mm" % (2 * P.CENTRE_LAP))
@@ -459,15 +453,9 @@ def main():
           limit=P.EAR_T + P.POST_HOLE_D)
     screw("faceplate screw reaches its nut", P.EAR_T - P.BAR_CB_D,
           P.EAR_T - P.BAR_CB_D + P.BAR_NUT_Y0, P.M6_HEX_D)
-    screw("tray screw reaches its nut", P.TAB_HX - P.TRAY_CB_D,
-          P.TAB_HX - P.TRAY_CB_D + 2.0, P.M6_NUT_D)
     screw("splice screw reaches its nut", P.RAIL_T,
           P.RAIL_T + P.SPLICE_BOSS_T - P.M6_HEX_D, P.M6_HEX_D)
 
-    # And the head has somewhere to sit at every one of them.
-    check(P.TRAY_CB_D + 2.0 <= P.TAB_HX,
-          "the tray screw's head is inside its tab",
-          "%.1f mm counterbore in a %.1f mm tab" % (P.TRAY_CB_D, P.TAB_HX))
 
     print("\n[clearances]")
     check(abs((P.POST_CLEAR_HW - P.BODY_HW) - 0.925) < 1e-9,
