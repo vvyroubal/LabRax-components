@@ -4,3 +4,6 @@ __pycache__/
 result.json
 .plates-*/
 .fem-*/
+# The FEM documents are 28 MB each and `make fem` rebuilds them in a few
+# minutes. Keeping them out of the history rather than out of reach.
+cad/fem_*.FCStd

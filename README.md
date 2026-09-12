@@ -19,6 +19,7 @@ make            # build the model and its exports, verify, render, plate
 make verify     # re-check the solids against the rack, device and bed
 make plate      # export/3mf/UCG_Fiber_LabRax-A1mini.3mf, for Bambu Studio
 make assembly   # put real M6 x 12 screws, nuts and washers in and check them
+make fem        # stress the tray's bolt tab with CalculiX, into cad/fem_*.FCStd
 make plates     # slice every plate and check it prints inside the bed
 ```
 
@@ -37,6 +38,8 @@ tools/
   preview.py      renders images/ (FreeCAD is headless here)
   plate.py        arranges the STLs onto A1 mini plates as a Bambu 3MF
   assembly.py     checks all 22 fasteners as solids against the built parts
+  fem.py          CalculiX study of the tray's bolt tab, saved as its own
+                  document so it can be opened and looked at
   checkplates.py  slices every plate for real and measures the toolpaths
   a1mini_project.json  the A1 mini preset the 3MF carries to be a project
 docs/

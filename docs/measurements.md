@@ -99,6 +99,28 @@ The bracket's window is 22.5 x 11.0, larger all round. The gateway can shift
 could clip it. Its height needs no such allowance: the case sits on the tray,
 so `DEV_Z0` fixes it.
 
+## Why the tray's bolt tab went
+
+Both tabs snapped off when their M6 was tightened. `make fem` meshes the rear
+of each tray half and loads the fastener where it actually bears; the analysis
+is saved as `cad/fem_tray_l.FCStd` and `cad/fem_tray_r.FCStd`, which open in
+the FEM workbench with the result colour map on them.
+
+| | tray_l | tray_r |
+|---|---|---|
+| peak von Mises at 100 N a bolt | 191.4 MPa | 152.0 MPa |
+| where | (-10, 136.6, 3) | (10, 136.6, 6) |
+| preload at which PETG yields | 26 N | 33 N |
+| an M6 at 2 N·m, about 1700 N | 65x over | 52x over |
+
+The peak sits exactly where both parts broke: Y = 136.6, the plane where the
+tab meets the plate, at the outer corner. The tab hung off a 10 x 3 mm neck,
+30 mm², with the bolt 6.5 mm above it and up to 22 mm behind, so nearly all of
+the preload arrived as bending. At 100 N a bolt the model deflects 4.2 mm.
+
+26 N of preload is about 0.03 N·m at the key. That is not a part that was
+over-tightened; it is a part that could not be tightened at all.
+
 ## A note on `cloud-gateway-1u-lab-rax.stl`
 
 This file is a Lab Rax gateway mount, but **not for the UCG-Fiber.** Measured:

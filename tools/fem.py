@@ -6,6 +6,12 @@ a load on the bolt and asks CalculiX what the part does about it.
 
     make fem
 
+Each analysis is saved as its own document, cad/fem_<part>.FCStd, so it can
+be opened and looked at: the mesh, the constraints, the material and the
+result colour map are all in there. It has to be a separate file -- build.py
+rewrites cad/UCG_Fiber_LabRax.FCStd from the script on every make, so an
+analysis living in that document would not survive the next build.
+
 Only the rear of each tray is modelled -- everything behind Y = CUT -- with
 that cut face held fixed. It is far enough from the tab for the boundary not
 to matter, and it keeps the mesh small enough to solve in a minute.
@@ -165,17 +171,23 @@ def run(name, sx):
     fea.load_results()
 
     res = [o for o in doc.Objects if o.isDerivedFrom("Fem::FemResultObject")]
-    if res:
-        print("  applied %s, worst deflection %.3f mm"
-              % (frc.Force, max(res[0].DisplacementLengths)))
     if not res:
         print("  no result came back")
         return None
     r = res[0]
+    print("  applied %s, worst deflection %.3f mm"
+          % (frc.Force, max(r.DisplacementLengths)))
     vm = r.vonMises
     peak = max(vm)
     i = list(vm).index(peak)
     node = r.Mesh.FemMesh.Nodes[r.NodeNumbers[i]]
+
+    # Save it, so there is something to open and look at.
+    out = os.path.join(ROOT, "cad", "fem_%s.FCStd" % name)
+    doc.saveAs(out)
+    print("  saved %s (%.1f MB)"
+          % (os.path.relpath(out, ROOT), os.path.getsize(out) / 1e6))
+
     shutil.rmtree(work, ignore_errors=True)
     return peak, (node.x, node.y, node.z), msh.FemMesh.NodeCount
 
