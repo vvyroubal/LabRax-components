@@ -150,15 +150,23 @@ down matters: the right way up, the flange that reaches over the gateway is a
 12 mm shelf hanging over nothing. Inverted, that flange lies on the bed and
 the part needs no support at all.
 
-The window is a **22.5 × 11.0 mm** stadium, centred, its centre 20 mm up the
-U, with a **6 mm round-over on its front edge** so the opening reads as a
-bezel rather than a hole punched in a plate. The round leaves 2 mm of the
+The window is a **22.5 × 11.0 mm** stadium, centred, its centre **25 mm up
+the U**, with a **6 mm round-over on its front edge** so the opening reads as
+a bezel rather than a hole punched in a plate. The round leaves 2 mm of the
 8 mm plate behind it, and the window stays full size at the back where the
-display needs it. The display it shows is 21.0 × 10.0, centred on the case, 14 mm above the
-case's bottom — and the case's bottom sits on the tray, so that height is
-fixed rather than floating. The window is 1.5 mm larger all round because the
-gateway can shift 0.6 mm either way between the rails, and showing a hair of
-white case is better than clipping the display.
+display needs it. The display it shows is 21.0 × 10.0, centred on the case,
+**19 mm above the case's bottom** — and the case's bottom sits on the tray,
+so that height is fixed rather than floating. The window is 1.5 mm larger all
+round because the gateway can shift 0.6 mm either way between the rails, and
+showing a hair of white case is better than clipping the display.
+
+**That 19 mm was 14 mm, and the first faceplate came out with the window 5 mm
+low.** 5.0 is exactly half the display's 10.0 height, so the 14.0 was to the
+oval's bottom edge rather than its centre. The check that was supposed to
+catch this could not: it built the display panel at the *window's* height, so
+the window was only ever compared against itself and would have passed
+wherever it sat. The display now has its own measured height in `params.py`
+and the check places the panel from that, independently.
 
 **The faceplate commits you to ports-at-the-back.** The face is closed apart
 from the window.

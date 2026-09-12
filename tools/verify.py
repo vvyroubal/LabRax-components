@@ -299,13 +299,33 @@ def main():
         check(vol(fp.common(rail)) < VOID,
               "it clears the rail at x=%+6.1f" % (sx * P.POCKET_HW),
               "%.3f mm3" % vol(fp.common(rail)))
-    # The window, against the display it has to show: a 21.0 x 10.0 stadium,
-    # centred on the case, its centre 14.0 above the case's bottom. Modelled
-    # as the stadium it is -- a sharp-cornered rectangle would report the
-    # window's own radii as clipping.
-    win = stadium(0.0, P.WIN_Z, 21.0, 10.0, -1.0, P.BAR_T + 1.0)
-    check(vol(fp.common(win)) < VOID, "the display is not clipped",
-          "%.3f mm3 across the 21.0 x 10.0 panel" % vol(fp.common(win)))
+    # The window, against the display it has to show. The display is placed
+    # from ITS OWN measured height, never from the window's -- the old check
+    # built the panel at P.WIN_Z, so the window was compared against itself
+    # and would have passed at any height at all. That is why a window 5 mm
+    # low got printed. Modelled as the stadium it is: a sharp-cornered
+    # rectangle would report the window's own radii as clipping.
+    disp = stadium(0.0, P.DISP_Z, P.DISP_W, P.DISP_H, -1.0, P.BAR_T + 1.0)
+    check(vol(fp.common(disp)) < VOID, "the display is not clipped",
+          "%.3f mm3 across the %.1f x %.1f panel"
+          % (vol(fp.common(disp)), P.DISP_W, P.DISP_H))
+    check(abs(P.DISP_Z - (P.DEV_Z0 + 19.0)) < 1e-9,
+          "the display sits 19.0 above the case bottom",
+          "centre at z=%.1f, the case bottom resting on the tray at %.1f"
+          % (P.DISP_Z, P.DEV_Z0))
+    # The window has to be concentric with it, with margin left all round.
+    check(abs(P.WIN_Z - P.DISP_Z) < 1e-9,
+          "the window is concentric with the display",
+          "both centred at z=%.1f" % P.DISP_Z)
+    for nm, w, d in (("above and below", P.WIN_H, P.DISP_H),
+                     ("each side", P.WIN_W, P.DISP_W)):
+        check((w - d) / 2.0 >= 0.5, "margin %s the display" % nm,
+              "%.2f mm" % ((w - d) / 2.0))
+    # And the opening, once rounded over, must stay clear of the flange.
+    top = P.WIN_Z + P.WIN_H / 2.0 + P.WIN_FILLET
+    check(top < P.BAR_FLANGE_Z0,
+          "the rounded opening stays below the flange",
+          "reaches z=%.1f, flange starts at %.1f" % (top, P.BAR_FLANGE_Z0))
     check(P.WIN_W > 21.0 and P.WIN_H > 10.0,
           "the window is larger than the display it shows",
           "%.1f x %.1f against 21.0 x 10.0" % (P.WIN_W, P.WIN_H))

@@ -223,20 +223,26 @@ BAR_SCREW_Z = 30.16   # [design] midway between two EIA holes
 # are unchanged.
 BOT_SCREW_Z = RACK_U - BAR_SCREW_Z  # 14.29, the lower pair
 
-# The display, measured on the device with callipers: a 21.0 x 10.0 stadium,
-# centred on the case's width, and its CENTRE 14.0 above the case's bottom --
-# confirmed, not inferred. It is the only thing on the front face: no reset
-# button, and the power jack is at the back with the ports. So the faceplate
-# needs this one window and nothing else.
+# The display: a 21.0 x 10.0 stadium, centred on the case's width, its centre
+# 19.0 above the case's bottom.
 #
-# The window is a little larger than the display. The gateway can shift 0.6 mm
+# That height was first taken as 14.0. The printed faceplate put the window
+# 5 mm low, and 5.0 is exactly half of the display's 10.0 height -- so the
+# 14.0 was to the BOTTOM edge of the oval, not its centre. 14.0 + 10.0/2 is
+# the 19.0 used here.
+#
+# It is the only thing on the front face: no reset button, and the power jack
+# is at the back with the ports. So the faceplate needs this one window.
+DISP_W = 21.0          # [dev] measured
+DISP_H = 10.0          # [dev] measured
+DISP_Z = DEV_Z0 + 19.0  # 25.0 -- the case sits on the tray, so DEV_Z0 fixes it
+
+# The window is a little larger than the display: the gateway can shift 0.6 mm
 # either way between the rails, and showing a hair of white case is better
-# than clipping the display. Its height needs no such allowance: the case sits
-# on the tray, so DEV_Z0 fixes it.
-WIN_W = 22.5          # [dev] 21.0 plus the float
-WIN_H = 11.0          # [dev] 10.0 plus a little
-WIN_Z = DEV_Z0 + 14.0  # 20.0, measured from the case's bottom, which sits on
-                       # the tray at DEV_Z0
+# than clipping the display.
+WIN_W = DISP_W + 1.5  # 22.5
+WIN_H = DISP_H + 1.0  # 11.0
+WIN_Z = DISP_Z        # concentric with the display, which is the whole point
 WIN_FILLET = 6.0       # [design] the window's front edge is rounded over, so
                        # the opening reads as a bezel rather than a hole
                        # punched in a plate. Added by hand in FreeCAD and

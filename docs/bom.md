@@ -23,17 +23,17 @@ the per-part support and brim settings — see
 
 ## Keep what you already printed
 
-**Only the trays and the legs have changed since the faceplate went in.**
-`side_l` and `side_r` are still byte-identical to the STLs published with
-"One faceplate instead of two bars" (`50ea387`), and `faceplate` to `b406e4b`.
-So if your sides and faceplate came from that version or later, reprint the
-two trays and the two legs and nothing else — about 145 g and 5 h 32.
+**The sides are the only parts that have not changed.** `side_l` and `side_r`
+are still byte-identical to the STLs published with "One faceplate instead of
+two bars" (`50ea387`). If yours came from that version or later, reprint the
+two trays, the two legs and the faceplate — about 188 g and 7 h 14. Only the
+two sides carry over.
 
 | part | verdict |
 |---|---|
 | `side_l`, `side_r` | **keep**, if printed since `50ea387` |
 | `leg_l`, `leg_r` | **reprint, both** — 11 mm shorter, and slotted so the splice adjusts twice as far |
-| `faceplate` | **keep** — even a `50ea387` one fits; the only later change is the window's round-over, 514 mm³ of cosmetics with no interface in it |
+| `faceplate` | **reprint** — the window moves up 5 mm; the display's centre is 19 mm above the case bottom, not 14 |
 | `tray_l`, `tray_r` | **reprint, both** — centre bolt tab deleted, four pegs instead of two, rear lip added |
 | `top_bar`, bottom bar | **gone** — replaced by the faceplate |
 
