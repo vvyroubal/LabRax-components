@@ -8,7 +8,7 @@ CAD   := cad/UCG_Fiber_LabRax.FCStd
 PARTS := side_l side_r leg_l leg_r tray_l tray_r faceplate
 STLS  := $(addprefix $(STL)/,$(addsuffix .stl,$(PARTS)))
 
-.PHONY: all model verify assembly images plate plates clean
+.PHONY: all model verify assembly fem images plate plates clean
 
 all: model verify assembly images plate
 
@@ -33,6 +33,11 @@ plate: $(STLS)
 # Put a real M6 x 12 and a real nut at all 22 positions and see if they fit.
 assembly: $(CAD)
 	$(FREECAD) tools/assembly.py
+
+# Stress the tray's bolt tab with CalculiX. Slow, and needs the FEM
+# workbench and ccx, so it is not part of `all`.
+fem:
+	$(FREECAD) tools/fem.py
 
 # Slice every plate for real and measure what the printer would actually do.
 # Slow (it runs the slicer five times) and needs Bambu Studio, so it is not
