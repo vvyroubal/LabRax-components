@@ -36,13 +36,27 @@ SLOT_H = 6.6   # [design] M6 clearance across the slot
 
 POST_CLEAR_W = 222.25  # [rack] clear width between the posts
 POST_CLEAR_HW = POST_CLEAR_W / 2
-POST_DEPTH = 35.0  # [rack] post cross-section front-to-back
 
-# Front to back. The side panel is 175.9 mm and fits BETWEEN the posts, so
-# that is the INNER depth -- reading it as the outer one is what made the
-# first bracket 27 mm too short. Outer, front post face to rear post face:
-RACK_INNER = 175.9              # [rack] side panel, between the posts
-RACK_D = RACK_INNER + 2 * 35.0  # [rack] 245.9, front face to rear face
+# The rack's depth, and the number this design got wrong twice.
+#
+# The first build read the side panel's 175.9 mm as the CLEAR gap between the
+# posts. It is not: the panel is 3 mm thick and seats about 2.95 mm into a
+# groove at each end. The gap it spans is the frame beams' 170.0 mm -- three
+# separate members in the rack's own 3MF are 170.0 long (objects 11, 24, 79),
+# and 170.0 + 2 x 2.95 is the panel's 175.9 exactly.
+#
+# So the clear gap is 170.0, not 175.9, and the bracket built on the old
+# reading came out about 16 mm too long -- far enough that winding the splice
+# all the way in still left the rear ears standing proud of the rear posts.
+#
+# The post's cross-section is 30 x 35 and the mesh does not say which way it
+# faces, so the outer depth is either 230.0 or 240.0. Rather than pick one,
+# the nominal sits between them and the splice -- now slotted at BOTH ends --
+# reaches either comfortably. Set it by fitting, not by this number.
+RACK_INNER = 170.0              # [rack] clear between the posts, from the beams
+POST_D = 32.5                   # [rack] cross-section is 30 x 35 and the
+                                # mesh does not say which way; take the midpoint
+RACK_D = RACK_INNER + 2 * POST_D  # [rack] 235.0, front face to rear face
 
 # 245.9 + two 8 mm ears is 261.9 mm, and a 180 mm bed takes 225.6 mm even
 # cornerwise, so each side is two pieces: a front section carrying everything
@@ -56,7 +70,12 @@ SPLICE_Y1 = 206.0     # [design] rear end of the front section
 SPLICE_T = 3.2        # [design] the leg's lap plate, same as the rail
 SPLICE_BOLT_Y = (161.0, 191.0)  # [design] nominal; the slots move +/-10
 SPLICE_BOLT_Z = 20.0  # [design]
-SPLICE_SLOT = 26.0    # [design] slot length -> +/-10 mm of adjustment
+SPLICE_SLOT = 26.0    # [design] slot length in the SIDE -> +/-9.7 mm
+# The leg is slotted too, and its nut pocket with it: a hexagon swept along Y
+# holds the nut against turning while letting it travel. Two slotted parts in
+# series double the adjustment without the side being touched, which matters
+# because the side is the expensive print and the leg is the cheap one.
+LEG_SLOT = 26.0       # [design] slot length in the LEG -> another +/-9.7 mm
 SPLICE_BOSS_T = 8.0   # [design] the leg thickens here to hold an M6 nut
 SPLICE_BOSS_H = 18.0  # [design] and is this tall around each one
 
@@ -256,3 +275,9 @@ EAR_CHAMFER = 4.0     # [design]
 M6_CLEAR = 6.4      # [rack]
 M6_HEX_AF = 10.09   # [rack] 11.65 across corners
 M6_HEX_D = 5.0      # [rack] nut thickness
+
+# The leg's nut pocket has to be LONGER than its bolt slot, not equal to it:
+# the nut must travel as far as the bolt does, and if the two end flush the
+# slot's end arc lands exactly on the hexagon's point -- a tangency the solid
+# modeller will not clean up ("Bnd_Box is void" on removeSplitter).
+LEG_NUT_SLOT = (LEG_SLOT - M6_CLEAR) + 2 * M6_HEX_AF / 3 ** 0.5  # 31.05

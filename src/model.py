@@ -160,16 +160,23 @@ def leg(doc, sx, name):
                 y + P.SPLICE_SLOT / 2 + 4.0, P.SPLICE_BOLT_Z + P.SPLICE_BOSS_H / 2)
     sk.pad(doc, bd, s, P.SPLICE_BOSS_T, reversed_=inward)
 
+    # Slotted, like the side's half of the joint. The side alone gave +/-9.7,
+    # which was not enough once the rack turned out to be shallower than the
+    # side panel implied; slotting this end too doubles the travel and costs
+    # only a leg reprint, the side being the part that takes four hours.
     s = sk.sketch(doc, bd, name + "_Sk_boltholes",
                   sk.plane(Vector(x_in, 0, 0), sk.Y, sk.Z))
     for y in P.SPLICE_BOLT_Y:
-        sk.circle(s, y, P.SPLICE_BOLT_Z, P.M6_CLEAR)
+        sk.slot(s, y, P.SPLICE_BOLT_Z, P.LEG_SLOT, P.M6_CLEAR)
     sk.pocket(doc, bd, s, P.SPLICE_BOSS_T)
 
+    # The nut pocket is stretched with it, so the nut travels the length of
+    # the slot. Its two flats parallel to Y stay captured, so it still cannot
+    # turn while the bolt is done up.
     s = sk.sketch(doc, bd, name + "_Sk_nuts",
                   sk.plane(Vector(x_in, 0, 0), sk.Y, sk.Z))
     for y in P.SPLICE_BOLT_Y:
-        sk.hexagon(s, y, P.SPLICE_BOLT_Z, P.M6_HEX_AF)
+        sk.hexslot(s, y, P.SPLICE_BOLT_Z, P.M6_HEX_AF, P.LEG_NUT_SLOT)
     sk.pocket(doc, bd, s, P.M6_HEX_D, reversed_=inward)
     return bd
 

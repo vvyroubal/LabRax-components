@@ -78,7 +78,7 @@ Seven prints, none over a 180 mm bed.
 | part | size (mm) | qty |
 |---|---|---|
 | `side_l` / `side_r` | 33 × 212.5 × 44.5 | 1 each |
-| `leg_l` / `leg_r` | 33 × 108 × 44.5 | 1 each |
+| `leg_l` / `leg_r` | 33 × 97.5 × 44.5 | 1 each |
 | `tray_l` / `tray_r` | 137 × 131.6 × 9 | 1 each |
 | `faceplate` | 214 × 20 × 44.5 | 1 |
 
@@ -88,12 +88,26 @@ the inner face of its rail, bolts through two M6, and carries the rear ear out
 to the back posts — so the bracket is held at four points and is not a
 cantilever.
 
-**That splice is slotted, and it is where the rack's depth gets set.** The
-rack's own parts disagree about how deep it is: the side panel gives 245.9 mm
-outer, while the top edge and the handle are both 170 mm, which gives 240. The
-slots allow ±9.8 mm, covering 236.1 – 255.7, so you slide the legs until the
-rear ears meet the posts and then tighten. Do not trust the number; use the
-slot.
+**That splice is slotted at both ends, and it is where the rack's depth gets
+set.** Read the rack's own parts carefully: three frame members in its 3MF are
+170.0 mm long, and that 170.0 is the clear gap between the posts. The side
+panel's 175.9 mm is *not* that gap — the panel is 3 mm thick and seats about
+2.95 mm into a groove at each end, and 170.0 + 2 × 2.95 is 175.9 exactly.
+Reading 175.9 as the gap is what made an earlier bracket about 16 mm too long,
+far enough that winding the splice fully in still left the rear ears standing
+proud of the rear posts.
+
+The post's cross-section is 30 × 35 and the mesh does not say which way it
+faces, so the outer depth is either 230 or 240. Rather than pick one, the
+nominal sits between them at **235**, and both halves of the splice are
+slotted — the side ±9.8 and the leg ±9.8, which add across the joint to
+**±19.6 mm, covering 215.4 – 254.6**. Slide the legs until the rear ears meet
+the posts, then tighten. Do not trust the number; use the slot.
+
+The leg's nut pocket is a hexagon stretched along the slot, so the nut travels
+with the bolt and still cannot turn. It is deliberately longer than the bolt
+slot: end the two flush and the slot's end arc lands exactly on the hexagon's
+point, which is a tangency the solid modeller will not clean up.
 
 The **tray** is the floor the gateway stands on. At 214 mm it will not fit the
 bed in any orientation, so it comes in halves that lap on the centreline. Each

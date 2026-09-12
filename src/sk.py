@@ -71,6 +71,25 @@ def hexagon(sk, cu, cv, af):
     return polygon(sk, pts)
 
 
+def hexslot(sk, cu, cv, af, w):
+    """A hexagon `af` across the flats, stretched to `w` along u.
+
+    A nut in this can travel but cannot turn: the two flats parallel to u stay
+    captured whatever position it slides to. Built as one counter-clockwise
+    loop, for the reason set out under slot().
+    """
+    import math
+    r = af / math.sqrt(3.0)
+    d = max(0.0, (w - 2.0 * r) / 2.0)
+    pts = []
+    for a_ in (0, 60, 120, 180, 240, 300):
+        x = r * math.cos(math.radians(a_))
+        y = r * math.sin(math.radians(a_))
+        pts.append((cu + x + (d if x > 1e-9 else -d if x < -1e-9 else 0.0),
+                    cv + y))
+    return polygon(sk, pts)
+
+
 def slot(sk, cu, cv, w, h):
     """Slot with semicircular ends, `w` long and `h` across.
 

@@ -6,13 +6,13 @@ screw lengths with the arithmetic set out at the bottom.
 
 ## Print
 
-Six plates, seven parts, about **259 g** and **11 h 24** in total.
+Six plates, seven parts, about **259 g** and **11 h 25** in total.
 
 | plate | part | size (mm) | filament | time | support |
 |---|---|---|---|---|---|
 | 1 | `side_l` | 33 × 212.5 × 44.5 | 35.3 g | 1 h 56 | yes |
 | 2 | `side_r` | 33 × 212.5 × 44.5 | 35.4 g | 1 h 57 | yes |
-| 3 | `leg_l` + `leg_r` | 33 × 108 × 44.5 each | 38.7 g | 1 h 53 | yes |
+| 3 | `leg_l` + `leg_r` | 33 × 97.5 × 44.5 each | 38.6 g | 1 h 54 | yes |
 | 4 | `tray_l` | 137 × 131.6 × 9 | 49.2 g | 1 h 45 | yes |
 | 5 | `tray_r` | 137 × 131.6 × 9 | 57.5 g | 2 h 07 | yes |
 | 6 | `faceplate` | 214 × 20 × 44.5 | 43.0 g | 1 h 46 | no |
@@ -23,16 +23,16 @@ the per-part support and brim settings — see
 
 ## Keep what you already printed
 
-**Only the trays have changed since the faceplate went in.** `side_l`,
-`side_r`, `leg_l` and `leg_r` are byte-identical to the STLs published with
+**Only the trays and the legs have changed since the faceplate went in.**
+`side_l` and `side_r` are still byte-identical to the STLs published with
 "One faceplate instead of two bars" (`50ea387`), and `faceplate` to `b406e4b`.
-So if your sides, legs and faceplate came from that version or later, reprint
-the two trays and nothing else.
+So if your sides and faceplate came from that version or later, reprint the
+two trays and the two legs and nothing else — about 145 g and 5 h 32.
 
 | part | verdict |
 |---|---|
 | `side_l`, `side_r` | **keep**, if printed since `50ea387` |
-| `leg_l`, `leg_r` | **keep**, if printed since `50ea387` |
+| `leg_l`, `leg_r` | **reprint, both** — 11 mm shorter, and slotted so the splice adjusts twice as far |
 | `faceplate` | **keep** — even a `50ea387` one fits; the only later change is the window's round-over, 514 mm³ of cosmetics with no interface in it |
 | `tray_l`, `tray_r` | **reprint, both** — centre bolt tab deleted, four pegs instead of two, rear lip added |
 | `top_bar`, bottom bar | **gone** — replaced by the faceplate |

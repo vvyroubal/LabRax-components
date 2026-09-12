@@ -194,9 +194,21 @@ def main():
               "%.1f mm3" % vol(asm.common(head)))
 
     print("\n[the rear legs -- reaching the back posts]")
-    check(abs(P.RACK_D - (P.RACK_INNER + 70.0)) < 1e-9,
-          "outer depth is the inner depth plus both posts",
-          "%.1f = %.1f + 2 x 35" % (P.RACK_D, P.RACK_INNER))
+    check(abs(P.RACK_D - (P.RACK_INNER + 2 * P.POST_D)) < 1e-9,
+          "outer depth is the clear gap plus both posts",
+          "%.1f = %.1f + 2 x %.1f" % (P.RACK_D, P.RACK_INNER, P.POST_D))
+    check(abs(P.RACK_INNER - 170.0) < 1e-9,
+          "the clear gap comes from the frame beams, not the side panel",
+          "170.0, the length of three members in the rack's own 3MF")
+    # The nut must travel as far as its bolt, and its pocket must not end
+    # flush with the slot -- that tangency is what broke the solid before.
+    check(abs((P.LEG_NUT_SLOT - 2 * P.M6_HEX_AF / 3 ** 0.5)
+              - (P.LEG_SLOT - P.M6_CLEAR)) < 1e-6,
+          "the leg's nut travels exactly as far as its bolt",
+          "%.2f mm each" % (P.LEG_SLOT - P.M6_CLEAR))
+    check(P.LEG_NUT_SLOT > P.LEG_SLOT + 1.0,
+          "the nut pocket runs past the ends of the bolt slot",
+          "%.2f vs %.2f" % (P.LEG_NUT_SLOT, P.LEG_SLOT))
     for sx, nm in ((-1, "leg_l"), (1, "leg_r")):
         lg = parts[nm]
         b = lg.BoundBox
@@ -215,11 +227,21 @@ def main():
               "%.0f mm3 of leg against %.0f mm3 of rail" % (vl, vs))
         check(vol(lg.common(side)) < VOID, "%s does not foul the side" % nm,
               "%.3f mm3" % vol(lg.common(side)))
-    # The splice bolts, and the range they give.
-    adj = (P.SPLICE_SLOT - P.M6_CLEAR) / 2.0
-    check(adj >= 8.0, "the splice adjusts enough to cover both readings",
-          "+/-%.1f mm, so %.1f..%.1f outer depth" % (adj, P.RACK_D - adj,
-                                                     P.RACK_D + adj))
+    # The splice bolts, and the range they give. Both halves are slotted, so
+    # the travel is the sum: the side's slot plus the leg's.
+    adj = ((P.SPLICE_SLOT - P.M6_CLEAR) + (P.LEG_SLOT - P.M6_CLEAR)) / 2.0
+    lo, hi = P.RACK_D - adj, P.RACK_D + adj
+    check(adj >= 18.0, "the splice adjusts far enough to be set by fitting",
+          "+/-%.1f mm, so %.1f..%.1f outer depth" % (adj, lo, hi))
+    # It must reach BOTH readings the rack's own parts give, since the mesh
+    # does not say which way the 30 x 35 post faces.
+    for d in (170.0 + 2 * 30.0, 170.0 + 2 * 35.0):
+        check(lo <= d <= hi, "it reaches a %.0f mm rack" % d,
+              "%.1f..%.1f covers it" % (lo, hi))
+    # And it must NOT still reach the reading that caused the problem, or the
+    # same mistake just gets made at the other end of the slot.
+    check(hi < 245.9 + 10.0, "the old 245.9 reading is no longer the middle",
+          "nominal now %.1f" % P.RACK_D)
     for sx in (-1, 1):
         lg = parts["leg_l" if sx < 0 else "leg_r"]
         side = parts["side_l" if sx < 0 else "side_r"]
@@ -233,16 +255,35 @@ def main():
             n = hexnut4(sx, y, P.SPLICE_BOLT_Z, 10.0)
             check(vol(lg.common(n)) < VOID, "its nut seats at y=%5.1f" % y,
                   "%.3f mm3" % vol(lg.common(n)))
-        # And the slot really is a slot, not a hole.
+        # And both really are slots, not holes. The travel adds up across the
+        # joint, but each part only ever sees its OWN slot's half of it --
+        # testing either one at the full +/-19.6 would be testing a position
+        # the bolt never reaches in that part.
+        side_adj = (P.SPLICE_SLOT - P.M6_CLEAR) / 2.0
+        leg_adj = (P.LEG_SLOT - P.M6_CLEAR) / 2.0
         for y in P.SPLICE_BOLT_Y:
-            for d in (-adj, adj):
+            for d in (-side_adj, side_adj):
                 sh = Part.makeCylinder(3.0, P.RAIL_T + 0.2,
                                        Vector(sx * P.BODY_HW, y + d,
                                               P.SPLICE_BOLT_Z),
                                        Vector(-sx, 0, 0))
                 check(vol(side.common(sh)) < VOID,
-                      "slot still clears at y=%5.1f%+5.1f" % (y, d),
+                      "side slot clears at y=%5.1f%+5.1f" % (y, d),
                       "%.3f mm3" % vol(side.common(sh)))
+            for d in (-leg_adj, leg_adj):
+                sh = Part.makeCylinder(
+                    3.0, P.SPLICE_BOSS_T + 0.2,
+                    Vector(sx * (P.POCKET_HW - P.SPLICE_BOSS_T), y + d,
+                           P.SPLICE_BOLT_Z), Vector(sx, 0, 0))
+                check(vol(lg.common(sh)) < VOID,
+                      "leg slot clears at y=%5.1f%+5.1f" % (y, d),
+                      "%.3f mm3" % vol(lg.common(sh)))
+            # the nut has to follow the bolt the whole way
+            for d in (-leg_adj, leg_adj):
+                n = hexnut4(sx, y + d, P.SPLICE_BOLT_Z, 10.0)
+                check(vol(lg.common(n)) < VOID,
+                      "its nut still seats at y=%5.1f%+5.1f" % (y, d),
+                      "%.3f mm3" % vol(lg.common(n)))
 
     print("\n[the front face -- one plate, with a window for the display]")
     fp = parts["faceplate"]
