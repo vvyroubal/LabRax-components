@@ -109,6 +109,36 @@ def pad(doc, bd, sk, length, reversed_=False, name=None):
     return p
 
 
+def fillet(doc, bd, base, edges, radius, name):
+    """Round over the named edges of `base`.
+
+    Edge names are the one fragile thing in a scripted PartDesign model --
+    "Edge19" means whatever the topological namer decided last time. Callers
+    should find their edges by where they are and pass the names in, so that
+    the selection survives a change upstream.
+    """
+    f = doc.addObject("PartDesign::Fillet", name)
+    bd.addObject(f)
+    f.Base = (base, list(edges))
+    f.Radius = radius
+    doc.recompute()
+    if not f.Shape.isValid() or not f.Shape.Solids:
+        raise RuntimeError("fillet %s did not build" % name)
+    return f
+
+
+def edges_on(shape, xlim, ylim, zlim):
+    """Names of the edges lying wholly inside a box. Geometry, not names."""
+    out = []
+    for i, e in enumerate(shape.Edges, start=1):
+        b = e.BoundBox
+        if (xlim[0] <= b.XMin and b.XMax <= xlim[1]
+                and ylim[0] <= b.YMin and b.YMax <= ylim[1]
+                and zlim[0] <= b.ZMin and b.ZMax <= zlim[1]):
+            out.append("Edge%d" % i)
+    return out
+
+
 def pocket(doc, bd, sk, length, reversed_=None, name=None):
     """Cut `length` into the body. Direction is worked out by trying it.
 

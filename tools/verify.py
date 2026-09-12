@@ -272,6 +272,28 @@ def main():
           "and lies within the gateway's face",
           "Z %.1f..%.1f inside %.0f..%.0f"
           % (P.WIN_Z - P.WIN_H / 2, P.WIN_Z + P.WIN_H / 2, P.DEV_Z0, P.DEV_Z1))
+    # The window's front edge is rounded over. Check the round is there by
+    # looking for material that a sharp-edged window would still have: just
+    # outside the window's outline, at the front face.
+    r = P.WIN_FILLET
+    # Thin in Y: a round-over has curved well in by even half a millimetre
+    # of depth, so a deeper probe measures the round itself, not a corner.
+    flare = box(-4.0, 4.0, 0.0, 0.2,
+                P.WIN_Z + P.WIN_H / 2 + 0.4, P.WIN_Z + P.WIN_H / 2 + 4.0)
+    check(vol(fp.common(flare)) < VOID,
+          "the window's front edge is rounded over",
+          "%.1f mm radius, %.3f mm3 of square corner left"
+          % (r, vol(fp.common(flare))))
+    # ...and that it has not eaten through to the back, where the window has
+    # to stay the size the display needs.
+    back = stadium(0.0, P.WIN_Z, 21.0, 10.0, P.BAR_T - 0.5, P.BAR_T + 0.5)
+    check(vol(fp.common(back)) < VOID,
+          "and has not narrowed the window at the back",
+          "%.3f mm3" % vol(fp.common(back)))
+    check(r < P.BAR_T, "the round leaves wall behind it",
+          "%.1f mm radius in a %.1f mm plate, %.1f mm left"
+          % (r, P.BAR_T, P.BAR_T - r))
+
     ahead = box(-P.FACE_HW, P.FACE_HW, -P.EAR_T + 0.01, 0.0, 0.0, P.RACK_U)
     stray = [n for n in names
              if n not in ("side_l", "side_r")

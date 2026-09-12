@@ -191,14 +191,24 @@ BAR_SCREW_Z = 30.16   # [design] midway between two EIA holes
 # are unchanged.
 BOT_SCREW_Z = RACK_U - BAR_SCREW_Z  # 14.29, the lower pair
 
-# The display, measured on the device: a 21.0 x 10.0 stadium, centred on the
-# case's width, its centre 14.0 above the case's bottom. The window is a
-# little larger -- the gateway can shift 0.6 mm either way between the rails,
-# and clipping the display would be worse than showing a hair of white case.
+# The display, measured on the device with callipers: a 21.0 x 10.0 stadium,
+# centred on the case's width, and its CENTRE 14.0 above the case's bottom --
+# confirmed, not inferred. It is the only thing on the front face: no reset
+# button, and the power jack is at the back with the ports. So the faceplate
+# needs this one window and nothing else.
+#
+# The window is a little larger than the display. The gateway can shift 0.6 mm
+# either way between the rails, and showing a hair of white case is better
+# than clipping the display. Its height needs no such allowance: the case sits
+# on the tray, so DEV_Z0 fixes it.
 WIN_W = 22.5          # [dev] 21.0 plus the float
 WIN_H = 11.0          # [dev] 10.0 plus a little
 WIN_Z = DEV_Z0 + 14.0  # 20.0, measured from the case's bottom, which sits on
                        # the tray at DEV_Z0
+WIN_FILLET = 6.0       # [design] the window's front edge is rounded over, so
+                       # the opening reads as a bezel rather than a hole
+                       # punched in a plate. Added by hand in FreeCAD and
+                       # brought back into the script from there.
 
 # The ears' outer corners are cut back, so the front reads as a shape rather
 # than as four square slabs.

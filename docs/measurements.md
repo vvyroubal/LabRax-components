@@ -86,6 +86,19 @@ That a shipped, working Lab Rax part slots its holes this generously is why
 this bracket slots its own, and why 3.2 mm of material outboard of the slot is
 acceptable (the reference leaves 2.24 mm).
 
+## The gateway's display
+
+Measured on the device with callipers, not taken from a datasheet: the front
+window is a **21.0 x 10.0 mm stadium**, centred on the case's width, with its
+**centre 14.0 mm above the case's bottom**. It is the only feature on the
+front face -- no reset button, and the power jack is at the back with the
+ports, which is what lets the faceplate be solid apart from the window.
+
+The bracket's window is 22.5 x 11.0, larger all round. The gateway can shift
+0.6 mm either way between the rails, so a window cut to the display's own size
+could clip it. Its height needs no such allowance: the case sits on the tray,
+so `DEV_Z0` fixes it.
+
 ## A note on `cloud-gateway-1u-lab-rax.stl`
 
 This file is a Lab Rax gateway mount, but **not for the UCG-Fiber.** Measured:

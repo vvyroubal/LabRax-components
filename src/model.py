@@ -221,7 +221,20 @@ def faceplate(doc, name):
             sk.hexagon(s, sx * P.BAR_SCREW_X, z, P.M6_HEX_AF)
     # Explicit: there is plate both sides of this plane, so the automatic
     # choice would cut the pocket behind the nut instead of around it.
-    sk.pocket(doc, bd, s, P.M6_HEX_D, reversed_=True)
+    last = sk.pocket(doc, bd, s, P.M6_HEX_D, reversed_=True)
+
+    # Round the window's front edge over. The four edges are picked out by
+    # where they are -- on the front face, inside the window's outline --
+    # rather than by name, so the selection survives anything upstream.
+    m = 0.2
+    edges = sk.edges_on(last.Shape,
+                        (-P.WIN_W / 2 - m, P.WIN_W / 2 + m),
+                        (-m, m),
+                        (P.WIN_Z - P.WIN_H / 2 - m, P.WIN_Z + P.WIN_H / 2 + m))
+    if len(edges) != 4:
+        raise RuntimeError("expected 4 window edges to round, found %d: %s"
+                           % (len(edges), edges))
+    sk.fillet(doc, bd, last, edges, P.WIN_FILLET, name + "_Fillet_window")
     return bd
 
 

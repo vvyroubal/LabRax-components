@@ -27,11 +27,12 @@ make plates     # slice every plate and check it prints inside the bed
 ```
 src/
   params.py       every dimension, tagged [rack] / [dev] / [design]
-  sk.py           sketch plumbing: planes, polygons, slots, pads, pockets
+  sk.py           sketch plumbing: planes, polygons, slots, pads, pockets,
+                  fillets, and finding edges by where they are
   model.py        the seven bodies
 build.py          writes cad/, export/stl/, export/step/
 tools/
-  verify.py       143 checks against the rack, the device and the printer
+  verify.py       146 checks against the rack, the device and the printer
   measure_rack.py re-derives the [rack] numbers from the Lab Rax mesh files
   preview.py      renders images/ (FreeCAD is headless here)
   plate.py        arranges the STLs onto A1 mini plates as a Bambu 3MF
@@ -113,7 +114,10 @@ down matters: the right way up, the flange that reaches over the gateway is a
 the part needs no support at all.
 
 The window is a **22.5 × 11.0 mm** stadium, centred, its centre 20 mm up the
-U. The display it shows is 21.0 × 10.0, centred on the case, 14 mm above the
+U, with a **6 mm round-over on its front edge** so the opening reads as a
+bezel rather than a hole punched in a plate. The round leaves 2 mm of the
+8 mm plate behind it, and the window stays full size at the back where the
+display needs it. The display it shows is 21.0 × 10.0, centred on the case, 14 mm above the
 case's bottom — and the case's bottom sits on the tray, so that height is
 fixed rather than floating. The window is 1.5 mm larger all round because the
 gateway can shift 0.6 mm either way between the rails, and showing a hair of
@@ -203,7 +207,7 @@ choice around it.
 Two tools, and they check different things.
 
 `make verify` measures the built solids, not the parameters, so a feature that
-silently does nothing is caught rather than assumed away. 143 checks: that each
+silently does nothing is caught rather than assumed away. 146 checks: that each
 body is one valid solid built from sketches driving pads and pockets; that it
 fits the bed, turning a long part on the diagonal if it has to; that no two
 parts foul each other; that an M6 passes all twelve rack slots; that the
