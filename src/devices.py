@@ -146,7 +146,7 @@ UCG_FIBER = Device(
     w=212.8, d=127.6, h=30.0, mass_g=734,
     plinth=0.0,
     keys_y=(20.0, 116.0),   # one pair inside the front edge, one near the back
-    front=Window(w=22.5, h=11.0, top_gap=6.0, fillet=6.0,
+    front=Window(w=22.5, h=11.0, top_gap=7.0, fillet=6.0,
                  disp_w=21.0, disp_h=10.0),
 )
 

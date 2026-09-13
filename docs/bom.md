@@ -51,7 +51,7 @@ anything already quoted against them still means the same thing.
 |---|---|
 | `side_l`, `side_r` | **keep**, if printed since `50ea387` |
 | `leg_l`, `leg_r` | **reprint, both** — 11 mm shorter, and slotted so the splice adjusts twice as far |
-| `faceplate` | **reprint** — the oval moves up: its top edge now sits 6.0 mm below the top bar |
+| `faceplate` | **reprint** — the oval moves up: its top edge now sits 7.0 mm below the top bar |
 | `tray_l`, `tray_r` | **reprint, both** — centre bolt tab deleted, four pegs instead of two, rear lip added |
 | `top_bar`, bottom bar | **gone** — replaced by the faceplate |
 

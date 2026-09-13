@@ -154,7 +154,7 @@ The tray takes no fastener at all.
 **The gateway** fills the bay, so the rails hold it straight and the ears
 overlap its ends by 12.4 mm. Its display faces front through a **22.5 × 11.0
 window** with a 6 mm round-over, placed by a rule about the printed part — the
-oval's top edge sits exactly 6.0 mm below the underside of the top bar — which
+oval's top edge sits exactly 7.0 mm below the underside of the top bar — which
 `verify` measures on the built solid. Two calliper readings taken off the case
 put that window wrong before the rule replaced them.
 

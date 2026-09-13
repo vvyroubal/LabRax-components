@@ -18,7 +18,7 @@ all: model verify assembly images plate
 model: $(CAD)
 
 # One build produces the document and every export, so they share a rule.
-$(CAD) $(STLS): build.py src/model.py src/params.py
+$(CAD) $(STLS): build.py src/model.py src/params.py src/devices.py src/sk.py
 	$(FREECAD) build.py
 
 # Check the built solids against the rack interface and each device envelope.
