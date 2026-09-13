@@ -150,23 +150,35 @@ down matters: the right way up, the flange that reaches over the gateway is a
 12 mm shelf hanging over nothing. Inverted, that flange lies on the bed and
 the part needs no support at all.
 
-The window is a **22.5 × 11.0 mm** stadium, centred, its centre **25 mm up
-the U**, with a **6 mm round-over on its front edge** so the opening reads as
+The window is a **22.5 × 11.0 mm** stadium, centred, with a **6 mm round-over
+on its front edge** so the opening reads as
 a bezel rather than a hole punched in a plate. The round leaves 2 mm of the
 8 mm plate behind it, and the window stays full size at the back where the
 display needs it. The display it shows is 21.0 × 10.0, centred on the case,
-**19 mm above the case's bottom** — and the case's bottom sits on the tray,
-so that height is fixed rather than floating. The window is 1.5 mm larger all
-round because the gateway can shift 0.6 mm either way between the rails, and
-showing a hair of white case is better than clipping the display.
+centred on the case. The window is 1.5 mm larger all round because the
+gateway can shift 0.6 mm either way between the rails, and showing a hair of
+white case is better than clipping the display.
 
-**That 19 mm was 14 mm, and the first faceplate came out with the window 5 mm
-low.** 5.0 is exactly half the display's 10.0 height, so the 14.0 was to the
-oval's bottom edge rather than its centre. The check that was supposed to
-catch this could not: it built the display panel at the *window's* height, so
-the window was only ever compared against itself and would have passed
-wherever it sat. The display now has its own measured height in `params.py`
-and the check places the panel from that, independently.
+**Its height is not calculated from the display.** Two calliper readings off
+the case were tried — 14.0 mm to the centre, then 19.0 — and both put the
+window wrong. The position is now given as a rule about the printed part
+instead:
+
+> **The oval's top edge sits exactly 5.0 mm below the underside of the top
+> bar** — the flange that reaches back over the gateway, at z = 36.8.
+
+That puts the window at z 20.8 – 31.8, centre 26.3. Being a rule about the
+faceplate rather than about the gateway, it can be measured on the built
+solid, and `verify` does exactly that: it scans the plate for where the window
+ends and where the flange begins, and checks the gap is 5.00. The old check
+could not have caught anything — it built the display panel at the *window's*
+own height, so the window was only ever compared against itself.
+
+One consequence worth seeing before printing: the 6 mm round-over now reaches
+z = 37.8 on the front face, about a millimetre above the level of the top
+bar's underside. Nothing breaks through — the flange is 8 mm behind and the
+plate is solid up there — but if the bezel wants to stay below that line,
+`WIN_FILLET` has to come down to 5 mm or less.
 
 **The faceplate commits you to ports-at-the-back.** The face is closed apart
 from the window.

@@ -309,10 +309,6 @@ def main():
     check(vol(fp.common(disp)) < VOID, "the display is not clipped",
           "%.3f mm3 across the %.1f x %.1f panel"
           % (vol(fp.common(disp)), P.DISP_W, P.DISP_H))
-    check(abs(P.DISP_Z - (P.DEV_Z0 + 19.0)) < 1e-9,
-          "the display sits 19.0 above the case bottom",
-          "centre at z=%.1f, the case bottom resting on the tray at %.1f"
-          % (P.DISP_Z, P.DEV_Z0))
     # The window has to be concentric with it, with margin left all round.
     check(abs(P.WIN_Z - P.DISP_Z) < 1e-9,
           "the window is concentric with the display",
@@ -321,11 +317,46 @@ def main():
                      ("each side", P.WIN_W, P.DISP_W)):
         check((w - d) / 2.0 >= 0.5, "margin %s the display" % nm,
               "%.2f mm" % ((w - d) / 2.0))
-    # And the opening, once rounded over, must stay clear of the flange.
-    top = P.WIN_Z + P.WIN_H / 2.0 + P.WIN_FILLET
-    check(top < P.BAR_FLANGE_Z0,
-          "the rounded opening stays below the flange",
-          "reaches z=%.1f, flange starts at %.1f" % (top, P.BAR_FLANGE_Z0))
+    # THE RULE: the oval's top edge sits exactly 5.0 mm below the underside of
+    # the top bar. Both edges are found on the BUILT SOLID, by scanning for
+    # where material starts and stops -- not read back out of params, which
+    # would prove nothing.
+    def scan_z(y, x, z0, z1, want, step=0.05):
+        """First z in [z0, z1] where material is/is not present at (x, y).
+
+        The probe is 4 x 1 x 0.4 mm, which is 1.6 mm3 when it is fully in
+        material -- comfortably over VOID. A thinner one reads as empty
+        everywhere and the scan silently finds nothing.
+        """
+        z = z0
+        while z <= z1:
+            probe = box(x - 2.0, x + 2.0, y - 0.5, y + 0.5, z, z + 0.4)
+            solid = vol(fp.common(probe)) > 1.5   # 1.6 when fully buried
+            if solid == want:
+                return z
+            z += step
+        return None
+
+    # behind the round-over, where the window is at full size
+    win_top = scan_z(P.BAR_T - 1.0, 0.0, P.WIN_Z, P.RACK_U, True)
+    # inside the flange, which reaches back over the gateway
+    bar_bottom = scan_z(P.BAR_T + 4.0, 0.0, 0.0, P.RACK_U, True)
+    check(win_top is not None and bar_bottom is not None,
+          "the window's top edge and the top bar's underside are both found",
+          "window top %s, bar underside %s" % (win_top, bar_bottom))
+    if win_top is not None and bar_bottom is not None:
+        gap = bar_bottom - win_top
+        check(abs(gap - P.WIN_TOP_GAP) < 0.1,
+              "the oval's top edge is %.1f mm below the top bar" % P.WIN_TOP_GAP,
+              "measured %.2f mm on the solid: window top z=%.2f, "
+              "bar underside z=%.2f" % (gap, win_top, bar_bottom))
+    # The round-over runs above the bar's line on the FRONT face, which is
+    # fine -- the flange is 8 mm behind it and the plate is solid up there --
+    # but it must not reach the top of the plate.
+    rim = P.WIN_Z + P.WIN_H / 2.0 + P.WIN_FILLET
+    check(rim < P.RACK_U - 2.0,
+          "the rounded rim stays inside the plate",
+          "reaches z=%.1f of %.2f" % (rim, P.RACK_U))
     check(P.WIN_W > 21.0 and P.WIN_H > 10.0,
           "the window is larger than the display it shows",
           "%.1f x %.1f against 21.0 x 10.0" % (P.WIN_W, P.WIN_H))

@@ -223,26 +223,32 @@ BAR_SCREW_Z = 30.16   # [design] midway between two EIA holes
 # are unchanged.
 BOT_SCREW_Z = RACK_U - BAR_SCREW_Z  # 14.29, the lower pair
 
-# The display: a 21.0 x 10.0 stadium, centred on the case's width, its centre
-# 19.0 above the case's bottom.
+# The window, and where it sits.
 #
-# That height was first taken as 14.0. The printed faceplate put the window
-# 5 mm low, and 5.0 is exactly half of the display's 10.0 height -- so the
-# 14.0 was to the BOTTOM edge of the oval, not its centre. 14.0 + 10.0/2 is
-# the 19.0 used here.
+# Its height is not calculated from the display any more. Two calliper
+# readings off the case were tried -- 14.0 to the centre, then 19.0 -- and
+# both put the window wrong. The position is now given directly, against a
+# feature of the faceplate itself rather than of the gateway:
 #
-# It is the only thing on the front face: no reset button, and the power jack
-# is at the back with the ports. So the faceplate needs this one window.
+#   THE OVAL'S TOP EDGE SITS EXACTLY 5.0 mm BELOW THE UNDERSIDE OF THE TOP
+#   BAR -- the flange that reaches back over the gateway, whose underside is
+#   BAR_FLANGE_Z0 = 36.8.
+#
+# That is a rule about the printed part, so it can be checked on the built
+# solid and is not at the mercy of a measurement.
+WIN_TOP_GAP = 5.0      # [design] specified: oval top to the top bar's underside
+WIN_W = 22.5           # [dev] the display is 21.0 wide, plus the float
+WIN_H = 11.0           # [dev] the display is 10.0 tall, plus a little
+WIN_Z = BAR_FLANGE_Z0 - WIN_TOP_GAP - WIN_H / 2.0  # 26.3
+
+# The display itself: a 21.0 x 10.0 stadium, centred on the case's width. It
+# is the only thing on the front face -- no reset button, and the power jack
+# is at the back with the ports. Its height is taken from the window now,
+# because the window's height is the thing that was specified; the checks on
+# it are therefore about size and concentricity, not about position.
 DISP_W = 21.0          # [dev] measured
 DISP_H = 10.0          # [dev] measured
-DISP_Z = DEV_Z0 + 19.0  # 25.0 -- the case sits on the tray, so DEV_Z0 fixes it
-
-# The window is a little larger than the display: the gateway can shift 0.6 mm
-# either way between the rails, and showing a hair of white case is better
-# than clipping the display.
-WIN_W = DISP_W + 1.5  # 22.5
-WIN_H = DISP_H + 1.0  # 11.0
-WIN_Z = DISP_Z        # concentric with the display, which is the whole point
+DISP_Z = WIN_Z
 WIN_FILLET = 6.0       # [design] the window's front edge is rounded over, so
                        # the opening reads as a bezel rather than a hole
                        # punched in a plate. Added by hand in FreeCAD and
