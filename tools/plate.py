@@ -148,22 +148,28 @@ def rotate(V, ops):
     return V
 
 
-PLATES_PER_ROW = 2
+PLATES_PER_ROW = 3     # see plate_origin(); 2 puts row 2 off the grid
 
 
 def plate_origin(index):
     """Bottom-left of plate `index` (1-based) in Bambu Studio's global layout.
 
-    Plates sit on a grid, two to a row, stepping +250 mm across a row and
-    -250 mm down to the next. Both numbers were read back out of Bambu Studio
-    itself: load a file, let it arrange, export, and see where it put things.
+    Plates sit on a grid THREE to a row, stepping 216 mm across a row and
+    216 mm down to the next. Found by trying candidates against the real
+    slicer, which is the only way to know: with two to a row every plate from
+    the second row on came back empty, and 250 mm failed on the second plate.
 
-    Getting this wrong fails in two different ways, neither of which mentions
-    coordinates. Land outside the grid entirely and the plate comes back empty
-    -- "one of the plate is empty or has no object fully inside it". Land near
-    enough that the parts are assigned to the right plate but not exactly on
-    it, and they are placed relative to the wrong origin -- "some objects are
-    located over the boundary of the heated bed".
+    Getting this wrong fails in two ways, neither of which mentions
+    coordinates. Land outside the grid and the plate comes back empty --
+    "Nothing to be sliced, either the print is empty or no object is fully
+    inside the print volume". Land near enough that the parts are assigned to
+    the right plate but not exactly on it, and they are placed relative to the
+    wrong origin -- "some objects are located over the boundary of the heated
+    bed".
+
+    Nothing caught this for a long time because checkplates.py rewrites each
+    plate as its own single-plate project before slicing, so it only ever
+    exercised plate 1's origin. It slices the real exported files as well now.
     """
     col = (index - 1) % PLATES_PER_ROW
     row = (index - 1) // PLATES_PER_ROW

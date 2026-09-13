@@ -112,9 +112,56 @@ def main():
     plate.PLATES = every
     shutil.rmtree(tmp, ignore_errors=True)
     print("\nbed %.0f x %.0f x %.0f" % (BED_X, BED_Y, BED_Z))
+
+    bad += slice_whole_files()
+
     for b in bad:
         print("  PROBLEM %s" % b)
     return 1 if bad else 0
+
+
+def slice_whole_files():
+    """Slice each exported 3MF as it stands, every plate in one go.
+
+    The per-plate pass above rewrites each plate as its own single-plate
+    project, so it only ever exercises plate 1's origin and says nothing about
+    whether the real file's plate grid is right. It was wrong for a long time
+    -- two plates to a row where Bambu Studio wants three -- and every plate
+    from the second row on came back "Nothing to be sliced". Nothing noticed,
+    because nothing had ever asked the slicer to open the file it ships.
+    """
+    print("\nthe exported files, sliced whole")
+    bad = []
+    for kit in plate.KITS:
+        f = os.path.join(ROOT, "export", "3mf", kit["out"])
+        if not os.path.exists(f):
+            bad.append("%s missing -- run make plate" % kit["out"])
+            continue
+        out = tempfile.mkdtemp(prefix=".whole-", dir=ROOT)
+        try:
+            r = subprocess.run(SLICER + ["--arrange", "0", "--slice", "0",
+                                         "--outputdir", out, f],
+                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                               timeout=1800)
+            log = r.stdout.decode("utf-8", "replace")
+            want = len(plate.CHASSIS_PLATES) + len(kit["plates"])
+            got = len([n for n in os.listdir(out) if n.endswith(".gcode")])
+            trouble = [l.split("]")[-1].strip()
+                       for l in log.splitlines()
+                       if "Nothing to be sliced" in l or "boundary" in l]
+            ok = r.returncode == 0 and got == want and not trouble
+            print("  %-34s %d of %d plates  %s"
+                  % (kit["out"], got, want,
+                     "ok" if ok else (trouble[0][:48] if trouble
+                                      else "exit %d" % r.returncode)))
+            if not ok:
+                bad.append("%s: %s" % (kit["out"],
+                                       trouble[0] if trouble
+                                       else "%d of %d plates sliced"
+                                       % (got, want)))
+        finally:
+            shutil.rmtree(out, ignore_errors=True)
+    return bad
 
 
 def _quiet(mod):
