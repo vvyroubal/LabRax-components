@@ -556,27 +556,33 @@ def one_device(parts, bodies, dev):
     # Measured between the sides' rear stops: the outer 7.4 mm at each end is
     # covered full height by the stop and the rear leg behind it, and always
     # has been. Everything in from there must stay open above the lip.
-    # Only for a device whose ports are on the back. A frame device faces its
-    # ports forward through the faceplate, so its back is just a back.
-    rear_ports = dev.front.kind == "window"
+    # Every device has something on its back -- ports, or at least a power
+    # socket -- so this runs whatever way it faces. Measured across the case's
+    # own width, or as much of it as the lip spans, whichever is narrower:
+    # wider than the case would count the sides' rear stops for a device that
+    # fills the bay, and the tray's own walls for one that does not. Neither
+    # is behind the case.
+    span = min(dev.w / 2.0, lip_x)
     ports_z0 = dev.z0 + P.REAR_LIP_H
-    behind = box(-lip_x, lip_x, dev.y0 + dev.d,
+    behind = box(-span, span, dev.y0 + dev.d,
                  dev.y0 + dev.d + 25.0, ports_z0, dev.z1)
     v = vol(asm.common(behind))
-    check(v < VOID or not rear_ports,
-          "the device's rear ports are clear above the lip"
-          if rear_ports else "nothing needs clearing behind (ports face front)",
-          "%.3f mm3 in the 25 mm behind the middle %.0f mm, above z=%.1f"
-          % (v, 2 * lip_x, ports_z0))
+    check(v < VOID, "the back of the case is clear above the lip",
+          "%.3f mm3 in the 25 mm behind its %.0f mm, above z=%.2f"
+          % (v, 2 * span, ports_z0))
 
-    # And say plainly how much of each end is blocked, so the one thing this
-    # bracket does cover is a number rather than a surprise.
-    ends = box(lip_x, dev.w / 2, dev.y0 + dev.d,
-               dev.y0 + dev.d + 25.0, ports_z0, dev.z1)
-    check(vol(asm.common(ends)) > VOID,
-          "the outer %.1f mm of each end is blocked by the stop and leg"
-          % (dev.w / 2 - lip_x),
-          "keep plugs out of the last %.1f mm" % (dev.w / 2 - lip_x))
+    # And say plainly how much of each end is blocked, where anything is, so
+    # the one thing this bracket does cover is a number rather than a surprise.
+    if dev.w / 2.0 > lip_x:
+        ends = box(lip_x, dev.w / 2, dev.y0 + dev.d,
+                   dev.y0 + dev.d + 25.0, ports_z0, dev.z1)
+        check(vol(asm.common(ends)) > VOID,
+              "the outer %.1f mm of each end is blocked by the stop and leg"
+              % (dev.w / 2 - lip_x),
+              "keep plugs out of the last %.1f mm" % (dev.w / 2 - lip_x))
+    else:
+        check(True, "nothing overhangs the ends of the case",
+              "it is narrower than the lip behind it")
 
     check(P.REAR_LIP_H <= 3.0, "the rear lip stays low enough to miss a port",
           "%.1f mm above the tray" % P.REAR_LIP_H)

@@ -5,10 +5,11 @@ ROOT    := $(CURDIR)
 STL   := export/stl
 STEP  := export/step
 CAD   := cad/UCG_Fiber_LabRax.FCStd
-DEVICES := ucg usw
+DEVICES := ucg usw sg108e
 PARTS := side_l side_r leg_l leg_r \
          tray_ucg_l tray_ucg_r faceplate_ucg \
-         tray_usw_l tray_usw_r faceplate_usw
+         tray_usw_l tray_usw_r faceplate_usw \
+         tray_sg108e_l tray_sg108e_r faceplate_sg108e
 STLS  := $(addprefix $(STL)/,$(addsuffix .stl,$(PARTS)))
 
 .PHONY: all model verify assembly images plate plates clean

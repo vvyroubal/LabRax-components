@@ -7,12 +7,13 @@ bolted to the front *and* rear posts.**
 
 ## What you can mount
 
-Two devices are modelled and checked today:
+Three devices are modelled and checked today:
 
 | device | model code | size (mm) | faces the front | print |
 |---|---|---|---|---|
 | **UniFi Cloud Gateway Fiber** | `UCG-Fiber` | 212.8 × 127.6 × 30, 734 g | its 0.96" display, through an oval window | `UCG_Fiber_LabRax-A1mini.3mf` |
 | **UniFi Flex Mini 2.5G** | `USW-Flex-2.5G-5` | 117.1 × 90 × 21.2, 206 g | its 5 × 2.5 GbE ports, through an open frame | `USW_Flex_LabRax-A1mini.3mf` |
+| **TP-Link Easy Smart switch** | `TL-SG108E` | 158 × 101 × 25 | its 8 × GbE ports, through an open frame | `TL_SG108E_LabRax-A1mini.3mf` |
 
 **There is one 3MF per device and each carries the chassis too**, six plates:
 1–3 the shared chassis, 4–6 that device's own tray pair and faceplate. Open
@@ -22,6 +23,7 @@ the two files — print them once.
 
 ![the gateway](images/assembly-ucg-front.png)
 ![the switch](images/assembly-usw-front.png)
+![the TP-Link](images/assembly-sg108e-front.png)
 
 ### Will mine fit?
 
@@ -83,6 +85,8 @@ Seven prints for one device, none over a 180 mm bed.
 | `faceplate_ucg` | 214 × 20 × 44.5 | 1 | UCG-Fiber |
 | `tray_usw_l` / `tray_usw_r` | 137 × 94 × 19.6 | 1 each | Flex Mini |
 | `faceplate_usw` | 214 × 20 × 44.5 | 1 | Flex Mini |
+| `tray_sg108e_l` / `tray_sg108e_r` | 137 × 105 × 17.8 | 1 each | TL-SG108E |
+| `faceplate_sg108e` | 214 × 20 × 44.5 | 1 | TL-SG108E |
 
 A **side** carries the front ear, the side rail, the ledge the tray lands on,
 and a rear stop. A **rear leg** laps 60 mm onto the inner face of that rail,
@@ -232,7 +236,7 @@ Two tools, each run once per device, and they check different things.
 
 `make verify` measures the **built solids**, not the parameters, so a feature
 that silently does nothing is caught rather than assumed away. **174 checks for
-the gateway, 169 for the switch.** That each body is one valid solid built from
+the gateway, 169 for each switch.** That each body is one valid solid built from
 sketches driving pads and pockets; that it fits the bed, turned on the diagonal
 if it has to; that no two parts foul each other; that an M6 passes all twelve
 rack slots and does not bottom out in the post's blind hole; that both halves
@@ -325,9 +329,10 @@ Nine plates in `export/3mf/UCG_Fiber_LabRax-A1mini.3mf`, grouped as kits:
 
 | plates | kit | filament | time |
 |---|---|---|---|
-| 1–3 | chassis | 109.2 g | 5 h 28 |
+| 1–3 | chassis (in every file) | 109.2 g | 5 h 28 |
 | 4–6 | UCG-Fiber | 149.7 g | 5 h 20 |
-| 7–9 | Flex Mini 2.5G | 135.7 g | 5 h 00 |
+| 4–6 | Flex Mini 2.5G | 135.7 g | 5 h 00 |
+| 4–6 | TL-SG108E | 142.9 g | 5 h 16 |
 
 Print the chassis once and then the kit for whatever you are racking: about
 259 g for the gateway, 245 g for the switch. Full details, and what survives

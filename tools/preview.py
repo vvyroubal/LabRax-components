@@ -32,9 +32,14 @@ COLOUR = {
 
 
 def colour_of(name):
-    """Device parts are named tray_ucg_l; colour them as tray_l would be."""
-    for key in ("_ucg", "_usw"):
-        name = name.replace(key, "")
+    """Device parts are named tray_ucg_l; colour them as tray_l would be.
+
+    The key is taken from devices.py rather than listed here, so a new device
+    is coloured like the others instead of falling through to grey.
+    """
+    import devices
+    for dev in devices.ALL:
+        name = name.replace("_" + dev.key, "")
     return COLOUR.get(name, (0.55, 0.55, 0.55))
 
 VIEWS = {

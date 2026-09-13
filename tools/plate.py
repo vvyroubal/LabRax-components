@@ -112,6 +112,19 @@ KITS = [
                NO_BRIM)]),
         ],
     },
+    {
+        "out": "TL_SG108E_LabRax-A1mini.3mf",
+        "title": "TL-SG108E in a Lab Rax 10 inch rack",
+        "plates": [
+            ("TL-SG108E 1 of 3 - left tray",
+             [("tray_sg108e_l", (90.0, 90.0), [], TRAY)]),
+            ("TL-SG108E 2 of 3 - right tray",
+             [("tray_sg108e_r", (90.0, 90.0), [], TRAY)]),
+            ("TL-SG108E 3 of 3 - faceplate",
+             [("faceplate_sg108e", (90.0, 90.0), [("x", 180), ("z", 45)],
+               NO_BRIM)]),
+        ],
+    },
 ]
 
 # Every plate there is, in one list. checkplates.py slices from this, and it
