@@ -1,13 +1,48 @@
-# UCG_Fiber
+# Lab Rax 1U device brackets
 
-A **1U bracket for a Lab Rax 10" rack**, bolted to the front *and* rear posts.
-It carries either of two UniFi devices:
+*(repo `UCG_Fiber-LabRax`, named after the first device it carried)*
 
-- **UCG-Fiber** — Cloud Gateway Fiber, 212.8 × 127.6 × 30 mm, 734 g
-- **USW-Flex-2.5G-5** — Flex Mini 2.5G switch, 117.1 × 90 × 21.2 mm, 206 g
+**1U brackets for a [Lab Rax 10" rack](https://makerworld.com/en/models/1464819-lab-rax-10-server-rack-bolted-version-5u),
+bolted to the front *and* rear posts.**
+
+## What you can mount
+
+Two devices are modelled and checked today:
+
+| device | model code | size (mm) | faces the front | print |
+|---|---|---|---|---|
+| **UniFi Cloud Gateway Fiber** | `UCG-Fiber` | 212.8 × 127.6 × 30, 734 g | its 0.96" display, through an oval window | chassis + plates 4–6 |
+| **UniFi Flex Mini 2.5G** | `USW-Flex-2.5G-5` | 117.1 × 90 × 21.2, 206 g | its 5 × 2.5 GbE ports, through an open frame | chassis + plates 7–9 |
+
+The **chassis is the same for both** — print it once. Each device then needs
+only its own tray pair and faceplate, three more prints.
 
 ![the gateway](images/assembly-ucg-front.png)
 ![the switch](images/assembly-usw-front.png)
+
+### Will mine fit?
+
+Anything inside this envelope can be carried without touching the chassis —
+only a new profile in `src/devices.py` and three prints:
+
+| | limit | set by |
+|---|---|---|
+| width | **up to 212.8 mm** | the bay between the rails, 214.0 less clearance |
+| depth | **up to 127.6 mm** | the ledge, which runs y 8 – 137 |
+| height | **up to 33.65 mm** | 1U, less the tray and a flange to cap the device |
+| weight | the gateway's 734 g is the tested case | a 214 × 132 × 6 tray deflects ~0.2 mm under it |
+
+A device narrower than **210.8 mm** gets walls on its tray to hold it straight,
+since the sides' rails no longer touch it; those walls need the device to be
+**204.8 mm or less**, so widths between 204.8 and 210.8 are the one gap in the
+range. A device shorter than the U can have a plinth under it to centre it in
+the opening, as the switch does. The faceplate is either a **window** onto a
+display or a **frame** onto ports — say which in the profile and the rest
+follows.
+
+What it cannot do: anything over 1U, anything deeper than the ledge, or
+anything that needs access to both long faces at once — the faceplate closes
+the front except for its opening.
 
 **Four of the seven parts are a chassis that takes no notice of what is in
 it.** The sides and the rear legs are sized by the rack alone; only the tray
