@@ -64,33 +64,60 @@ SUPPORT = {"enable_support": "1", "support_type": "normal(auto)"}
 NO_BRIM = {"brim_type": "no_brim"}
 TRAY = dict(SUPPORT, **NO_BRIM)
 
-PLATES = [
+# The chassis serves either device, so it goes in both files. Plate names are
+# what Bambu Studio shows on the tab, so they say which kit a plate belongs to
+# and how many are in it -- opening a file should not need the README.
+CHASSIS_PLATES = [
     # A side is 212 mm long, so it only goes on the bed turned 45 degrees.
-    ("Left side", [("side_l", (90.0, 90.0), [("z", 45)], SUPPORT)]),
-    ("Right side", [("side_r", (90.0, 90.0), [("z", 45)], SUPPORT)]),
-    ("Rear legs", [
+    ("Chassis 1/3 - left side",
+     [("side_l", (90.0, 90.0), [("z", 45)], SUPPORT)]),
+    ("Chassis 2/3 - right side",
+     [("side_r", (90.0, 90.0), [("z", 45)], SUPPORT)]),
+    ("Chassis 3/3 - rear legs", [
         ("leg_l", (90.0, 55.0), [("z", 90)], SUPPORT),
         ("leg_r", (90.0, 125.0), [("z", 90)], SUPPORT),
     ]),
-    # The lap strip along each tray edge stands 3 mm off the bed, so the tray
-    # wants support under its rim. It comes away from the underside.
-    ("Left tray", [("tray_ucg_l", (90.0, 92.5), [], TRAY)]),
-    ("Right tray", [("tray_ucg_r", (90.0, 92.5), [], TRAY)]),
-    # The faceplate stands on edge -- 214 mm will not lie flat on this bed --
-    # and upside down, which puts the flange on the bed instead of leaving it
-    # as a 12 mm shelf hanging over nothing. Whole top face down, no support.
-    ("Faceplate", [("faceplate_ucg", (90.0, 90.0),
-                    [("x", 180), ("z", 45)], NO_BRIM)]),
-
-    # --- the switch kit ---------------------------------------------------
-    # Plates 1 to 3 are the chassis and serve either device; these three are
-    # the USW-Flex-2.5G-5's own. Numbered after the gateway's so that a plate
-    # number already quoted in the docs keeps meaning what it meant.
-    ("Left tray, switch", [("tray_usw_l", (90.0, 90.0), [], TRAY)]),
-    ("Right tray, switch", [("tray_usw_r", (90.0, 90.0), [], TRAY)]),
-    ("Faceplate, switch", [("faceplate_usw", (90.0, 90.0),
-                            [("x", 180), ("z", 45)], NO_BRIM)]),
 ]
+
+# One file per device, each a complete build: the shared chassis first, then
+# that device's own three. The lap strip along each tray edge stands 3 mm off
+# the bed, so a tray wants support under its rim; it comes away from the
+# underside. A faceplate stands on edge -- 214 mm will not lie flat on this
+# bed -- and upside down, which puts the flange on the bed instead of leaving
+# it as a 12 mm shelf hanging over nothing.
+KITS = [
+    {
+        "out": "UCG_Fiber_LabRax-A1mini.3mf",
+        "title": "UCG-Fiber in a Lab Rax 10 inch rack",
+        "plates": [
+            ("UCG-Fiber 1/3 - left tray",
+             [("tray_ucg_l", (90.0, 92.5), [], TRAY)]),
+            ("UCG-Fiber 2/3 - right tray",
+             [("tray_ucg_r", (90.0, 92.5), [], TRAY)]),
+            ("UCG-Fiber 3/3 - faceplate",
+             [("faceplate_ucg", (90.0, 90.0), [("x", 180), ("z", 45)],
+               NO_BRIM)]),
+        ],
+    },
+    {
+        "out": "USW_Flex_LabRax-A1mini.3mf",
+        "title": "USW-Flex-2.5G-5 in a Lab Rax 10 inch rack",
+        "plates": [
+            ("USW-Flex 1/3 - left tray",
+             [("tray_usw_l", (90.0, 90.0), [], TRAY)]),
+            ("USW-Flex 2/3 - right tray",
+             [("tray_usw_r", (90.0, 90.0), [], TRAY)]),
+            ("USW-Flex 3/3 - faceplate",
+             [("faceplate_usw", (90.0, 90.0), [("x", 180), ("z", 45)],
+               NO_BRIM)]),
+        ],
+    },
+]
+
+# Every plate there is, in one list. checkplates.py slices from this, and it
+# is the default for a build() called without a kit chosen.
+PLATES = CHASSIS_PLATES + [p for k in KITS for p in k["plates"]]
+TITLE = "Lab Rax 1U device bracket"
 
 
 def load_stl(path):
@@ -258,7 +285,7 @@ def build():
              'xmlns:BambuStudio="http://schemas.bambulab.com/package/2021">\n'
              ' <metadata name="Application">BambuStudio-02.08.02.61</metadata>\n'
              ' <metadata name="BambuStudio:3mfVersion">1</metadata>\n'
-             ' <metadata name="Title">UCG-Fiber Lab Rax bracket</metadata>\n'
+             ' <metadata name="Title">%s</metadata>\n' % TITLE +
              ' <metadata name="Designer"></metadata>\n'
              ' <metadata name="Description">1U bracket, plated for an A1 mini'
              '</metadata>\n'
@@ -323,5 +350,18 @@ def build():
     return 0
 
 
+def main():
+    """Write one 3MF per device, each carrying the chassis as well."""
+    global PLATES, OUT, TITLE
+    rc = 0
+    for kit in KITS:
+        PLATES = CHASSIS_PLATES + kit["plates"]
+        OUT = os.path.join(ROOT, "export", "3mf", kit["out"])
+        TITLE = kit["title"]
+        rc |= build()
+        print("")
+    return rc
+
+
 if __name__ == "__main__":
-    sys.exit(build())
+    sys.exit(main())

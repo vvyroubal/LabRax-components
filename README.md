@@ -11,11 +11,14 @@ Two devices are modelled and checked today:
 
 | device | model code | size (mm) | faces the front | print |
 |---|---|---|---|---|
-| **UniFi Cloud Gateway Fiber** | `UCG-Fiber` | 212.8 × 127.6 × 30, 734 g | its 0.96" display, through an oval window | chassis + plates 4–6 |
-| **UniFi Flex Mini 2.5G** | `USW-Flex-2.5G-5` | 117.1 × 90 × 21.2, 206 g | its 5 × 2.5 GbE ports, through an open frame | chassis + plates 7–9 |
+| **UniFi Cloud Gateway Fiber** | `UCG-Fiber` | 212.8 × 127.6 × 30, 734 g | its 0.96" display, through an oval window | `UCG_Fiber_LabRax-A1mini.3mf` |
+| **UniFi Flex Mini 2.5G** | `USW-Flex-2.5G-5` | 117.1 × 90 × 21.2, 206 g | its 5 × 2.5 GbE ports, through an open frame | `USW_Flex_LabRax-A1mini.3mf` |
 
-The **chassis is the same for both** — print it once. Each device then needs
-only its own tray pair and faceplate, three more prints.
+**There is one 3MF per device and each carries the chassis too**, six plates:
+1–3 the shared chassis, 4–6 that device's own tray pair and faceplate. Open
+one, print all six, done. Every plate is labelled in Bambu Studio with the kit
+it belongs to. If you build both, the three chassis plates are identical in
+the two files — print them once.
 
 ![the gateway](images/assembly-ucg-front.png)
 ![the switch](images/assembly-usw-front.png)
@@ -64,7 +67,7 @@ as something you can edit feature by feature.
 make            # build, verify, render, plate
 make verify     # re-check the solids against the rack, each device and the bed
 make assembly   # put real M6 x 12 screws, nuts and washers in and check them
-make plate      # export/3mf/UCG_Fiber_LabRax-A1mini.3mf, for Bambu Studio
+make plate      # one 3MF per device in export/3mf/, for Bambu Studio
 make plates     # slice every plate for real and measure the toolpaths
 ```
 
