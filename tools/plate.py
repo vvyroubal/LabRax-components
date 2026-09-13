@@ -69,11 +69,11 @@ TRAY = dict(SUPPORT, **NO_BRIM)
 # and how many are in it -- opening a file should not need the README.
 CHASSIS_PLATES = [
     # A side is 212 mm long, so it only goes on the bed turned 45 degrees.
-    ("Chassis 1/3 - left side",
+    ("Chassis 1 of 3 - left side",
      [("side_l", (90.0, 90.0), [("z", 45)], SUPPORT)]),
-    ("Chassis 2/3 - right side",
+    ("Chassis 2 of 3 - right side",
      [("side_r", (90.0, 90.0), [("z", 45)], SUPPORT)]),
-    ("Chassis 3/3 - rear legs", [
+    ("Chassis 3 of 3 - rear legs", [
         ("leg_l", (90.0, 55.0), [("z", 90)], SUPPORT),
         ("leg_r", (90.0, 125.0), [("z", 90)], SUPPORT),
     ]),
@@ -90,11 +90,11 @@ KITS = [
         "out": "UCG_Fiber_LabRax-A1mini.3mf",
         "title": "UCG-Fiber in a Lab Rax 10 inch rack",
         "plates": [
-            ("UCG-Fiber 1/3 - left tray",
+            ("UCG-Fiber 1 of 3 - left tray",
              [("tray_ucg_l", (90.0, 92.5), [], TRAY)]),
-            ("UCG-Fiber 2/3 - right tray",
+            ("UCG-Fiber 2 of 3 - right tray",
              [("tray_ucg_r", (90.0, 92.5), [], TRAY)]),
-            ("UCG-Fiber 3/3 - faceplate",
+            ("UCG-Fiber 3 of 3 - faceplate",
              [("faceplate_ucg", (90.0, 90.0), [("x", 180), ("z", 45)],
                NO_BRIM)]),
         ],
@@ -103,11 +103,11 @@ KITS = [
         "out": "USW_Flex_LabRax-A1mini.3mf",
         "title": "USW-Flex-2.5G-5 in a Lab Rax 10 inch rack",
         "plates": [
-            ("USW-Flex 1/3 - left tray",
+            ("USW-Flex 1 of 3 - left tray",
              [("tray_usw_l", (90.0, 90.0), [], TRAY)]),
-            ("USW-Flex 2/3 - right tray",
+            ("USW-Flex 2 of 3 - right tray",
              [("tray_usw_r", (90.0, 90.0), [], TRAY)]),
-            ("USW-Flex 3/3 - faceplate",
+            ("USW-Flex 3 of 3 - faceplate",
              [("faceplate_usw", (90.0, 90.0), [("x", 180), ("z", 45)],
                NO_BRIM)]),
         ],
@@ -208,10 +208,32 @@ def _single_filament(cfg, keep=2):
     return out
 
 
+# Bambu Studio turns a plate's name into a filename, so it refuses the
+# characters a filename cannot hold -- and says so with a dialog that names
+# the characters but not the plate, or the file, or where it found them.
+# "1/3" was enough to trigger it.
+BAD_NAME_CHARS = set('<>:/\\|?*"')
+
+
+def check_name(what, name):
+    hit = sorted(set(name) & BAD_NAME_CHARS)
+    if hit:
+        return ["%s %r uses %s, which Bambu Studio will not accept in a name"
+                % (what, name, " ".join(repr(c) for c in hit))]
+    return []
+
+
 def build():
     objects, items, cfg_objects, cfg_plates = [], [], [], []
     report, problems = [], []
     oid = 1
+
+    problems += check_name("the title", TITLE)
+    problems += check_name("the file name", os.path.basename(OUT))
+    for pname, parts in PLATES:
+        problems += check_name("plate name", pname)
+        for name, _c, _o, _s in parts:
+            problems += check_name("part name", name)
 
     for pindex, (pname, parts) in enumerate(PLATES, start=1):
         ox, oy = plate_origin(pindex)

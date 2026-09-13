@@ -17,8 +17,8 @@ whichever you open is a complete build. Open it, print all six plates, done.
 | `export/3mf/UCG_Fiber_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 UCG-Fiber | 258.9 g, 10 h 48 |
 | `export/3mf/USW_Flex_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 USW-Flex | 244.8 g, 10 h 28 |
 
-Every plate carries its own label in Bambu Studio — `Chassis 2/3 - right
-side`, `UCG-Fiber 3/3 - faceplate` — so the tab tells you which kit a plate
+Every plate carries its own label in Bambu Studio — `Chassis 2 of 3 - right
+side`, `UCG-Fiber 3 of 3 - faceplate` — so the tab tells you which kit a plate
 belongs to without reference to this table.
 
 | kit | parts | filament | time |
