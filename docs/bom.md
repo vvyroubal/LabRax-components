@@ -17,6 +17,7 @@ whichever you open is a complete build. Open it, print all six plates, done.
 | `export/3mf/UCG_Fiber_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 UCG-Fiber | 258.9 g, 10 h 48 |
 | `export/3mf/USW_Flex_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 USW-Flex | 244.8 g, 10 h 28 |
 | `export/3mf/TL_SG108E_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 TL-SG108E | 252.1 g, 10 h 44 |
+| `export/3mf/NUC6i7KYK_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 NUC6i7KYK | 243.3 g, 10 h 42 |
 
 Every plate carries its own label in Bambu Studio — `Chassis 2 of 3 - right
 side`, `UCG-Fiber 3 of 3 - faceplate` — so the tab tells you which kit a plate
@@ -28,6 +29,7 @@ belongs to without reference to this table.
 | UCG-Fiber | `tray_ucg_l`, `tray_ucg_r`, `faceplate_ucg` | 149.7 g | 5 h 20 |
 | USW-Flex-2.5G-5 | `tray_usw_l`, `tray_usw_r`, `faceplate_usw` | 135.7 g | 5 h 00 |
 | TL-SG108E | `tray_sg108e_l`, `tray_sg108e_r`, `faceplate_sg108e` | 142.9 g | 5 h 16 |
+| NUC6i7KYK | `tray_nuc_l`, `tray_nuc_r`, `faceplate_nuc` | 134.1 g | 5 h 14 |
 
 **If you are building both**, print the chassis once — the three chassis
 plates are identical in the two files.
@@ -50,10 +52,13 @@ Chassis plus one device is about **259 g / 10 h 48** for the gateway, or
 | 4† | `tray_sg108e_l` | 137 × 105 × 17.8 | 46.7 g | 1 h 37 | yes |
 | 5† | `tray_sg108e_r` | 137 × 105 × 17.8 | 58.7 g | 2 h 05 | yes |
 | 6† | `faceplate_sg108e` | 214 × 20 × 44.5 | 37.5 g | 1 h 34 | no |
+| 4‡ | `tray_nuc_l` | 137 × 120 × 11.2 | 44.2 g | 1 h 38 | yes |
+| 5‡ | `tray_nuc_r` | 137 × 120 × 11.2 | 55.1 g | 2 h 04 | yes |
+| 6‡ | `faceplate_nuc` | 214 × 20 × 44.5 | 34.8 g | 1 h 32 | no |
 
-\* in `USW_Flex_LabRax-A1mini.3mf`, † in `TL_SG108E_LabRax-A1mini.3mf`; the
-rows with neither mark are in `UCG_Fiber_LabRax-A1mini.3mf`. Plates 1–3 are
-the same chassis in all three.
+\* in `USW_Flex_LabRax-A1mini.3mf`, † in `TL_SG108E_LabRax-A1mini.3mf`,
+‡ in `NUC6i7KYK_LabRax-A1mini.3mf`; the rows with no mark are in
+`UCG_Fiber_LabRax-A1mini.3mf`. Plates 1–3 are the same chassis in all four.
 
 PETG, 0.2 mm layers, and the plated 3MF already carries the orientations and
 the per-part support and brim settings — see

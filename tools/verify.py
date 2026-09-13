@@ -587,6 +587,39 @@ def one_device(parts, bodies, dev):
     check(P.REAR_LIP_H <= 3.0, "the rear lip stays low enough to miss a port",
           "%.1f mm above the tray" % P.REAR_LIP_H)
 
+    # --- ventilation, where the device needs it ---------------------------
+    if dev.vent:
+        # Measured as open area seen from below, not as "the pocket ran": a
+        # slot that stops inside the plinth removes material and still leaves
+        # the intake covered.
+        under = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d,
+                    -1.0, dev.z0 + 0.5)
+        solid = vol(trays.common(under))
+        full = dev.w * dev.d * (dev.z0 + 1.5)
+        open_frac = 1.0 - solid / full
+        check(open_frac > 0.10,
+              "the tray is opened up under a device that needs air",
+              "%.0f%% of the footprint is clear through" % (100 * open_frac))
+        # And that they go clean through -- floor to the face the device sits
+        # on -- along the whole depth. Sampled at 1 mm across the full width
+        # rather than on a coarse grid: a 10 mm grid against a 13 mm slot
+        # pitch aliases, and reports ribs as a blocked tray.
+        for tag, y in (("front", dev.y0 + dev.d * 0.25),
+                       ("middle", dev.y0 + dev.d * 0.50),
+                       ("back", dev.y0 + dev.d * 0.75)):
+            opened = 0
+            n_col = int(dev.w)
+            for i in range(n_col):
+                x = -dev.w / 2 + i + 0.5
+                col = box(x - 0.4, x + 0.4, y - 1.0, y + 1.0,
+                          -1.0, dev.z0 + 1.0)
+                if vol(trays.common(col)) < VOID:
+                    opened += 1
+            frac = 100.0 * opened / n_col
+            check(frac >= 20.0,
+                  "air gets through at the %s of the footprint" % tag,
+                  "%.0f%% of the width is open floor to case" % frac)
+
     # --- the lip that stops the gateway sliding back ----------------------
     # Before this existed the only thing behind the gateway was the two rear
     # stops on the sides, reaching in to x = +/-99: 7.4 mm of overlap at each
@@ -603,15 +636,18 @@ def one_device(parts, bodies, dev):
     # 2 mm stride: the gap this caught was 198 mm wide, so nothing that
     # matters hides between samples, and it halves a slow walk that now runs
     # once per device.
+    # Across the span the lip covers, not the whole case: the outer ends are
+    # reported separately above, and for a device shorter than the sides' own
+    # rear stops there is legitimately nothing out there at this depth.
     gaps = []
-    for i in range(0, int(dev.w / 2.0) + 1):
-        x = -dev.w / 2 + 2.0 * i
+    for i in range(0, int(span) + 1):
+        x = -span + 2.0 * i
         probe = box(x - 0.4, x + 0.4, dev.y0 + dev.d + 0.05,
                     dev.y0 + dev.d + P.REAR_LIP_H + 2.0,
                     dev.z0 + 0.2, dev.z0 + P.REAR_LIP_H - 0.2)
         if vol(asm.common(probe)) < VOID:
             gaps.append(x)
-    check(not gaps, "something is behind the gateway across its whole width",
+    check(not gaps, "something is behind the case across the lip's span",
           "unbacked at x = %s" % (gaps[:6] if gaps else "nowhere"))
 
     # The lip must not foul the sides' rear stops, which start where it ends.

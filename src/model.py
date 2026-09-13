@@ -332,6 +332,33 @@ def tray(doc, dev, sx, name):
         sk.rect(s, x0, dev.y0, x1, rear)
         sk.pad(doc, bd, s, dev.plinth + P.TRAY_WALL_H)
 
+    # --- ventilation, for a device that breathes through its underside ----
+    # Slots run fore and aft through the full-thickness part of this half --
+    # outboard of the lap, inboard of the ledge. The lap itself is left solid:
+    # a hole there would have to pass through both halves where they overlap,
+    # and the lap is the joint that holds the tray together.
+    if dev.vent:
+        lo, hi = lap + P.VENT_MARGIN, P.LEDGE_X0 - P.VENT_MARGIN
+        y0, y1 = dev.y0 + P.VENT_MARGIN, rear - P.VENT_MARGIN
+        pitch = P.VENT_W + P.VENT_RIB
+        n = int((hi - lo + P.VENT_RIB) // pitch)
+        if n > 0:
+            run = n * pitch - P.VENT_RIB
+            x = lo + (hi - lo - run) / 2.0
+            s = sk.sketch(doc, bd, name + "_Sk_vents",
+                          sk.plane(Vector(0, 0, 0), sk.X, sk.Y))
+            for i in range(n):
+                a0 = x + i * pitch
+                if sx < 0:
+                    sk.rect(s, -a0 - P.VENT_W, y0, -a0, y1)
+                else:
+                    sk.rect(s, a0, y0, a0 + P.VENT_W, y1)
+            # Up through the plate and any plinth on top of it: a slot that
+            # stops under the plinth is not a vent, it is a pocket. The
+            # direction is left to be worked out -- there is material on one
+            # side of z=0 only, so there is nothing to get wrong.
+            sk.pocket(doc, bd, s, P.TRAY_T + dev.plinth)
+
     # --- the lip across the back ------------------------------------------
     # Raised off the tray's own rear face and padded backwards, so it lands
     # just behind the device and catches the bottom of its back panel. The

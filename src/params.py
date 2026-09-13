@@ -212,6 +212,14 @@ REAR_LIP_T = 3.0      # [design] thickness, fore and aft
 TRAY_WALL_T = 4.0     # [design] wall thickness
 TRAY_WALL_H = 8.0     # [design] how far it rises above the case's underside
 
+# A tray under a device that breathes through its underside has to be opened
+# up, or the tray is a lid on the intake. Slots run fore-and-aft through the
+# full-thickness part of each half; the centre lap is left solid, because
+# holing it would mean holing both halves at once where they overlap.
+VENT_W = 8.0        # [design] slot width
+VENT_RIB = 5.0      # [design] material between slots
+VENT_MARGIN = 6.0   # [design] solid border kept round the vented panel
+
 REAR_LIP_X = STOP_X0  # [design] it stops where the sides' rear stops start,
                       # so the two together span the full rear face
 

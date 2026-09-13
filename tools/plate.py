@@ -125,6 +125,19 @@ KITS = [
                NO_BRIM)]),
         ],
     },
+    {
+        "out": "NUC6i7KYK_LabRax-A1mini.3mf",
+        "title": "Intel NUC6i7KYK in a Lab Rax 10 inch rack",
+        "plates": [
+            ("NUC6i7KYK 1 of 3 - left tray",
+             [("tray_nuc_l", (90.0, 90.0), [], TRAY)]),
+            ("NUC6i7KYK 2 of 3 - right tray",
+             [("tray_nuc_r", (90.0, 90.0), [], TRAY)]),
+            ("NUC6i7KYK 3 of 3 - faceplate",
+             [("faceplate_nuc", (90.0, 90.0), [("x", 180), ("z", 45)],
+               NO_BRIM)]),
+        ],
+    },
 ]
 
 # Every plate there is, in one list. checkplates.py slices from this, and it
