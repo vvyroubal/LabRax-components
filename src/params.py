@@ -230,16 +230,17 @@ BOT_SCREW_Z = RACK_U - BAR_SCREW_Z  # 14.29, the lower pair
 # both put the window wrong. The position is now given directly, against a
 # feature of the faceplate itself rather than of the gateway:
 #
-#   THE OVAL'S TOP EDGE SITS EXACTLY 5.0 mm BELOW THE UNDERSIDE OF THE TOP
+#   THE OVAL'S TOP EDGE SITS EXACTLY 6.0 mm BELOW THE UNDERSIDE OF THE TOP
 #   BAR -- the flange that reaches back over the gateway, whose underside is
 #   BAR_FLANGE_Z0 = 36.8.
 #
 # That is a rule about the printed part, so it can be checked on the built
-# solid and is not at the mercy of a measurement.
-WIN_TOP_GAP = 5.0      # [design] specified: oval top to the top bar's underside
+# solid and is not at the mercy of a measurement. It was 5.0 on the faceplate
+# before this one; the oval moves DOWN 1 mm by the gap opening to 6.0.
+WIN_TOP_GAP = 6.0      # [design] specified: oval top to the top bar's underside
 WIN_W = 22.5           # [dev] the display is 21.0 wide, plus the float
 WIN_H = 11.0           # [dev] the display is 10.0 tall, plus a little
-WIN_Z = BAR_FLANGE_Z0 - WIN_TOP_GAP - WIN_H / 2.0  # 26.3
+WIN_Z = BAR_FLANGE_Z0 - WIN_TOP_GAP - WIN_H / 2.0  # 25.3
 
 # The display itself: a 21.0 x 10.0 stadium, centred on the case's width. It
 # is the only thing on the front face -- no reset button, and the power jack

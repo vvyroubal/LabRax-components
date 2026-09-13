@@ -164,21 +164,20 @@ the case were tried — 14.0 mm to the centre, then 19.0 — and both put the
 window wrong. The position is now given as a rule about the printed part
 instead:
 
-> **The oval's top edge sits exactly 5.0 mm below the underside of the top
+> **The oval's top edge sits exactly 6.0 mm below the underside of the top
 > bar** — the flange that reaches back over the gateway, at z = 36.8.
 
-That puts the window at z 20.8 – 31.8, centre 26.3. Being a rule about the
+That puts the window at z 19.8 – 30.8, centre 25.3. Being a rule about the
 faceplate rather than about the gateway, it can be measured on the built
 solid, and `verify` does exactly that: it scans the plate for where the window
 ends and where the flange begins, and checks the gap is 5.00. The old check
 could not have caught anything — it built the display panel at the *window's*
 own height, so the window was only ever compared against itself.
 
-One consequence worth seeing before printing: the 6 mm round-over now reaches
-z = 37.8 on the front face, about a millimetre above the level of the top
-bar's underside. Nothing breaks through — the flange is 8 mm behind and the
-plate is solid up there — but if the bezel wants to stay below that line,
-`WIN_FILLET` has to come down to 5 mm or less.
+Worth noting: the 6 mm round-over reaches z = 36.8 on the front face, which is
+exactly the level of the top bar's underside. That is where the bezel stops
+growing before it would look like it runs into the bar — the two are 8 mm
+apart in depth, so nothing actually meets.
 
 **The faceplate commits you to ports-at-the-back.** The face is closed apart
 from the window.
