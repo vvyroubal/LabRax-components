@@ -25,6 +25,7 @@ from FreeCAD import Vector
 
 import params as P
 import sk
+import devices
 
 
 def _ear_outline(sx):
@@ -61,12 +62,12 @@ def side(doc, sx, name):
     # nib of its own.
     s = sk.sketch(doc, bd, name + "_Sk_ledge",
                   sk.plane(Vector(sx * P.LEDGE_X0, 0, 0), sk.Y, sk.Z))
-    sk.rect(s, P.DEV_Y0, 0.0, P.DEV_Y1, P.LAP_T)
+    sk.rect(s, P.LEDGE_Y0, 0.0, P.LEDGE_Y1, P.LAP_T)
     sk.pad(doc, bd, s, P.BODY_HW - P.LEDGE_X0, reversed_=out)
 
     s = sk.sketch(doc, bd, name + "_Sk_stop",
-                  sk.plane(Vector(0, P.DEV_Y1, 0), sk.X, sk.Z))
-    sk.rect(s, sx * P.STOP_X0, 0.0, sx * P.BODY_HW, P.DEV_Z1)
+                  sk.plane(Vector(0, P.STOP_Y, 0), sk.X, sk.Z))
+    sk.rect(s, sx * P.STOP_X0, 0.0, sx * P.BODY_HW, P.STOP_H)
     sk.pad(doc, bd, s, P.STOP_T, reversed_=True)
 
     # --- what gets taken away --------------------------------------------
@@ -181,20 +182,25 @@ def leg(doc, sx, name):
     return bd
 
 
-def faceplate(doc, name):
-    """The front of the bracket: one plate across the whole opening.
+def faceplate(doc, dev, name):
+    """The front of the bracket for one device: one plate across the opening.
 
     It replaces the bar above the device and the bar below it. Being one piece
-    it has no joint to open, it stops the gateway across its whole face rather
-    than at four corner blocks, and it stops the tray sliding forward. The
-    window is the gateway's display; the rest of the face is covered, which is
-    why the ports have to be at the back.
+    it has no joint to open, it stops the device across its whole face rather
+    than at four corner blocks, and it stops the tray sliding forward.
+
+    What the opening in it is depends on the device. A gateway with a display
+    facing front gets a Window: a small oval placed by a rule against the top
+    bar. A switch with its ports facing front gets a Frame: a large opening
+    onto the ports whose border overlaps the case, so the case can be reached
+    but cannot come out. Either way the plate itself is identical.
 
     It stops at the rails' inner faces rather than spanning the full opening,
     so the sides need no notch cut in them -- one cut full height would have
     separated each ear from its rail.
     """
     bd = sk.body(doc, name)
+    front = dev.front
 
     s = sk.sketch(doc, bd, name + "_Sk_plate",
                   sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
@@ -203,13 +209,18 @@ def faceplate(doc, name):
 
     s = sk.sketch(doc, bd, name + "_Sk_window",
                   sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
-    sk.slot(s, 0.0, P.WIN_Z, P.WIN_W, P.WIN_H)
+    if front.kind == "window":
+        sk.slot(s, 0.0, front.z(dev), front.w, front.h)
+    else:
+        w, h, z = front.w(dev), front.h(dev), front.z(dev)
+        sk.rect(s, -w / 2.0, z - h / 2.0, w / 2.0, z + h / 2.0)
     sk.pocket(doc, bd, s, P.BAR_T)
 
-    # The flange over the top of the gateway, so it cannot lift.
+    # The flange over the top of the device, so it cannot lift. It sits on the
+    # device, so a short device brings it down with it.
     s = sk.sketch(doc, bd, name + "_Sk_flange",
                   sk.plane(Vector(0, P.BAR_T, 0), sk.X, sk.Z))
-    sk.rect(s, -P.POCKET_HW, P.BAR_FLANGE_Z0, P.POCKET_HW, P.RACK_U)
+    sk.rect(s, -P.POCKET_HW, dev.flange_z0, P.POCKET_HW, P.RACK_U)
     sk.pad(doc, bd, s, P.BAR_FLANGE_D, reversed_=True)
 
     # Four M6, at the same places the two bars used, so the ears do not
@@ -230,31 +241,42 @@ def faceplate(doc, name):
     # choice would cut the pocket behind the nut instead of around it.
     last = sk.pocket(doc, bd, s, P.M6_HEX_D, reversed_=True)
 
-    # Round the window's front edge over. The four edges are picked out by
-    # where they are -- on the front face, inside the window's outline --
-    # rather than by name, so the selection survives anything upstream.
+    if not front.fillet:
+        return bd
+
+    # Round the window's front edge, so the opening reads as a bezel rather
+    # than a hole punched in a plate. Found geometrically: the four edges that
+    # lie on the front face within the window's own extent.
     m = 0.2
+    w, h, z = front.w, front.h, front.z(dev)
     edges = sk.edges_on(last.Shape,
-                        (-P.WIN_W / 2 - m, P.WIN_W / 2 + m),
+                        (-w / 2 - m, w / 2 + m),
                         (-m, m),
-                        (P.WIN_Z - P.WIN_H / 2 - m, P.WIN_Z + P.WIN_H / 2 + m))
+                        (z - h / 2 - m, z + h / 2 + m))
     if len(edges) != 4:
         raise RuntimeError("expected 4 window edges to round, found %d: %s"
                            % (len(edges), edges))
-    sk.fillet(doc, bd, last, edges, P.WIN_FILLET, name + "_Fillet_window")
+    sk.fillet(doc, bd, last, edges, front.fillet, name + "_Fillet_window")
     return bd
 
 
-def tray(doc, sx, name):
-    """Half of the tray.
+def tray(doc, dev, sx, name):
+    """Half of the tray that carries one device.
 
     The two halves are not mirrors: at the centreline one has to pass under
     the other. The left half takes the bottom of the lap, the right half the
     top, which is the only rule needed to read the section below -- and it is
     also why the right half carries the pegs and the left half the sockets.
+
+    This is the part that knows what device it is for. The plate and the lap
+    are the same whatever goes on top; the rear lip moves to the back of that
+    device, and a device narrower or shorter than the bay gets a plinth to
+    lift it and walls to hold it straight.
     """
     bd = sk.body(doc, name)
     lap = P.CENTRE_LAP
+    rear = dev.y1 - P.TRAY_FIT
+
     if sx < 0:
         # outer edge laps ON TOP of the ledge; centre tongue runs underneath
         pts = [(-P.TRAY_X1, P.LAP_T), (-P.LEDGE_X0, P.LAP_T),
@@ -265,19 +287,19 @@ def tray(doc, sx, name):
                (P.LEDGE_X0, 0.0), (P.LEDGE_X0, P.LAP_T),
                (P.TRAY_X1, P.LAP_T), (P.TRAY_X1, P.TRAY_T), (-lap, P.TRAY_T)]
     s = sk.sketch(doc, bd, name + "_Sk_plate",
-                  sk.plane(Vector(0, P.DEV_Y0, 0), sk.X, sk.Z))
+                  sk.plane(Vector(0, dev.y0, 0), sk.X, sk.Z))
     sk.polygon(s, pts)
-    sk.pad(doc, bd, s, P.DEV_Y1 - P.DEV_Y0 - P.TRAY_FIT, reversed_=True)
+    sk.pad(doc, bd, s, rear - dev.y0, reversed_=True)
 
     # Four pegs key the two halves to each other. There is no bolt: the one
     # that used to be here hung off a 10 x 3 mm neck and snapped off both
     # halves the first time it was tightened. The lap does the work -- 60 mm
-    # wide, the full depth, closed by the gateway's weight -- and the pegs
+    # wide, the full depth, closed by the device's weight -- and the pegs
     # stop the halves shifting or going out of square.
     s = sk.sketch(doc, bd, name + "_Sk_keys",
                   sk.plane(Vector(0, 0, P.LAP_T), sk.X, sk.Y))
     for kx in (-P.KEY_X, P.KEY_X):
-        for ky in P.KEY_Y:
+        for ky in dev.keys_y:
             sk.circle(s, kx, ky,
                       P.KEY_D if sx > 0 else P.KEY_D + P.KEY_FIT)
     if sx > 0:
@@ -287,39 +309,71 @@ def tray(doc, sx, name):
     else:
         sk.pocket(doc, bd, s, P.LAP_T)
 
+    # --- the plinth, where the device has to be lifted --------------------
+    # A short device sitting on the tray floor leaves a band of blank plate
+    # above it, which matters when its front face is the one you look at.
+    # The plinth raises it until it is centred in the U.
+    if dev.plinth > 0.0:
+        x0, x1 = ((-dev.hw, -lap) if sx < 0 else (-lap, dev.hw))
+        s = sk.sketch(doc, bd, name + "_Sk_plinth",
+                      sk.plane(Vector(0, 0, P.TRAY_T), sk.X, sk.Y))
+        sk.rect(s, x0, dev.y0, x1, rear)
+        # Upward: on an XY sketch plane, reversed_ is -Z (the pegs use that).
+        sk.pad(doc, bd, s, dev.plinth)
+
+    # --- walls, where the device is narrower than the bay -----------------
+    # A device that fills the bay is held straight by the sides' own rails.
+    # One that does not would wander, so its tray holds it instead.
+    if dev.walls:
+        t = P.TRAY_WALL_T
+        x0, x1 = ((-dev.hw - t, -dev.hw) if sx < 0 else (dev.hw, dev.hw + t))
+        s = sk.sketch(doc, bd, name + "_Sk_wall",
+                      sk.plane(Vector(0, 0, P.TRAY_T), sk.X, sk.Y))
+        sk.rect(s, x0, dev.y0, x1, rear)
+        sk.pad(doc, bd, s, dev.plinth + P.TRAY_WALL_H)
+
     # --- the lip across the back ------------------------------------------
     # Raised off the tray's own rear face and padded backwards, so it lands
-    # 1 mm behind the gateway and catches the bottom of its back panel. The
-    # two halves carry it between them: the left from the side's rear stop to
-    # the near edge of the lap, the right from there to the other stop. Each
-    # follows its own half's section, so the lip is a continuation of the
-    # plate rather than a tab stuck on it.
-    top = P.TRAY_T + P.REAR_LIP_H
-    lap = P.CENTRE_LAP
+    # just behind the device and catches the bottom of its back panel. The
+    # two halves carry it between them. It rises from the device's underside,
+    # not the tray's, so a plinth carries it up too.
+    top = dev.z0 + P.REAR_LIP_H
+    lip_x = (dev.hw + P.TRAY_WALL_T) if dev.walls else P.REAR_LIP_X
     if sx < 0:
-        pts = [(-P.REAR_LIP_X, 0.0), (-lap, 0.0), (-lap, top),
-               (-P.REAR_LIP_X, top)]
+        pts = [(-lip_x, 0.0), (-lap, 0.0), (-lap, top), (-lip_x, top)]
     else:
         # Steps down at the edge of the lap, where this half is only the top
         # 3 mm of the tray -- there is no material below it to stand on.
         pts = [(-lap, P.LAP_T), (lap, P.LAP_T), (lap, 0.0),
-               (P.REAR_LIP_X, 0.0), (P.REAR_LIP_X, top), (-lap, top)]
+               (lip_x, 0.0), (lip_x, top), (-lap, top)]
     s = sk.sketch(doc, bd, name + "_Sk_rearlip",
-                  sk.plane(Vector(0, P.DEV_Y1 - P.TRAY_FIT, 0), sk.X, sk.Z))
+                  sk.plane(Vector(0, rear, 0), sk.X, sk.Z))
     sk.polygon(s, pts)
     sk.pad(doc, bd, s, P.REAR_LIP_T, reversed_=True)
 
     return bd
 
 
-def build(doc):
-    """Every part, as its own Body. Returns {name: body}."""
-    return {
+def build(doc, only=None):
+    """Every part, as its own Body. Returns {name: body}.
+
+    Four of them are the chassis and are shared: they are sized by the rack
+    and never read a device. The rest come in threes, one set per device.
+
+    `only` restricts it to one device's set plus the chassis. The checkers use
+    that to work on one device at a time: a document holding every part of
+    every device is a lot of solid to fuse and intersect, and doing it twice
+    over in one process is what made the checks fall over.
+    """
+    out = {
         "side_l": side(doc, -1, "side_l"),
         "side_r": side(doc, +1, "side_r"),
         "leg_l": leg(doc, -1, "leg_l"),
         "leg_r": leg(doc, +1, "leg_r"),
-        "tray_l": tray(doc, -1, "tray_l"),
-        "tray_r": tray(doc, +1, "tray_r"),
-        "faceplate": faceplate(doc, "faceplate"),
     }
+    for dev in (devices.ALL if only is None else (only,)):
+        out[dev.part("tray_l")] = tray(doc, dev, -1, dev.part("tray_l"))
+        out[dev.part("tray_r")] = tray(doc, dev, +1, dev.part("tray_r"))
+        out[dev.part("faceplate")] = faceplate(doc, dev,
+                                                 dev.part("faceplate"))
+    return out

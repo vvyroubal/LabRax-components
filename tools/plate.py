@@ -74,13 +74,22 @@ PLATES = [
     ]),
     # The lap strip along each tray edge stands 3 mm off the bed, so the tray
     # wants support under its rim. It comes away from the underside.
-    ("Left tray", [("tray_l", (90.0, 92.5), [], TRAY)]),
-    ("Right tray", [("tray_r", (90.0, 92.5), [], TRAY)]),
+    ("Left tray", [("tray_ucg_l", (90.0, 92.5), [], TRAY)]),
+    ("Right tray", [("tray_ucg_r", (90.0, 92.5), [], TRAY)]),
     # The faceplate stands on edge -- 214 mm will not lie flat on this bed --
     # and upside down, which puts the flange on the bed instead of leaving it
     # as a 12 mm shelf hanging over nothing. Whole top face down, no support.
-    ("Faceplate", [("faceplate", (90.0, 90.0),
+    ("Faceplate", [("faceplate_ucg", (90.0, 90.0),
                     [("x", 180), ("z", 45)], NO_BRIM)]),
+
+    # --- the switch kit ---------------------------------------------------
+    # Plates 1 to 3 are the chassis and serve either device; these three are
+    # the USW-Flex-2.5G-5's own. Numbered after the gateway's so that a plate
+    # number already quoted in the docs keeps meaning what it meant.
+    ("Left tray, switch", [("tray_usw_l", (90.0, 90.0), [], TRAY)]),
+    ("Right tray, switch", [("tray_usw_r", (90.0, 90.0), [], TRAY)]),
+    ("Faceplate, switch", [("faceplate_usw", (90.0, 90.0),
+                            [("x", 180), ("z", 45)], NO_BRIM)]),
 ]
 
 

@@ -6,16 +6,29 @@ screw lengths with the arithmetic set out at the bottom.
 
 ## Print
 
-Six plates, seven parts, about **259 g** and **11 h 25** in total.
+**Four parts are the chassis and serve either device; three more are that
+device's own.** Print the chassis once, then the kit for what you are racking.
+
+| kit | plates | parts | filament | time |
+|---|---|---|---|---|
+| chassis | 1–3 | `side_l`, `side_r`, `leg_l`, `leg_r` | 109.2 g | 5 h 28 |
+| UCG-Fiber | 4–6 | `tray_ucg_l`, `tray_ucg_r`, `faceplate_ucg` | 149.7 g | 5 h 20 |
+| USW-Flex-2.5G-5 | 7–9 | `tray_usw_l`, `tray_usw_r`, `faceplate_usw` | 135.7 g | 5 h 00 |
+
+Chassis plus one device is about **259 g / 10 h 48** for the gateway, or
+**245 g / 10 h 28** for the switch. All nine plates, 394.6 g.
 
 | plate | part | size (mm) | filament | time | support |
 |---|---|---|---|---|---|
 | 1 | `side_l` | 33 × 212.5 × 44.5 | 35.3 g | 1 h 56 | yes |
-| 2 | `side_r` | 33 × 212.5 × 44.5 | 35.4 g | 1 h 57 | yes |
+| 2 | `side_r` | 33 × 212.5 × 44.5 | 35.3 g | 1 h 56 | yes |
 | 3 | `leg_l` + `leg_r` | 33 × 97.5 × 44.5 each | 38.6 g | 1 h 54 | yes |
-| 4 | `tray_l` | 137 × 131.6 × 9 | 49.2 g | 1 h 45 | yes |
-| 5 | `tray_r` | 137 × 131.6 × 9 | 57.5 g | 2 h 07 | yes |
-| 6 | `faceplate` | 214 × 20 × 44.5 | 43.0 g | 1 h 46 | no |
+| 4 | `tray_ucg_l` | 137 × 131.6 × 9 | 49.2 g | 1 h 45 | yes |
+| 5 | `tray_ucg_r` | 137 × 131.6 × 9 | 57.5 g | 2 h 07 | yes |
+| 6 | `faceplate_ucg` | 214 × 20 × 44.5 | 43.0 g | 1 h 46 | no |
+| 7 | `tray_usw_l` | 137 × 94 × 19.6 | 41.4 g | 1 h 34 | yes |
+| 8 | `tray_usw_r` | 137 × 94 × 19.6 | 54.2 g | 2 h 02 | yes |
+| 9 | `faceplate_usw` | 214 × 20 × 44.5 | 40.1 g | 1 h 42 | no |
 
 PETG, 0.2 mm layers, and the plated 3MF already carries the orientations and
 the per-part support and brim settings — see
@@ -28,6 +41,11 @@ are still byte-identical to the STLs published with "One faceplate instead of
 two bars" (`50ea387`). If yours came from that version or later, reprint the
 two trays, the two legs and the faceplate — about 188 g and 7 h 14. Only the
 two sides carry over.
+
+The gateway's tray and faceplate were renamed when the switch was added --
+`tray_l` is now `tray_ucg_l`, `faceplate` is `faceplate_ucg` -- but the
+geometry is byte-for-byte what it was. Plate numbers 1 to 6 are unchanged, so
+anything already quoted against them still means the same thing.
 
 | part | verdict |
 |---|---|

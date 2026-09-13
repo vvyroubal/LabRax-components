@@ -90,8 +90,16 @@ CLR_W = 1.2  # [design] total width clearance
 CLR_H = 0.8  # [design]
 CLR_D = 1.4  # [design]
 
-POCKET_W = DEV_W + CLR_W   # 214.0
-POCKET_HW = POCKET_W / 2   # 107.0
+# The bay the chassis offers is set by the RACK, not by the device that goes
+# in it. The posts leave 222.25 between them; 0.925 mm of clearance a side
+# puts the body at 110.2 half-width, and a 3.2 mm rail inside that leaves
+# 107.0. The UCG-Fiber needing exactly 214.0 is a happy accident of a
+# well-chosen device, not the reason for the number -- which is why a second,
+# much narrower device needs no change to the sides or the legs.
+RAIL_CLEAR = 0.925         # [rack] per side, between rail and post
+BODY_HW = POST_CLEAR_HW - RAIL_CLEAR   # 110.2
+POCKET_HW = BODY_HW - 3.2  # 107.0; RAIL_T repeats this below
+POCKET_W = 2 * POCKET_HW   # 214.0
 
 # ------------------------------------------------------------ the sides ----
 # One screw size for the whole bracket: M6 x 12. That is not a preference,
@@ -110,7 +118,6 @@ EAR_T = 6.5        # [design] front and rear ear plate thickness
 EAR_X0 = 94.0      # [design] inboard edge of the ears. Far enough in
                    # that a screw head at BAR_SCREW_X bears fully on it.
 RAIL_T = 3.2       # [design] side rail; 107.0 + 3.2 = 110.2 <= 111.125
-BODY_HW = POCKET_HW + RAIL_T  # 110.2, leaves 0.925 mm per side to the posts
 
 TRAY_T = 6.0       # [design] the tray the device sits on
 LAP_T = TRAY_T / 2  # [design] each half of a step lap
@@ -125,6 +132,16 @@ DEV_Y1 = DEV_Y0 + DEV_D + CLR_D  # 137.0
 
 STOP_T = 7.0       # [design] rear stop thickness
 STOP_X0 = 99.0     # [design]
+
+# The chassis's own idea of how far back it will carry a tray, and where its
+# rear stop sits. These happen to be the UCG-Fiber's numbers -- the sides were
+# drawn around it -- but the side does not read the device any more. A device
+# shorter than this simply leaves the stop unused behind it and is caught by
+# its own tray's lip instead, which is what lets one pair of sides serve both.
+LEDGE_Y0 = 8.0     # [design] = DEV_Y0, the front of the ledge
+LEDGE_Y1 = 137.0   # [design] the deepest tray the chassis supports
+STOP_Y = 137.0     # [design] front face of the sides' rear stop
+STOP_H = 36.0      # [design] how tall it stands
 
 # Ventilation in the side rails -- the device vents through its sides.
 RAIL_VENT_Z0 = 10.0
@@ -189,6 +206,12 @@ KEY_Y = (20.0, 116.0)  # [design] one pair just inside the gateway's front edge,
 # tab that broke -- that one carried 1700 N of preload on a 3 mm neck.
 REAR_LIP_H = 3.0      # [design] how far it stands above the tray
 REAR_LIP_T = 3.0      # [design] thickness, fore and aft
+# A tray for a device narrower than the bay has to locate it sideways, which
+# the sides' own rails do for a device that fills the bay. Walls on the tray,
+# and a plinth under the device where one is wanted to centre it in the U.
+TRAY_WALL_T = 4.0     # [design] wall thickness
+TRAY_WALL_H = 8.0     # [design] how far it rises above the case's underside
+
 REAR_LIP_X = STOP_X0  # [design] it stops where the sides' rear stops start,
                       # so the two together span the full rear face
 

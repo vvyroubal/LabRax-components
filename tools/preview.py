@@ -16,6 +16,7 @@ import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STL = os.path.join(ROOT, "export", "stl")
+sys.path.insert(0, os.path.join(ROOT, "src"))
 OUT = os.path.join(ROOT, "images")
 
 # part -> fill hue, so the pieces stay distinguishable in the assembly views
@@ -28,6 +29,13 @@ COLOUR = {
     "tray_r": (0.46, 0.60, 0.38),
     "faceplate": (0.30, 0.44, 0.62),
 }
+
+
+def colour_of(name):
+    """Device parts are named tray_ucg_l; colour them as tray_l would be."""
+    for key in ("_ucg", "_usw"):
+        name = name.replace(key, "")
+    return COLOUR.get(name, (0.55, 0.55, 0.55))
 
 VIEWS = {
     # name: (right vector, up vector) -- the camera looks along right x up
@@ -89,7 +97,7 @@ def render(tris_by_part, right, up, path, width=1100, pad=18, ss=2):
 
     pts, cols, depth = [], [], []
     for name, tris in tris_by_part.items():
-        base = np.array(COLOUR.get(name, (0.5, 0.5, 0.5)))
+        base = np.array(colour_of(name))
         n = np.cross(tris[:, 1] - tris[:, 0], tris[:, 2] - tris[:, 0])
         ln = np.linalg.norm(n, axis=1)
         ok = ln > 1e-12
@@ -147,20 +155,29 @@ def render(tris_by_part, right, up, path, width=1100, pad=18, ss=2):
 
 def main():
     os.makedirs(OUT, exist_ok=True)
-    parts = {}
-    for name in COLOUR:
-        p = os.path.join(STL, name + ".stl")
-        if os.path.exists(p):
-            parts[name] = load_stl(p)
-    if not parts:
+    import devices
+    chassis = ("side_l", "side_r", "leg_l", "leg_r")
+    made = 0
+    VIEWS["iso"] = iso_basis()
+    # One set of views per device: the chassis, plus that device's own parts.
+    for dev in devices.ALL:
+        parts = {}
+        for name in chassis + (dev.part("tray_l"), dev.part("tray_r"),
+                               dev.part("faceplate")):
+            p = os.path.join(STL, name + ".stl")
+            if os.path.exists(p):
+                parts[name] = load_stl(p)
+        if not parts:
+            continue
+        made += 1
+        for view, (right, up) in VIEWS.items():
+            f = os.path.join(OUT, "assembly-%s-%s.png" % (dev.key, view))
+            w, h = render(parts, right, up, f)
+            print("%-32s %d x %d" % (os.path.relpath(f, ROOT), w, h))
+    if not made:
         print("no STLs in %s -- run make first" % STL)
         return 1
-
-    VIEWS["iso"] = iso_basis()
-    for view, (right, up) in VIEWS.items():
-        f = os.path.join(OUT, "assembly-%s.png" % view)
-        w, h = render(parts, right, up, f)
-        print("%-28s %d x %d" % (os.path.relpath(f, ROOT), w, h))
+    parts = {}
 
     # the two big parts on their own, in the orientation they are printed
     for name in ("tray", "ear_r"):

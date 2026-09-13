@@ -31,6 +31,7 @@ from FreeCAD import Vector  # noqa: E402
 
 import params as P  # noqa: E402
 import model  # noqa: E402
+import devices  # noqa: E402
 
 BED = 180.0  # Bambu Lab A1 mini
 VOID = 1.0   # mm^3 -- below this an intersection is boolean noise
@@ -129,31 +130,47 @@ def fits_bed(b):
 
 
 def main():
-    doc = App.newDocument("verify")
-    bodies = model.build(doc)
-    doc.recompute()
-    parts = {n: b.Shape for n, b in bodies.items()}
-    names = list(parts)
+    keys = os.environ.get("UCG_DEVICE", "").split(",")
+    todo = [d for d in devices.ALL if not keys[0] or d.key in keys]
 
+    # Everything below is checked once per device: the chassis is shared, so
+    # it has to be shown to work with each of them, and two devices' trays
+    # occupy the same space by design -- they are never in the rack together.
+    for dev in todo:
+        doc = App.newDocument("check_" + dev.key)
+        bodies = model.build(doc, only=dev)
+        doc.recompute()
+        parts = {n: b.Shape for n, b in bodies.items()}
+        print("\n" + "=" * 62)
+        print("== %s  %.1f x %.1f x %.1f, %d g"
+              % (dev.name, dev.w, dev.d, dev.h, dev.mass_g))
+        print("=" * 62)
+        print("\n[parts]")
+        for n in sorted(parts):
+            sh = parts[n]
+            check(sh.isValid() and len(sh.Solids) == 1,
+                  "%-14s is one valid solid" % n, "%d solids" % len(sh.Solids))
+            ok, how = fits_bed(sh.BoundBox)
+            check(ok, "%-14s fits the A1 mini bed" % n, how)
+            b = bodies[n]
+            sk_ = [o for o in b.Group if o.TypeId == "Sketcher::SketchObject"]
+            so = [o for o in b.Group
+                  if o.TypeId in ("PartDesign::Pad", "PartDesign::Pocket")]
+            check(len(sk_) > 0 and len(so) > 0,
+                  "%-14s is sketches driving solids" % n,
+                  "%d sketches, %d pads/pockets" % (len(sk_), len(so)))
+        one_device(parts, bodies, dev)
+
+
+def one_device(parts, bodies, dev):
+    names = ["side_l", "side_r", "leg_l", "leg_r",
+             dev.part("tray_l"), dev.part("tray_r"), dev.part("faceplate")]
     asm = parts[names[0]]
     for n in names[1:]:
         asm = asm.fuse(parts[n])
     asm = asm.removeSplitter()
-
-    print("\n[parts]")
-    for n, s in parts.items():
-        check(s.isValid() and len(s.Solids) == 1,
-              "%-10s is one valid solid" % n,
-              "%d solids" % len(s.Solids))
-        ok, how = fits_bed(s.BoundBox)
-        check(ok, "%-10s fits the A1 mini bed" % n, how)
-    for n, b in bodies.items():
-        sketches = [o for o in b.Group if o.TypeId == "Sketcher::SketchObject"]
-        solids = [o for o in b.Group
-                  if o.TypeId in ("PartDesign::Pad", "PartDesign::Pocket")]
-        check(len(sketches) > 0 and len(solids) > 0,
-              "%-10s is sketches driving solids" % n,
-              "%d sketches, %d pads/pockets" % (len(sketches), len(solids)))
+    front = dev.front
+    lip_x = (dev.hw + P.TRAY_WALL_T) if dev.walls else P.REAR_LIP_X
 
     print("\n[no part overlaps another]")
     for i, a in enumerate(names):
@@ -286,105 +303,153 @@ def main():
                       "%.3f mm3" % vol(lg.common(n)))
 
     print("\n[the front face -- one plate, with a window for the display]")
-    fp = parts["faceplate"]
+    fp = parts[dev.part("faceplate")]
     check(len(fp.Solids) == 1, "the faceplate is one solid", "%d" % len(fp.Solids))
     b = fp.BoundBox
     check(abs(b.ZMin) < 1e-6 and abs(b.ZMax - P.RACK_U) < 1e-6,
           "it covers the whole height of the U", "Z %.2f..%.2f" % (b.ZMin, b.ZMax))
-    check(b.XLength >= P.DEV_W, "and the whole width of the gateway's face",
-          "%.1f mm across a %.1f mm face" % (b.XLength, P.DEV_W))
+    check(b.XLength >= dev.w, "and the whole width of the gateway's face",
+          "%.1f mm across a %.1f mm face" % (b.XLength, dev.w))
     for sx in (-1, 1):
         rail = box(sx * P.POCKET_HW, sx * P.BODY_HW, -1.0, P.RACK_D,
                    0.0, P.RAIL_TOP)
         check(vol(fp.common(rail)) < VOID,
               "it clears the rail at x=%+6.1f" % (sx * P.POCKET_HW),
               "%.3f mm3" % vol(fp.common(rail)))
-    # The window, against the display it has to show. The display is placed
-    # from ITS OWN measured height, never from the window's -- the old check
-    # built the panel at P.WIN_Z, so the window was compared against itself
-    # and would have passed at any height at all. That is why a window 5 mm
-    # low got printed. Modelled as the stadium it is: a sharp-cornered
-    # rectangle would report the window's own radii as clipping.
-    disp = stadium(0.0, P.DISP_Z, P.DISP_W, P.DISP_H, -1.0, P.BAR_T + 1.0)
-    check(vol(fp.common(disp)) < VOID, "the display is not clipped",
-          "%.3f mm3 across the %.1f x %.1f panel"
-          % (vol(fp.common(disp)), P.DISP_W, P.DISP_H))
-    # The window has to be concentric with it, with margin left all round.
-    check(abs(P.WIN_Z - P.DISP_Z) < 1e-9,
-          "the window is concentric with the display",
-          "both centred at z=%.1f" % P.DISP_Z)
-    for nm, w, d in (("above and below", P.WIN_H, P.DISP_H),
-                     ("each side", P.WIN_W, P.DISP_W)):
-        check((w - d) / 2.0 >= 0.5, "margin %s the display" % nm,
-              "%.2f mm" % ((w - d) / 2.0))
-    # THE RULE: the oval's top edge sits exactly 5.0 mm below the underside of
-    # the top bar. Both edges are found on the BUILT SOLID, by scanning for
-    # where material starts and stops -- not read back out of params, which
-    # would prove nothing.
-    def scan_z(y, x, z0, z1, want, step=0.05):
-        """First z in [z0, z1] where material is/is not present at (x, y).
+    if front.kind == "window":
+        # The window, against the display it has to show. The display is placed
+        # from ITS OWN measured height, never from the window's -- the old check
+        # built the panel at front.z(dev), so the window was compared against itself
+        # and would have passed at any height at all. That is why a window 5 mm
+        # low got printed. Modelled as the stadium it is: a sharp-cornered
+        # rectangle would report the window's own radii as clipping.
+        disp = stadium(0.0, front.z(dev), front.disp_w, front.disp_h,
+                       -1.0, P.BAR_T + 1.0)
+        check(vol(fp.common(disp)) < VOID, "the display is not clipped",
+              "%.3f mm3 across the %.1f x %.1f panel"
+              % (vol(fp.common(disp)), front.disp_w, front.disp_h))
+        # The window has to be concentric with it, with margin left all round.
+        for nm, w, d in (("above and below", front.h, front.disp_h),
+                         ("each side", front.w, front.disp_w)):
+            check((w - d) / 2.0 >= 0.5, "margin %s the display" % nm,
+                  "%.2f mm" % ((w - d) / 2.0))
+        # THE RULE: the oval's top edge sits exactly 5.0 mm below the underside of
+        # the top bar. Both edges are found on the BUILT SOLID, by scanning for
+        # where material starts and stops -- not read back out of params, which
+        # would prove nothing.
+        def solid_at(y, x, z):
+            """Is there material at (x, y, z)?
 
-        The probe is 4 x 1 x 0.4 mm, which is 1.6 mm3 when it is fully in
-        material -- comfortably over VOID. A thinner one reads as empty
-        everywhere and the scan silently finds nothing.
-        """
-        z = z0
-        while z <= z1:
+            The probe is 4 x 1 x 0.4 mm -- 1.6 mm3 when fully buried, well
+            over the 1 mm3 noise floor. A thinner one reads as empty
+            everywhere and the scan silently finds nothing.
+            """
             probe = box(x - 2.0, x + 2.0, y - 0.5, y + 0.5, z, z + 0.4)
-            solid = vol(fp.common(probe)) > 1.5   # 1.6 when fully buried
-            if solid == want:
-                return z
-            z += step
-        return None
+            return vol(fp.common(probe)) > 1.5
 
-    # behind the round-over, where the window is at full size
-    win_top = scan_z(P.BAR_T - 1.0, 0.0, P.WIN_Z, P.RACK_U, True)
-    # inside the flange, which reaches back over the gateway
-    bar_bottom = scan_z(P.BAR_T + 4.0, 0.0, 0.0, P.RACK_U, True)
-    check(win_top is not None and bar_bottom is not None,
-          "the window's top edge and the top bar's underside are both found",
-          "window top %s, bar underside %s" % (win_top, bar_bottom))
-    if win_top is not None and bar_bottom is not None:
-        gap = bar_bottom - win_top
-        check(abs(gap - P.WIN_TOP_GAP) < 0.1,
-              "the oval's top edge is %.1f mm below the top bar" % P.WIN_TOP_GAP,
-              "measured %.2f mm on the solid: window top z=%.2f, "
-              "bar underside z=%.2f" % (gap, win_top, bar_bottom))
-    # The round-over runs above the bar's line on the FRONT face, which is
-    # fine -- the flange is 8 mm behind it and the plate is solid up there --
-    # but it must not reach the top of the plate.
-    rim = P.WIN_Z + P.WIN_H / 2.0 + P.WIN_FILLET
-    check(rim < P.RACK_U - 2.0,
-          "the rounded rim stays inside the plate",
-          "reaches z=%.1f of %.2f" % (rim, P.RACK_U))
-    check(P.WIN_W > 21.0 and P.WIN_H > 10.0,
-          "the window is larger than the display it shows",
-          "%.1f x %.1f against 21.0 x 10.0" % (P.WIN_W, P.WIN_H))
-    check(P.WIN_Z - P.WIN_H / 2 > P.DEV_Z0 and P.WIN_Z + P.WIN_H / 2 < P.DEV_Z1,
-          "and lies within the gateway's face",
-          "Z %.1f..%.1f inside %.0f..%.0f"
-          % (P.WIN_Z - P.WIN_H / 2, P.WIN_Z + P.WIN_H / 2, P.DEV_Z0, P.DEV_Z1))
-    # The window's front edge is rounded over. Check the round is there by
-    # looking for material that a sharp-edged window would still have: just
-    # outside the window's outline, at the front face.
-    r = P.WIN_FILLET
-    # Thin in Y: a round-over has curved well in by even half a millimetre
-    # of depth, so a deeper probe measures the round itself, not a corner.
-    flare = box(-4.0, 4.0, 0.0, 0.2,
-                P.WIN_Z + P.WIN_H / 2 + 0.4, P.WIN_Z + P.WIN_H / 2 + 4.0)
-    check(vol(fp.common(flare)) < VOID,
-          "the window's front edge is rounded over",
-          "%.1f mm radius, %.3f mm3 of square corner left"
-          % (r, vol(fp.common(flare))))
-    # ...and that it has not eaten through to the back, where the window has
-    # to stay the size the display needs.
-    back = stadium(0.0, P.WIN_Z, 21.0, 10.0, P.BAR_T - 0.5, P.BAR_T + 0.5)
-    check(vol(fp.common(back)) < VOID,
-          "and has not narrowed the window at the back",
-          "%.3f mm3" % vol(fp.common(back)))
-    check(r < P.BAR_T, "the round leaves wall behind it",
-          "%.1f mm radius in a %.1f mm plate, %.1f mm left"
-          % (r, P.BAR_T, P.BAR_T - r))
+        def scan_z(y, x, z0, z1, want, tol=0.01):
+            """The z in [z0, z1] where material starts, by bisection.
+
+            Material presence is monotonic over both ranges used here -- void
+            below, solid above -- so halving beats stepping: a dozen booleans
+            instead of the several hundred a 0.05 mm walk costs, and it is
+            the more accurate of the two. Stepping the whole range twice over
+            was enough to make this run die.
+            """
+            if solid_at(y, x, z0) == want:
+                return z0
+            if solid_at(y, x, z1) != want:
+                return None
+            lo, hi = z0, z1
+            while hi - lo > tol:
+                mid = (lo + hi) / 2.0
+                if solid_at(y, x, mid) == want:
+                    hi = mid
+                else:
+                    lo = mid
+            return hi
+
+        # behind the round-over, where the window is at full size
+        win_top = scan_z(P.BAR_T - 1.0, 0.0, front.z(dev), P.RACK_U - 1.0, True)
+        # inside the flange, which reaches back over the gateway
+        bar_bottom = scan_z(P.BAR_T + 4.0, 0.0, 0.0, P.RACK_U - 1.0, True)
+        check(win_top is not None and bar_bottom is not None,
+              "the window's top edge and the top bar's underside are both found",
+              "window top %s, bar underside %s" % (win_top, bar_bottom))
+        if win_top is not None and bar_bottom is not None:
+            gap = bar_bottom - win_top
+            check(abs(gap - front.top_gap) < 0.1,
+                  "the oval's top edge is %.1f mm below the top bar" % front.top_gap,
+                  "measured %.2f mm on the solid: window top z=%.2f, "
+                  "bar underside z=%.2f" % (gap, win_top, bar_bottom))
+        # The round-over runs above the bar's line on the FRONT face, which is
+        # fine -- the flange is 8 mm behind it and the plate is solid up there --
+        # but it must not reach the top of the plate.
+        rim = front.z(dev) + front.h / 2.0 + front.fillet
+        check(rim < P.RACK_U - 2.0,
+              "the rounded rim stays inside the plate",
+              "reaches z=%.1f of %.2f" % (rim, P.RACK_U))
+        check(front.w > front.disp_w and front.h > front.disp_h,
+              "the window is larger than the display it shows",
+              "%.1f x %.1f against %.1f x %.1f"
+              % (front.w, front.h, front.disp_w, front.disp_h))
+        check(front.z(dev) - front.h / 2 > dev.z0 and front.z(dev) + front.h / 2 < dev.z1,
+              "and lies within the gateway's face",
+              "Z %.1f..%.1f inside %.0f..%.0f"
+              % (front.z(dev) - front.h / 2, front.z(dev) + front.h / 2, dev.z0, dev.z1))
+        # The window's front edge is rounded over. Check the round is there by
+        # looking for material that a sharp-edged window would still have: just
+        # outside the window's outline, at the front face.
+        r = front.fillet
+        # Thin in Y: a round-over has curved well in by even half a millimetre
+        # of depth, so a deeper probe measures the round itself, not a corner.
+        flare = box(-4.0, 4.0, 0.0, 0.2,
+                    front.z(dev) + front.h / 2 + 0.4, front.z(dev) + front.h / 2 + 4.0)
+        check(vol(fp.common(flare)) < VOID,
+              "the window's front edge is rounded over",
+              "%.1f mm radius, %.3f mm3 of square corner left"
+              % (r, vol(fp.common(flare))))
+        # ...and that it has not eaten through to the back, where the window has
+        # to stay the size the display needs.
+        back = stadium(0.0, front.z(dev), front.disp_w, front.disp_h,
+                       P.BAR_T - 0.5, P.BAR_T + 0.5)
+        check(vol(fp.common(back)) < VOID,
+              "and has not narrowed the window at the back",
+              "%.3f mm3" % vol(fp.common(back)))
+        check(r < P.BAR_T, "the round leaves wall behind it",
+              "%.1f mm radius in a %.1f mm plate, %.1f mm left"
+              % (r, P.BAR_T, P.BAR_T - r))
+
+    else:
+        # A frame, not a window: the opening is onto the ports, and its job is
+        # to let a plug in while not letting the case out.
+        w, h, z = front.w(dev), front.h(dev), front.z(dev)
+        check(w < dev.w and h < dev.h,
+              "the case cannot pass through its own opening",
+              "case %.1f x %.1f, opening %.1f x %.1f" % (dev.w, dev.h, w, h))
+        check(front.border_x >= 2.0 and front.border_z >= 1.0,
+              "the border that holds it in is worth having",
+              "%.2f mm each side, %.2f mm top and bottom"
+              % (front.border_x, front.border_z))
+        # An RJ45 with its latch is about 12 x 16. It has to pass the opening
+        # AND the 8 mm of plate behind it, so the probe is swept the whole way.
+        plug = box(-6.0, 6.0, -1.0, P.BAR_T + 1.0, z - 8.0, z + 8.0)
+        check(vol(fp.common(plug)) < VOID,
+              "an RJ45 plug passes the opening and the plate behind it",
+              "%.3f mm3 in the way of a 12 x 16 plug" % vol(fp.common(plug)))
+        # The opening must sit on the ports, which are on the case's face.
+        check(z - h / 2 > dev.z0 and z + h / 2 < dev.z1,
+              "the opening lies within the case's face",
+              "Z %.2f..%.2f inside %.2f..%.2f"
+              % (z - h / 2, z + h / 2, dev.z0, dev.z1))
+        check(abs(z - P.RACK_U / 2.0) < 0.5,
+              "and is centred in the U, because it is what you look at",
+              "opening centre z=%.3f, U centre %.3f" % (z, P.RACK_U / 2.0))
+        # Nothing in front of the case except that border.
+        face = box(-dev.w / 2, dev.w / 2, 0.0, dev.y0, dev.z0, dev.z1)
+        held = vol(fp.common(face))
+        check(held > 500.0, "the frame stands in front of the case all round",
+              "%.0f mm3 of border over its face" % held)
 
     ahead = box(-P.FACE_HW, P.FACE_HW, -P.EAR_T + 0.01, 0.0, 0.0, P.RACK_U)
     stray = [n for n in names
@@ -411,74 +476,78 @@ def main():
                   % (x, z), "%.3f mm3" % vol(asm.common(through)))
 
     print("\n[device]")
-    dev = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0, P.DEV_Y0 + P.DEV_D,
-              P.DEV_Z0, P.DEV_Z1)
-    check(vol(asm.common(dev)) < VOID, "device sits without interference",
-          "%.3f mm3" % vol(asm.common(dev)))
+    case = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d,
+               dev.z0, dev.z1)
+    check(vol(asm.common(case)) < VOID, "device sits without interference",
+          "%.3f mm3" % vol(asm.common(case)))
     cradle = parts["side_l"].fuse(parts["side_r"]).fuse(
-        parts["tray_l"]).fuse(parts["tray_r"])
-    drop = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0, P.DEV_Y0 + P.DEV_D,
-               P.DEV_Z0, 400)
+        parts[dev.part("tray_l")]).fuse(parts[dev.part("tray_r")])
+    drop = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d,
+               dev.z0, 400)
     check(vol(cradle.common(drop)) < VOID, "drops in from above between the sides",
           "%.3f mm3" % vol(cradle.common(drop)))
-    shelf = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0, P.DEV_Y0 + P.DEV_D,
-                P.DEV_Z0 - 2.0, P.DEV_Z0)
+    shelf = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d,
+                dev.z0 - 2.0, dev.z0)
     check(vol(cradle.common(shelf)) > 20000.0, "the tray carries it",
           "%.0f mm3 under it" % vol(cradle.common(shelf)))
-    fwd = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0 - P.BAR_T, P.DEV_Y0,
-              P.DEV_Z0, P.DEV_Z1)
+    fwd = box(-dev.w / 2, dev.w / 2, dev.y0 - P.BAR_T, dev.y0,
+              dev.z0, dev.z1)
     check(vol(asm.common(fwd)) > 100.0, "stopped at the front",
           "%.0f mm3" % vol(asm.common(fwd)))
-    back = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y1, P.DEV_Y1 + P.STOP_T,
-               P.DEV_Z0, P.DEV_Z1)
+    back = box(-dev.w / 2, dev.w / 2, dev.y1, dev.y1 + P.STOP_T,
+               dev.z0, dev.z1)
     check(vol(asm.common(back)) > 100.0, "stopped at the rear",
           "%.0f mm3" % vol(asm.common(back)))
     # And it must not be able to leave through the front once the bar is on.
     # The top bar's end blocks reach down to BAR_END_Z0 and stand directly in
     # front of the device's face at each end; nothing else does.
     for push in (1.5, 5.0, 20.0):
-        moved = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0 - push,
-                    P.DEV_Y0 + P.DEV_D - push, P.DEV_Z0, P.DEV_Z1)
+        moved = box(-dev.w / 2, dev.w / 2, dev.y0 - push,
+                    dev.y0 + dev.d - push, dev.z0, dev.z1)
         v = vol(asm.common(moved))
         check(v > 50.0, "cannot be pushed %.1f mm out of the front" % push,
               "%.0f mm3 of interference" % v)
-    face = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0 - P.BAR_T, P.DEV_Y0,
-               P.DEV_Z0, P.DEV_Z1)
-    half = box(-P.DEV_W / 2, 0.0, P.DEV_Y0 - P.BAR_T, P.DEV_Y0,
-               P.DEV_Z0, P.DEV_Z1)
+    face = box(-dev.w / 2, dev.w / 2, dev.y0 - P.BAR_T, dev.y0,
+               dev.z0, dev.z1)
+    half = box(-dev.w / 2, 0.0, dev.y0 - P.BAR_T, dev.y0,
+               dev.z0, dev.z1)
     per = vol(fp.common(half))
-    check(per > 3000.0, "the faceplate stands across the gateway's face",
-          "%.0f mm3 of it on each half" % per)
+    # A window covers the face and shows a sliver of it; a frame deliberately
+    # opens most of it and keeps only a border. Ask for the border, not for a
+    # fixed volume that only a covered face can reach.
+    want = 3000.0 if dev.front.kind == "window" else 500.0
+    check(per > want, "the faceplate stands across the device's face",
+          "%.0f mm3 of it on each half, wanted %.0f" % (per, want))
 
-    over = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0, P.DEV_Y0 + P.DEV_D,
-               P.DEV_Z1, P.RACK_U)
+    over = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d,
+               dev.z1, P.RACK_U)
     check(vol(fp.common(over)) > 100.0, "the faceplate's flange caps it",
           "%.0f mm3 over it" % vol(fp.common(over)))
 
     print("\n[the tray]")
-    trays = parts["tray_l"].fuse(parts["tray_r"]).removeSplitter()
+    trays = parts[dev.part("tray_l")].fuse(parts[dev.part("tray_r")]).removeSplitter()
     # It must be a floor, not two ledges: solid under the device all the way
     # across, at every depth.
     for x in (-100.0, -60.0, -16.0, 0.0, 16.0, 60.0, 100.0):
-        col = box(x - 4, x + 4, P.DEV_Y0 + 4, P.DEV_Y1 - 4, 0.0, P.DEV_Z0)
+        col = box(x - 4, x + 4, dev.y0 + 4, dev.y1 - 4, 0.0, dev.z0)
         v = vol(trays.common(col))
         check(v > 300.0, "tray carries the device at x=%+7.1f" % x,
               "%.0f mm3" % v)
     # Each half laps onto its side's ledge for the whole depth.
     for sx, side in ((-1, "side_l"), (1, "side_r")):
-        band = box(sx * P.LEDGE_X0, sx * P.TRAY_X1, P.DEV_Y0, P.DEV_Y1,
+        band = box(sx * P.LEDGE_X0, sx * P.TRAY_X1, dev.y0, dev.y1,
                    0.0, P.TRAY_T)
         vt = vol(trays.common(band))
         vs = vol(parts[side].common(band))
         check(vt > 1000.0 and vs > 1000.0, "%s carries the tray's edge" % side,
               "ledge %.0f mm3 under tray %.0f mm3" % (vs, vt))
     # The centre lap has to overlap, not just butt.
-    lap = box(-P.CENTRE_LAP, P.CENTRE_LAP, P.DEV_Y0, P.DEV_Y1, 0.0, P.TRAY_T)
-    check(vol(parts["tray_l"].common(lap)) > 1000.0
-          and vol(parts["tray_r"].common(lap)) > 1000.0,
+    lap = box(-P.CENTRE_LAP, P.CENTRE_LAP, dev.y0, dev.y1, 0.0, P.TRAY_T)
+    check(vol(parts[dev.part("tray_l")].common(lap)) > 1000.0
+          and vol(parts[dev.part("tray_r")].common(lap)) > 1000.0,
           "the halves lap on the centreline",
-          "%.0f / %.0f mm3" % (vol(parts["tray_l"].common(lap)),
-                               vol(parts["tray_r"].common(lap))))
+          "%.0f / %.0f mm3" % (vol(parts[dev.part("tray_l")].common(lap)),
+                               vol(parts[dev.part("tray_r")].common(lap))))
     # No bolt across this joint: the tab that used to carry one snapped off
     # both halves when it was tightened. Nothing may stand behind the gateway
     # where it did, either -- that is where its rear ports are. The rear lip
@@ -487,22 +556,27 @@ def main():
     # Measured between the sides' rear stops: the outer 7.4 mm at each end is
     # covered full height by the stop and the rear leg behind it, and always
     # has been. Everything in from there must stay open above the lip.
-    ports_z0 = P.DEV_Z0 + P.REAR_LIP_H
-    behind = box(-P.REAR_LIP_X, P.REAR_LIP_X, P.DEV_Y0 + P.DEV_D,
-                 P.DEV_Y0 + P.DEV_D + 25.0, ports_z0, P.DEV_Z1)
+    # Only for a device whose ports are on the back. A frame device faces its
+    # ports forward through the faceplate, so its back is just a back.
+    rear_ports = dev.front.kind == "window"
+    ports_z0 = dev.z0 + P.REAR_LIP_H
+    behind = box(-lip_x, lip_x, dev.y0 + dev.d,
+                 dev.y0 + dev.d + 25.0, ports_z0, dev.z1)
     v = vol(asm.common(behind))
-    check(v < VOID, "the gateway's rear ports are clear above the lip",
+    check(v < VOID or not rear_ports,
+          "the device's rear ports are clear above the lip"
+          if rear_ports else "nothing needs clearing behind (ports face front)",
           "%.3f mm3 in the 25 mm behind the middle %.0f mm, above z=%.1f"
-          % (v, 2 * P.REAR_LIP_X, ports_z0))
+          % (v, 2 * lip_x, ports_z0))
 
     # And say plainly how much of each end is blocked, so the one thing this
     # bracket does cover is a number rather than a surprise.
-    ends = box(P.REAR_LIP_X, P.DEV_W / 2, P.DEV_Y0 + P.DEV_D,
-               P.DEV_Y0 + P.DEV_D + 25.0, ports_z0, P.DEV_Z1)
+    ends = box(lip_x, dev.w / 2, dev.y0 + dev.d,
+               dev.y0 + dev.d + 25.0, ports_z0, dev.z1)
     check(vol(asm.common(ends)) > VOID,
           "the outer %.1f mm of each end is blocked by the stop and leg"
-          % (P.DEV_W / 2 - P.REAR_LIP_X),
-          "keep plugs out of the last %.1f mm" % (P.DEV_W / 2 - P.REAR_LIP_X))
+          % (dev.w / 2 - lip_x),
+          "keep plugs out of the last %.1f mm" % (dev.w / 2 - lip_x))
 
     check(P.REAR_LIP_H <= 3.0, "the rear lip stays low enough to miss a port",
           "%.1f mm above the tray" % P.REAR_LIP_H)
@@ -511,8 +585,8 @@ def main():
     # Before this existed the only thing behind the gateway was the two rear
     # stops on the sides, reaching in to x = +/-99: 7.4 mm of overlap at each
     # end of a 212.8 mm rear face. The lip covers what is between them.
-    lip = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0 + P.DEV_D,
-              P.DEV_Y0 + P.DEV_D + 25.0, P.DEV_Z0, P.DEV_Z0 + P.REAR_LIP_H)
+    lip = box(-dev.w / 2, dev.w / 2, dev.y0 + dev.d,
+              dev.y0 + dev.d + 25.0, dev.z0, dev.z0 + P.REAR_LIP_H)
     v = vol(trays.common(lip))
     check(v > 1000.0, "the tray has a lip behind the gateway",
           "%.0f mm3 of it" % v)
@@ -520,12 +594,15 @@ def main():
     # Walk the rear face and ask, at each x, whether ANYTHING is behind it.
     # This is the check that would have caught the missing lip: the parts all
     # fitted, nothing overlapped, and 93% of the back was still open.
+    # 2 mm stride: the gap this caught was 198 mm wide, so nothing that
+    # matters hides between samples, and it halves a slow walk that now runs
+    # once per device.
     gaps = []
-    for i in range(0, 213):
-        x = -P.DEV_W / 2 + i
-        probe = box(x - 0.4, x + 0.4, P.DEV_Y0 + P.DEV_D + 0.05,
-                    P.DEV_Y0 + P.DEV_D + P.REAR_LIP_H + 2.0,
-                    P.DEV_Z0 + 0.2, P.DEV_Z0 + P.REAR_LIP_H - 0.2)
+    for i in range(0, int(dev.w / 2.0) + 1):
+        x = -dev.w / 2 + 2.0 * i
+        probe = box(x - 0.4, x + 0.4, dev.y0 + dev.d + 0.05,
+                    dev.y0 + dev.d + P.REAR_LIP_H + 2.0,
+                    dev.z0 + 0.2, dev.z0 + P.REAR_LIP_H - 0.2)
         if vol(asm.common(probe)) < VOID:
             gaps.append(x)
     check(not gaps, "something is behind the gateway across its whole width",
@@ -538,9 +615,9 @@ def main():
 
     # It has to be behind the gateway, not under it: the case sits on the
     # tray, so a lip that started too far forward would hold it off the floor.
-    for nm in ("tray_l", "tray_r"):
-        under = box(-P.DEV_W / 2, P.DEV_W / 2, P.DEV_Y0,
-                    P.DEV_Y0 + P.DEV_D, P.DEV_Z0 + 0.05, P.DEV_Z1)
+    for nm in (dev.part("tray_l"), dev.part("tray_r")):
+        under = box(-dev.w / 2, dev.w / 2, dev.y0,
+                    dev.y0 + dev.d, dev.z0 + 0.05, dev.z1)
         v = vol(parts[nm].common(under))
         check(v < VOID, "%s stays below the gateway it carries" % nm,
               "%.3f mm3 in the way" % v)
@@ -548,22 +625,22 @@ def main():
     # Four pegs key the halves instead.
     # The pegs that key the front of the joint, where no bolt will fit.
     for kx in (-P.KEY_X, P.KEY_X):
-        for ky in P.KEY_Y:
+        for ky in dev.keys_y:
             peg = Part.makeCylinder(P.KEY_D / 2, P.LAP_T - 0.1,
                                     Vector(kx, ky, 0.05), Vector(0, 0, 1))
-            check(vol(parts["tray_r"].common(peg)) > 20.0
-                  and vol(parts["tray_l"].common(peg)) < VOID,
+            check(vol(parts[dev.part("tray_r")].common(peg)) > 20.0
+                  and vol(parts[dev.part("tray_l")].common(peg)) < VOID,
                   "a peg keys the joint at x=%+6.1f y=%5.1f" % (kx, ky),
                   "%.0f mm3 of peg, %.3f in the socket"
-                  % (vol(parts["tray_r"].common(peg)),
-                     vol(parts["tray_l"].common(peg))))
-    check(len(P.KEY_Y) >= 2, "pegs at the front and the back of the lap",
+                  % (vol(parts[dev.part("tray_r")].common(peg)),
+                     vol(parts[dev.part("tray_l")].common(peg))))
+    check(len(dev.keys_y) >= 2, "pegs at the front and the back of the lap",
           "rows at y = %s" % ", ".join("%.0f" % y for y in P.KEY_Y))
     # The lap has to be wide, because it is what holds the front together.
     check(2 * P.CENTRE_LAP >= 60.0, "the centre lap is at least 60 mm wide",
           "%.0f mm" % (2 * P.CENTRE_LAP))
     # And nothing may rise above the tray in front of the device.
-    front = box(-P.DEV_W / 2, P.DEV_W / 2, -P.EAR_T, P.DEV_Y0,
+    front = box(-dev.w / 2, dev.w / 2, -P.EAR_T, dev.y0,
                 P.TRAY_T, P.RACK_U)
     v = vol(trays.common(front))
     check(v < VOID, "nothing stands in front of the device's face",
@@ -573,12 +650,12 @@ def main():
     # tray is an interference fit.
     edge = box(P.LEDGE_X0, P.TRAY_X1, -50, 400, P.LAP_T, P.TRAY_T)
     got = trays.common(edge).BoundBox.YLength
-    gap = P.DEV_Y1 - P.DEV_Y0
+    gap = dev.y1 - dev.y0
     check(gap - got >= 0.3, "the tray drops into the gap it has to sit in",
           "%.2f mm long, %.2f mm gap, %.2f mm of fit" % (got, gap, gap - got))
 
     # Held fore and aft by the bottom bar and the rear stop, so it cannot walk.
-    ahead = box(-P.TRAY_X1, P.TRAY_X1, P.DEV_Y0 - 1.0, P.DEV_Y0,
+    ahead = box(-P.TRAY_X1, P.TRAY_X1, dev.y0 - 1.0, dev.y0,
                 0.0, P.TRAY_T)
     check(vol(fp.common(ahead)) > 100.0,
           "the faceplate stops the tray sliding forward",
@@ -609,12 +686,24 @@ def main():
     print("\n[clearances]")
     check(abs((P.POST_CLEAR_HW - P.BODY_HW) - 0.925) < 1e-9,
           "0.925 mm per side between rail and post")
-    for nm, got, want in (("width", P.POCKET_W - P.DEV_W, P.CLR_W),
-                          ("height", P.POCKET_TOP - P.DEV_Z1, P.CLR_H)):
-        check(abs(got - want) < 1e-9, "%s clearance %.2f mm" % (nm, got))
-    check(2 * P.EAR_X0 < P.DEV_W,
-          "the ears overlap the device's ends, so it cannot slide out",
-          "opening %.1f vs device %.1f" % (2 * P.EAR_X0, P.DEV_W))
+    check(abs((dev.flange_z0 - dev.z1) - dev.clr_h) < 1e-9,
+          "height clearance %.2f mm" % (dev.flange_z0 - dev.z1))
+    if dev.walls:
+        # Narrower than the bay: its tray's walls hold it straight, and the
+        # faceplate's border -- checked above -- is what stops it coming out.
+        gap = 2 * dev.hw - dev.w
+        check(abs(gap - dev.clr_w) < 1e-9,
+              "width clearance between the tray's walls %.2f mm" % gap)
+        check(2 * (dev.hw + P.TRAY_WALL_T) <= P.POCKET_W,
+              "and those walls fit the bay",
+              "%.1f mm across a %.1f mm bay"
+              % (2 * (dev.hw + P.TRAY_WALL_T), P.POCKET_W))
+    else:
+        check(abs((P.POCKET_W - dev.w) - dev.clr_w) < 1e-9,
+              "width clearance %.2f mm" % (P.POCKET_W - dev.w))
+        check(2 * P.EAR_X0 < dev.w,
+              "the ears overlap the device's ends, so it cannot slide out",
+              "opening %.1f vs device %.1f" % (2 * P.EAR_X0, dev.w))
 
     print("\n%d checks, %d failed" % (_checks, len(_fails)))
     for f in _fails:

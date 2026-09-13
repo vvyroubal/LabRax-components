@@ -1,9 +1,18 @@
 # UCG_Fiber
 
-A 1U bracket that holds a **UniFi Cloud Gateway Fiber (UCG-Fiber)** in a
-**Lab Rax 10" rack**, bolted to the front *and* rear rails.
+A 1U bracket that holds a **UniFi Cloud Gateway Fiber (UCG-Fiber)** — or a
+**UniFi Flex Mini 2.5G (USW-Flex-2.5G-5)** — in a **Lab Rax 10" rack**, bolted
+to the front *and* rear rails.
 
-![front](images/assembly-front.png)
+![front](images/assembly-ucg-front.png)
+
+**Four of the seven parts are the chassis and take no notice of what is in
+them.** The sides and the rear legs are sized by the rack; only the tray pair
+and the faceplate are drawn around a device. So a second device costs three
+prints, not seven, and the sides you have already printed carry over
+untouched.
+
+![front](images/assembly-usw-front.png)
 
 The gateway is 212.8 mm wide and the rack's posts are 222.25 mm apart, so
 there is 4.7 mm a side to work with. Most of the design follows from that.
@@ -32,7 +41,7 @@ src/
   model.py        the seven bodies
 build.py          writes cad/, export/stl/, export/step/
 tools/
-  verify.py       147 checks against the rack, the device and the printer
+  verify.py       174 / 169 checks, run once per device
   measure_rack.py re-derives the [rack] numbers from the Lab Rax mesh files
   preview.py      renders images/ (FreeCAD is headless here)
   plate.py        arranges the STLs onto A1 mini plates as a Bambu 3MF
@@ -73,14 +82,25 @@ stock Lab Rax faceplates slot their holes for the same reason.
 
 ## Parts
 
-Seven prints, none over a 180 mm bed.
+Seven prints for one device, none over a 180 mm bed: four shared, three its
+own.
 
-| part | size (mm) | qty |
-|---|---|---|
-| `side_l` / `side_r` | 33 × 212.5 × 44.5 | 1 each |
-| `leg_l` / `leg_r` | 33 × 97.5 × 44.5 | 1 each |
-| `tray_l` / `tray_r` | 137 × 131.6 × 9 | 1 each |
-| `faceplate` | 214 × 20 × 44.5 | 1 |
+| part | size (mm) | qty | |
+|---|---|---|---|
+| `side_l` / `side_r` | 33 × 212.5 × 44.5 | 1 each | chassis |
+| `leg_l` / `leg_r` | 33 × 97.5 × 44.5 | 1 each | chassis |
+| `tray_ucg_l` / `tray_ucg_r` | 137 × 131.6 × 9 | 1 each | UCG-Fiber |
+| `faceplate_ucg` | 214 × 20 × 44.5 | 1 | UCG-Fiber |
+| `tray_usw_l` / `tray_usw_r` | 137 × 94 × 19.6 | 1 each | Flex Mini |
+| `faceplate_usw` | 214 × 20 × 44.5 | 1 | Flex Mini |
+
+**What makes the chassis shared is that its width comes from the rack, not
+from the gateway.** The posts leave 222.25 mm; 0.925 mm of clearance a side
+and a 3.2 mm rail give a bay 214 mm wide. The UCG-Fiber needing exactly that
+is a happy accident of a well-chosen device — so a device half the width needs
+no change to the sides or the legs at all. The sides' ledge and rear stop are
+likewise the chassis's own numbers now: a shorter device simply leaves the
+stop unused behind it and is caught by its own tray's lip.
 
 A **side** carries everything that touches the device: front ear, side rail,
 the ledge the tray lands on, and the rear stop. A **rear leg** laps 60 mm onto
@@ -182,7 +202,43 @@ apart in depth, so nothing actually meets.
 **The faceplate commits you to ports-at-the-back.** The face is closed apart
 from the window.
 
-![iso](images/assembly-iso.png)
+![iso](images/assembly-ucg-iso.png)
+
+## The switch: UniFi Flex Mini 2.5G
+
+117.1 × 90 × 21.2 mm and 206 g, against the gateway's 212.8 × 127.6 × 30 and
+734 g — barely half the width and a third of the weight. The chassis does not
+change; its tray pair and faceplate do.
+
+![iso](images/assembly-usw-iso.png)
+
+**It is lifted, not laid on the floor.** 21.2 mm in a 44.45 mm U would leave
+17 mm of blank plate above it, and its front face is the one you look at, so
+the tray carries a 5.625 mm plinth. That puts the case at z 11.625 – 32.825 —
+centred on 22.225, which is the centre of the U to three decimal places.
+
+**Its tray holds it straight.** A device that fills the bay is held by the
+sides' own rails; this one has 96.9 mm of slack, so walls 4 mm thick stand at
+x ±59.15 and rise 8 mm above the case floor.
+
+**The faceplate is a frame, not a window.** The ports face front, so the plate
+opens onto them: a 109.1 × 17.5 mm rectangle centred in the U, leaving a 4 mm
+border each side and 1.85 mm top and bottom. That border is what holds the
+switch in — retention here is absolute rather than frictional, because a
+117.1 × 21.2 case cannot pass a 109.1 × 17.5 hole. The plug sets the height: an
+RJ45 with its latch needs about 16 mm, and `verify` sweeps a 12 × 16 mm plug
+envelope through the opening *and* the 8 mm of plate behind it to prove one
+fits.
+
+Backwards, it is stopped by its tray's rear lip at y 99, 1 mm behind the case.
+So the frame holds it forward and the lip holds it back, and both are in the
+same three-part kit.
+
+**Before you print it**, measure the port strip on your unit — the left edge
+of the first RJ45 to the right edge of the USB-C, and its height. The opening
+above is sized to expose all but a 4 mm border, which should clear everything,
+but this project has already had two calliper readings drive a reprint and
+that is the one number worth confirming.
 
 ## Fasteners
 
@@ -262,7 +318,8 @@ choice around it.
 Two tools, and they check different things.
 
 `make verify` measures the built solids, not the parameters, so a feature that
-silently does nothing is caught rather than assumed away. 147 checks: that each
+silently does nothing is caught rather than assumed away. 174 checks for the
+gateway and 169 for the switch, run as a separate pass each: that each
 body is one valid solid built from sketches driving pads and pockets; that it
 fits the bed, turning a long part on the diagonal if it has to; that no two
 parts foul each other; that an M6 passes all twelve rack slots; that the
@@ -296,7 +353,7 @@ sides differently.
 `make assembly` is less forgiving, because arithmetic can agree with itself
 while the hole is somewhere else entirely. It places a real M6 × 12, a real
 nut and a real washer at every one of the twenty positions and asks
-whether they fit what was actually built — 107 checks: that each shank is
+whether they fit what was actually built — 107 checks per device: that each shank is
 clear the whole way, that each head has something to bear on and how much,
 that each nut sits in its pocket, and that no fastener touches the gateway.
 

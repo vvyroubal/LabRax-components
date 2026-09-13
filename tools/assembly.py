@@ -39,6 +39,7 @@ import Part  # noqa: E402
 from FreeCAD import Vector  # noqa: E402
 
 import params as P  # noqa: E402
+import devices  # noqa: E402
 import model  # noqa: E402
 
 VOID = 1.0        # mm^3 below which an intersection is boolean noise
@@ -162,12 +163,22 @@ def fasteners():
 
 
 def main():
-    doc = App.newDocument("assembly")
-    bodies = model.build(doc)
-    doc.recompute()
-    parts = {n: b.Shape for n, b in bodies.items()}
-    names = sorted(parts)
+    keys = os.environ.get("UCG_DEVICE", "").split(",")
+    todo = [d for d in devices.ALL if not keys[0] or d.key in keys]
+    for dev in todo:
+        doc = App.newDocument("check_" + dev.key)
+        bodies = model.build(doc, only=dev)
+        doc.recompute()
+        parts = {n: b.Shape for n, b in bodies.items()}
+        print("\n" + "=" * 62)
+        print("== %s" % dev.name)
+        print("=" * 62)
+        one_device(parts, dev)
 
+
+def one_device(parts, dev):
+    names = ["side_l", "side_r", "leg_l", "leg_r",
+             dev.part("tray_l"), dev.part("tray_r"), dev.part("faceplate")]
     asm = parts[names[0]]
     for n in names[1:]:
         asm = asm.fuse(parts[n])
@@ -205,11 +216,11 @@ def main():
     print("\n  %d screws, %d with nuts, %d with washers"
           % (len(fs), nuts, sum(1 for f in fs if f.washer)))
 
-    print("\n[the gateway]")
-    dev = Part.makeBox(P.DEV_W, P.DEV_D, P.DEV_H,
-                       Vector(-P.DEV_W / 2, P.DEV_Y0, P.DEV_Z0))
-    check(vol(asm.common(dev)) < VOID, "sits in the bracket without fouling it",
-          "%.3f mm3" % vol(asm.common(dev)))
+    print("\n[the device]")
+    case = Part.makeBox(dev.w, dev.d, dev.h,
+                        Vector(-dev.w / 2, dev.y0, dev.z0))
+    check(vol(asm.common(case)) < VOID, "sits in the bracket without fouling it",
+          "%.3f mm3" % vol(asm.common(case)))
     for f in fs:
         n = f.nut()
         bits = f.shank().fuse(f.head())
@@ -218,7 +229,7 @@ def main():
         w = f.washer_solid()
         if w is not None:
             bits = bits.fuse(w)
-        v = vol(dev.common(bits))
+        v = vol(case.common(bits))
         if v > VOID:
             check(False, "%-26s clears the gateway" % f.name, "%.1f mm3" % v)
     check(True, "no fastener touches the gateway",

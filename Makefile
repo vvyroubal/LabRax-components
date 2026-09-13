@@ -5,7 +5,10 @@ ROOT    := $(CURDIR)
 STL   := export/stl
 STEP  := export/step
 CAD   := cad/UCG_Fiber_LabRax.FCStd
-PARTS := side_l side_r leg_l leg_r tray_l tray_r faceplate
+DEVICES := ucg usw
+PARTS := side_l side_r leg_l leg_r \
+         tray_ucg_l tray_ucg_r faceplate_ucg \
+         tray_usw_l tray_usw_r faceplate_usw
 STLS  := $(addprefix $(STL)/,$(addsuffix .stl,$(PARTS)))
 
 .PHONY: all model verify assembly images plate plates clean
@@ -18,9 +21,14 @@ model: $(CAD)
 $(CAD) $(STLS): build.py src/model.py src/params.py
 	$(FREECAD) build.py
 
-# Check the built solids against the rack interface and the device envelope.
+# Check the built solids against the rack interface and each device envelope.
+# One process per device: the chassis is shared, so it has to be shown to work
+# with each of them, and one document holding every part of every device is
+# more solid than the boolean kernel will carry.
 verify: $(CAD)
-	$(FREECAD) tools/verify.py
+	@for d in $(DEVICES); do \
+	  UCG_DEVICE=$$d $(FREECAD) tools/verify.py || exit 1; \
+	done
 
 # FreeCAD is headless here, so previews are rendered from the STLs.
 images: $(STLS)
@@ -32,7 +40,9 @@ plate: $(STLS)
 
 # Put a real M6 x 12 and a real nut at all 22 positions and see if they fit.
 assembly: $(CAD)
-	$(FREECAD) tools/assembly.py
+	@for d in $(DEVICES); do \
+	  UCG_DEVICE=$$d $(FREECAD) tools/assembly.py || exit 1; \
+	done
 
 # Slice every plate for real and measure what the printer would actually do.
 # Slow (it runs the slicer five times) and needs Bambu Studio, so it is not
