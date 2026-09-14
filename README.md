@@ -194,6 +194,17 @@ about 25 mm² and will bury itself in PETG. A washer takes that to 46–60 mm².
 
 The tray takes no fastener at all.
 
+**A nut is fed in from the rear, and the flange can be in its way.** The two
+upper nut pockets sit at z = 30.16, fixed by the sides — which are shared —
+while the faceplate's flange sits on top of the device, which is not. A short
+device pulls the flange down into the path the nut has to travel: on the Flex
+Mini it sat **1.58 mm** into it and the upper nuts could not be fitted at all,
+and the TL-SG108E cleared by 0.32 mm, which is no clearance on a printed part.
+Where that gap falls under `NUT_FEED_CLEAR`, the flange is cut back at those
+two positions. It costs nothing — at x = ±100 the flange is outboard of every
+device carried here. `verify` sweeps a nut the whole 17 mm of its travel
+rather than only checking that it seats, because seating is not fitting.
+
 ## How each device is held
 
 | | UCG-Fiber | Flex Mini 2.5G |
