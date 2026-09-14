@@ -241,6 +241,13 @@ BAR_END_X0 = 96.0   # [design] the taller end block starts here
 BAR_END_Z0 = 23.7   # [design] deep enough for an M6 nut across its flats
 BAR_FLANGE_D = 12.0  # [design] how far it reaches back over the device.
                      # Every millimetre here costs 0.7 mm of bed diagonal.
+# A nut is fed into its pocket from the rear, so it has to travel under the
+# flange to get there. The flange follows the DEVICE's height while the nut
+# positions are fixed by the sides, which are shared -- so a short device
+# pulls the flange down into that path. Where the gap is smaller than this,
+# the flange is cut back at the two upper screws.
+NUT_FEED_CLEAR = 0.8   # [design] vertical room for a nut to slide in
+
 BAR_FLANGE_Z0 = BAR_Z0      # flush with the bar's underside
 
 BAR_SCREW_X = 100.0   # [design] inboard of the rack slots. Its nut is

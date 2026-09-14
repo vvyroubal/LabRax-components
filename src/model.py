@@ -241,6 +241,26 @@ def faceplate(doc, dev, name):
     # choice would cut the pocket behind the nut instead of around it.
     last = sk.pocket(doc, bd, s, P.M6_HEX_D, reversed_=True)
 
+    # The flange follows the device's height, so a short device pulls it down
+    # into the path a nut must travel to reach its pocket -- on the Flex Mini
+    # it sat 1.58 mm into that path and the upper nuts could not be fitted at
+    # all. Cut it back where that happens. At x = +/-100 the flange is
+    # outboard of every device carried so far, so the relief costs nothing.
+    nut_top = P.BAR_SCREW_Z + P.M6_HEX_AF / 2.0
+    if dev.flange_z0 < nut_top + P.NUT_FEED_CLEAR:
+        hw = P.M6_HEX_AF / 3 ** 0.5 + 0.5      # across corners, plus room
+        s = sk.sketch(doc, bd, name + "_Sk_nutrelief",
+                      sk.plane(Vector(0, P.BAR_T, 0), sk.X, sk.Z))
+        for sx in (-1, 1):
+            sk.rect(s, sx * P.BAR_SCREW_X - hw, dev.flange_z0,
+                    sx * P.BAR_SCREW_X + hw, nut_top + P.NUT_FEED_CLEAR)
+        # Rearward, into the flange. On an X-Z plane a pocket's reversed_ is
+        # -Y -- the nut pockets above rely on that -- so this one is False,
+        # and it has to be stated: there is material both sides of this plane,
+        # so letting the direction be worked out would notch the front plate
+        # above the nut instead and leave the flange where it was.
+        sk.pocket(doc, bd, s, P.BAR_FLANGE_D, reversed_=False)
+
     if not front.fillet:
         return bd
 

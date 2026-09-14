@@ -468,6 +468,19 @@ def one_device(parts, bodies, dev):
             check(vol(asm.common(n)) < VOID,
                   "M6 nut seats clear of everything at x=%+7.2f z=%5.2f" % (x, z),
                   "%.3f mm3" % vol(asm.common(n)))
+            # Seating is not fitting. The nut goes in from the rear, so it has
+            # to travel the whole way to its pocket -- and the flange follows
+            # the device's height while this position does not, so on a short
+            # device the flange can sit squarely in that path. It did: the
+            # Flex Mini's upper nuts could not be fitted at all, and every
+            # check passed, because none of them swept the nut in.
+            feed = hexnut3(x, z, 10.0, P.BAR_NUT_Y0 + 0.05,
+                           P.BAR_T + P.BAR_FLANGE_D)
+            v = vol(asm.common(feed))
+            check(v < VOID,
+                  "and can be fed in from the rear at x=%+7.2f z=%5.2f" % (x, z),
+                  "%.3f mm3 in its way over the %.1f mm it travels"
+                  % (v, P.BAR_T + P.BAR_FLANGE_D - P.BAR_NUT_Y0))
             through = Part.makeCylinder(3.0, P.EAR_T + P.BAR_NUT_Y0 + 0.1,
                                         Vector(x, -P.EAR_T - 0.05, z),
                                         Vector(0, 1, 0))
