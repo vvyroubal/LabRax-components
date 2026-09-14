@@ -442,9 +442,18 @@ def one_device(parts, bodies, dev):
               "the opening lies within the case's face",
               "Z %.2f..%.2f inside %.2f..%.2f"
               % (z - h / 2, z + h / 2, dev.z0, dev.z1))
-        check(abs(z - P.RACK_U / 2.0) < 0.5,
-              "and is centred in the U, because it is what you look at",
-              "opening centre z=%.3f, U centre %.3f" % (z, P.RACK_U / 2.0))
+        # The CASE is what gets centred in the U -- that is the plinth's job,
+        # and it is what makes the front look right. The opening follows the
+        # ports, which need not be centred on the case: the Flex Mini's is
+        # 1 mm taller at the top because a centred one would not pass a plug.
+        check(abs((dev.z0 + dev.z1) / 2.0 - P.RACK_U / 2.0) < 0.05,
+              "the case is centred in the U, which is what you look at",
+              "case centre z=%.3f, U centre %.3f"
+              % ((dev.z0 + dev.z1) / 2.0, P.RACK_U / 2.0))
+        check(front.border_z >= 0.8 and front.border_z_top >= 0.8,
+              "the frame still overlaps the case top and bottom",
+              "%.2f mm below the opening, %.2f mm above"
+              % (front.border_z, front.border_z_top))
         # Nothing in front of the case except that border.
         face = box(-dev.w / 2, dev.w / 2, 0.0, dev.y0, dev.z0, dev.z1)
         held = vol(fp.common(face))
@@ -703,11 +712,24 @@ def one_device(parts, bodies, dev):
     # It has to be able to drop into the gap between the nib and the rear
     # stop, which means being shorter than it -- modelled flush, a printed
     # tray is an interference fit.
+    # Measured against the CHASSIS -- the faceplate in front, the sides' rear
+    # stops behind -- not against the device's own depth. It used to compare
+    # the tray with the device it was drawn around, which a tray always
+    # matches, so it passed on three trays that had 38, 27 and 12 mm of slack
+    # and slid about inside the bracket.
     edge = box(P.LEDGE_X0, P.TRAY_X1, -50, 400, P.LAP_T, P.TRAY_T)
-    got = trays.common(edge).BoundBox.YLength
-    gap = dev.y1 - dev.y0
+    strip = trays.common(edge).BoundBox
+    got = strip.YLength
+    gap = P.STOP_Y - P.LEDGE_Y0
     check(gap - got >= 0.3, "the tray drops into the gap it has to sit in",
           "%.2f mm long, %.2f mm gap, %.2f mm of fit" % (got, gap, gap - got))
+    check(gap - got <= P.TRAY_FIT + 0.2,
+          "and cannot walk fore and aft once it is in",
+          "%.2f mm of slack between the faceplate and the rear stops"
+          % (gap - got))
+    check(abs(strip.YMax - (P.LEDGE_Y1 - P.TRAY_FIT)) < 0.05,
+          "its ledge strip reaches back to the stops",
+          "ends at y %.2f, stops at %.1f" % (strip.YMax, P.STOP_Y))
 
     # Held fore and aft by the bottom bar and the rear stop, so it cannot walk.
     ahead = box(-P.TRAY_X1, P.TRAY_X1, dev.y0 - 1.0, dev.y0,

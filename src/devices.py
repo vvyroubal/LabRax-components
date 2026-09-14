@@ -58,19 +58,23 @@ class Frame(object):
 
     kind = "frame"
 
-    def __init__(self, border_x, border_z, fillet=0.0):
+    def __init__(self, border_x, border_z, border_z_top=None, fillet=0.0):
         self.border_x = border_x
+        # Top and bottom are separate because the ports are not centred on the
+        # case. The bottom edge is the one that matters -- it is what a plug's
+        # body has to clear -- so it stays put and the top edge moves.
         self.border_z = border_z
+        self.border_z_top = border_z if border_z_top is None else border_z_top
         self.fillet = fillet
 
     def w(self, dev):
         return dev.w - 2 * self.border_x
 
     def h(self, dev):
-        return dev.h - 2 * self.border_z
+        return dev.h - self.border_z - self.border_z_top
 
     def z(self, dev):
-        return (dev.z0 + dev.z1) / 2.0
+        return dev.z0 + self.border_z + self.h(dev) / 2.0
 
 
 class Device(object):
@@ -165,7 +169,11 @@ USW_FLEX_MINI = Device(
     w=117.1, d=90.0, h=21.2, mass_g=206,
     plinth=(P.RACK_U - 21.2) / 2.0 - P.TRAY_T,   # 5.625, centres it in the U
     keys_y=(20.0, 85.0),    # its tray is shorter, so the back pair comes in
-    front=Frame(border_x=4.0, border_z=1.85),
+    # The opening is 1 mm taller at the top than a centred one would be: with
+    # it centred, an RJ45 would not go in. The bottom edge is fixed -- that is
+    # the one a plug's body sits on -- so the extra millimetre comes off the
+    # top border, which drops from 1.85 to 0.85.
+    front=Frame(border_x=4.0, border_z=1.85, border_z_top=0.85),
 )
 
 # TP-Link TL-SG108E, eight gigabit ports on one long face, external 5 V brick.

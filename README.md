@@ -226,14 +226,25 @@ put that window wrong before the rule replaced them.
 8.8 mm shorter, and its ports are what you look at, so its tray carries a
 **5.625 mm plinth** that lifts the case until it is centred in the U — 22.225,
 which is the U's centre to three decimals — and **4 mm walls at x ±59.15** that
-hold it straight. Its faceplate is a **frame**: a 109.1 × 17.5 mm opening onto
-the ports, leaving a 4 mm border each side and 1.85 mm top and bottom.
+hold it straight. Its faceplate is a **frame**: a 109.1 × 18.5 mm opening onto
+the ports, leaving a 4 mm border each side, **1.85 mm below and 0.85 above**.
 
-That border is what retains it, and retention is absolute rather than
-frictional: a 117.1 × 21.2 case cannot pass a 109.1 × 17.5 hole. The **plug**
+**That opening is not centred on the case.** Centred, an RJ45 would not go in.
+The bottom edge — the one a plug's body sits on — stays put, and the extra
+millimetre comes off the top border. What is centred in the U is the **case**,
+which is the plinth's job and what makes the front look right.
+
+The border is what retains it, and retention is absolute rather than
+frictional: a 117.1 × 21.2 case cannot pass a 109.1 × 18.5 hole. The **plug**
 sets the height — an RJ45 with its latch needs about 16 mm on a case only
 21.2 mm tall — so `verify` sweeps a 12 × 16 mm plug envelope through the
 opening *and* the 8 mm of plate behind it to prove one fits.
+
+**Every tray reaches the rear stops**, whatever its device's depth. What
+locates a tray fore and aft is the strip riding the ledge — the faceplate in
+front of it, the sides' rear stops behind — so that strip runs back to
+y 136.6 on all of them. Without it the Flex Mini's tray slid **38 mm** inside
+the bracket, the TL-SG108E's 27 and the NUC's 12.
 
 ![the switch, assembled](images/assembly-usw-iso.png)
 

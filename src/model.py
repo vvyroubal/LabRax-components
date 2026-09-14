@@ -311,6 +311,20 @@ def tray(doc, dev, sx, name):
     sk.polygon(s, pts)
     sk.pad(doc, bd, s, rear - dev.y0, reversed_=True)
 
+    # --- the strip that reaches the rear stop -----------------------------
+    # The tray is located fore and aft by the faceplate in front and the
+    # sides' rear stops behind, and what reaches them is the strip riding the
+    # ledge, not the plate under the device. A tray shorter than the bay has
+    # to carry that strip back to the stop or it walks: the Flex Mini's had
+    # 38 mm of slack, the TL-SG108E's 27 and the NUC's 12. The gateway fills
+    # the bay already, so it grows nothing.
+    back = P.LEDGE_Y1 - P.TRAY_FIT
+    if rear < back - 1e-9:
+        s = sk.sketch(doc, bd, name + "_Sk_rails",
+                      sk.plane(Vector(0, rear, 0), sk.X, sk.Z))
+        sk.rect(s, sx * P.LEDGE_X0, P.LAP_T, sx * P.TRAY_X1, P.TRAY_T)
+        sk.pad(doc, bd, s, back - rear, reversed_=True)
+
     # Four pegs key the two halves to each other. There is no bolt: the one
     # that used to be here hung off a 10 x 3 mm neck and snapped off both
     # halves the first time it was tightened. The lap does the work -- 60 mm
