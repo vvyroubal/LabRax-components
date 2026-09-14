@@ -227,7 +227,9 @@ put that window wrong before the rule replaced them.
 **5.625 mm plinth** that lifts the case until it is centred in the U — 22.225,
 which is the U's centre to three decimals — and **4 mm walls at x ±59.15** that
 hold it straight. Its faceplate is a **frame**: a 109.1 × 18.5 mm opening onto
-the ports, leaving a 4 mm border each side, **1.85 mm below and 0.85 above**.
+the ports, leaving a 4 mm border each side, **1.85 mm below and 0.85 above**,
+with a **6 mm round-over on its front edge** — the same bezel the gateway's
+window has, leaving 2 mm of the 8 mm plate behind it.
 
 **That opening is not centred on the case.** Centred, an RJ45 would not go in.
 The bottom edge — the one a plug's body sits on — stays put, and the extra

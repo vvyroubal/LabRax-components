@@ -259,16 +259,25 @@ def faceplate(doc, dev, name):
         # and it has to be stated: there is material both sides of this plane,
         # so letting the direction be worked out would notch the front plate
         # above the nut instead and leave the flange where it was.
-        sk.pocket(doc, bd, s, P.BAR_FLANGE_D, reversed_=False)
+        last = sk.pocket(doc, bd, s, P.BAR_FLANGE_D, reversed_=False)
 
     if not front.fillet:
         return bd
 
-    # Round the window's front edge, so the opening reads as a bezel rather
-    # than a hole punched in a plate. Found geometrically: the four edges that
-    # lie on the front face within the window's own extent.
+    # Round the opening's front edge, so it reads as a bezel rather than a
+    # hole punched in a plate. Found geometrically: the four edges that lie on
+    # the front face within the opening's own extent -- two lines and two arcs
+    # for a window, four lines for a frame, four either way.
+    #
+    # Applied to the LAST feature, not to the pocket that cut the opening. A
+    # PartDesign dressup replaces the chain from its base onwards, so basing
+    # it on the window pocket drops everything after it: the flange, the screw
+    # holes and the nut pockets all disappear, and the body comes out 8 mm
+    # deep instead of 20 with nothing to bolt it on by.
     m = 0.2
-    w, h, z = front.w, front.h, front.z(dev)
+    w = front.w(dev) if callable(front.w) else front.w
+    h = front.h(dev) if callable(front.h) else front.h
+    z = front.z(dev)
     edges = sk.edges_on(last.Shape,
                         (-w / 2 - m, w / 2 + m),
                         (-m, m),

@@ -173,7 +173,9 @@ USW_FLEX_MINI = Device(
     # it centred, an RJ45 would not go in. The bottom edge is fixed -- that is
     # the one a plug's body sits on -- so the extra millimetre comes off the
     # top border, which drops from 1.85 to 0.85.
-    front=Frame(border_x=4.0, border_z=1.85, border_z_top=0.85),
+    # 6 mm round-over on the opening's front edge, the same bezel the
+    # gateway's window has. It leaves 2 mm of the 8 mm plate behind it.
+    front=Frame(border_x=4.0, border_z=1.85, border_z_top=0.85, fillet=6.0),
 )
 
 # TP-Link TL-SG108E, eight gigabit ports on one long face, external 5 V brick.

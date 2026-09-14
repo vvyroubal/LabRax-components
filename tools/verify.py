@@ -459,6 +459,22 @@ def one_device(parts, bodies, dev):
         held = vol(fp.common(face))
         check(held > 500.0, "the frame stands in front of the case all round",
               "%.0f mm3 of border over its face" % held)
+        if front.fillet:
+            # A round-over flares the opening at the front face. It has to
+            # stay inside the plate, and leave wall behind it.
+            r = front.fillet
+            check(z + h / 2 + r < P.RACK_U and z - h / 2 - r > 0.0,
+                  "the rounded rim stays inside the plate",
+                  "z %.2f..%.2f of 0..%.2f"
+                  % (z - h / 2 - r, z + h / 2 + r, P.RACK_U))
+            check(r < P.BAR_T, "the round leaves wall behind it",
+                  "%.1f mm radius in a %.1f mm plate, %.1f mm left"
+                  % (r, P.BAR_T, P.BAR_T - r))
+            # and it must not eat into the nut pockets beside it
+            check(w / 2 + r < P.BAR_SCREW_X - P.M6_HEX_AF / 2,
+                  "and stays clear of the faceplate's own nuts",
+                  "rim reaches x=%.2f, nut starts %.2f"
+                  % (w / 2 + r, P.BAR_SCREW_X - P.M6_HEX_AF / 2))
 
     ahead = box(-P.FACE_HW, P.FACE_HW, -P.EAR_T + 0.01, 0.0, 0.0, P.RACK_U)
     stray = [n for n in names
