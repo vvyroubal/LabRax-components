@@ -139,8 +139,14 @@ def slice_whole_files():
             continue
         out = tempfile.mkdtemp(prefix=".whole-", dir=ROOT)
         try:
+            # Slice a COPY. Bambu Studio writes back to the file it is given
+            # -- thumbnails, per-object meshes, slice_info, plate previews --
+            # which took a 96 kB export to 217 kB and left the working tree
+            # dirty every time these checks ran.
+            copy = os.path.join(out, os.path.basename(f))
+            shutil.copy2(f, copy)
             r = subprocess.run(SLICER + ["--arrange", "0", "--slice", "0",
-                                         "--outputdir", out, f],
+                                         "--outputdir", out, copy],
                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                timeout=1800)
             log = r.stdout.decode("utf-8", "replace")
