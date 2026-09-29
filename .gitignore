@@ -1,4 +1,4 @@
-cad/*.FCBak
+common/cad/*.FCBak
 __pycache__/
 *.pyc
 result.json
@@ -6,4 +6,4 @@ result.json
 .fem-*/
 # The FEM documents are 28 MB each and `make fem` rebuilds them in a few
 # minutes. Keeping them out of the history rather than out of reach.
-cad/fem_*.FCStd
+common/cad/fem_*.FCStd

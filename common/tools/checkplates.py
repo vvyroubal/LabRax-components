@@ -6,7 +6,7 @@ printed: support does not stay inside the part it holds up, and on the trays it
 reaches about 5 mm past the overhanging edge. The only way to know is to slice
 and read the toolpaths back.
 
-    python3 tools/checkplates.py
+    python3 common/tools/checkplates.py
 
 Each plate is written out as a one-plate project and sliced on its own, because
 Bambu Studio's CLI will not slice a project with more than two plates. Extents
@@ -26,8 +26,8 @@ import subprocess
 import sys
 import tempfile
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, "tools"))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.join(ROOT, "common", "tools"))
 
 import plate  # noqa: E402
 
@@ -133,7 +133,7 @@ def slice_whole_files():
     print("\nthe exported files, sliced whole")
     bad = []
     for kit in plate.KITS:
-        f = os.path.join(ROOT, "export", "3mf", kit["out"])
+        f = plate.kit_path(kit)
         if not os.path.exists(f):
             bad.append("%s missing -- run make plate" % kit["out"])
             continue

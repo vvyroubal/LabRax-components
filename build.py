@@ -1,5 +1,7 @@
 #!/usr/bin/env freecadcmd
-"""Build the bracket: cad/UCG_Fiber_LabRax.FCStd plus STL and STEP.
+"""Build the bracket: common/cad/UCG_Fiber_LabRax.FCStd plus STL and STEP.
+
+The chassis STLs go to common/stl, each device's to its own folder's stl/.
 
 Each part is a PartDesign Body made of sketches with pads and pockets, so the
 document opens as something you can edit feature by feature.
@@ -22,7 +24,7 @@ if not ROOT:
         ROOT = os.path.dirname(os.path.abspath(__file__))
     except NameError:
         ROOT = os.getcwd()
-sys.path.insert(0, os.path.join(ROOT, "src"))
+sys.path.insert(0, os.path.join(ROOT, "common", "src"))
 
 import FreeCAD as App  # noqa: E402
 import Mesh  # noqa: E402,F401
@@ -35,17 +37,16 @@ import devices  # noqa: E402
 
 DOC = "UCG_Fiber_LabRax"
 
-# Four shared, then three per device. Listed this way so adding a device to
-# devices.py is the whole change -- nothing here has to be edited with it.
-CHASSIS = ("side_l", "side_r", "leg_l", "leg_r")
-PARTS = CHASSIS + tuple(
-    d.part(b) for d in devices.ALL
-    for b in ("tray_l", "tray_r", "faceplate"))
+# Four shared, then three per device. Listed this way so adding a device's
+# folder is the whole change -- nothing here has to be edited with it.
+PARTS = devices.CHASSIS + tuple(p for d in devices.ALL for p in d.parts)
 
 
 def main():
-    for sub in ("cad", "export/stl", "export/step"):
-        os.makedirs(os.path.join(ROOT, sub), exist_ok=True)
+    for sub in ("cad", "stl", "step"):
+        os.makedirs(os.path.join(devices.COMMON, sub), exist_ok=True)
+    for dev in devices.ALL:
+        os.makedirs(dev.stl_dir, exist_ok=True)
 
     doc = App.newDocument(DOC)
     bodies = model.build(doc)
@@ -56,15 +57,15 @@ def main():
     if bad:
         print("NOT A SINGLE VALID SOLID: %s" % ", ".join(bad))
 
-    doc.saveAs(os.path.join(ROOT, "cad", DOC + ".FCStd"))
+    doc.saveAs(os.path.join(devices.COMMON, "cad", DOC + ".FCStd"))
 
     for name in PARTS:
         mesh = MeshPart.meshFromShape(Shape=bodies[name].Shape,
                                       LinearDeflection=0.02,
                                       AngularDeflection=0.25, Relative=False)
-        mesh.write(os.path.join(ROOT, "export", "stl", name + ".stl"))
+        mesh.write(devices.stl_path(name))
     Part.export([bodies[n] for n in PARTS],
-                os.path.join(ROOT, "export", "step", DOC + ".step"))
+                os.path.join(devices.COMMON, "step", DOC + ".step"))
 
     print("\n%-16s %-34s %12s %8s" % ("part", "bounding box (mm)",
                                        "volume (cm3)", "features"))

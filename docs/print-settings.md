@@ -3,7 +3,7 @@
 Sliced for a **Bambu Lab A1 mini** (180 × 180 × 180).
 
 ```sh
-make plate      # export/3mf/UCG_Fiber_LabRax-A1mini.3mf
+make plate      # one 3MF in each device's folder
 ```
 
 That file is a full Bambu Studio project: five plates, parts rotated into the
@@ -27,7 +27,7 @@ returns `Success` with no warnings.
 
 Fitting the bed is not the same as printing inside it: support does not stay
 within the part it holds up, and on the trays it reaches about 5 mm past the
-overhanging edge. `tools/plate.py` only knows where the parts sit.
+overhanging edge. `common/tools/plate.py` only knows where the parts sit.
 
 ```sh
 make plates     # slices all five and measures the toolpaths
@@ -90,7 +90,7 @@ tightest dimension in the design, and a printed rack's post spacing varies.
 
 ## Fit adjustment
 
-Everything is in `src/params.py`; rebuild with `make`.
+Everything is in `common/src/params.py`; rebuild with `make`.
 
 | symptom | change |
 |---|---|
@@ -117,8 +117,8 @@ Three things bite, none of which say what they mean:
 - **"The 3mf file has invalid config, load geometry data only"** — the file is
   not a project. Bambu Studio keeps the meshes and throws the plates and the
   per-object settings away. It wants a complete
-  `Metadata/project_settings.config`; `tools/a1mini_project.json` is one, and
-  `tools/plate.py` embeds it.
+  `Metadata/project_settings.config`; `common/tools/a1mini_project.json` is one, and
+  `common/tools/plate.py` embeds it.
 - **"G-code conflicts detected after slicing"** — either a prime tower has
   landed on a part, or two parts' 5 mm brims have run into each other. The
   project is cut to a single PETG slot with the tower off, and the plater
@@ -126,7 +126,7 @@ Three things bite, none of which say what they mean:
 - **"One of the plate is empty…"** or **"some objects are located over the
   boundary of the heated bed"** — the plate grid. Plates sit two to a row,
   216 mm apart; land outside it and parts are silently dropped or measured
-  against the wrong origin. See `plate_origin()` in `tools/plate.py`.
+  against the wrong origin. See `plate_origin()` in `common/tools/plate.py`.
 
 The CLI will not slice a project with more than two plates. To check the
 geometry, build a one-plate file per plate and slice those, which is what was

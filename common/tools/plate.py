@@ -4,7 +4,7 @@
 The bracket needs two plates: the tray fills a 180 mm bed almost exactly on
 its own, and everything else goes on the second.
 
-    python3 tools/plate.py        # writes export/3mf/UCG_Fiber_LabRax-A1mini.3mf
+    python3 common/tools/plate.py  # writes one 3MF into each device's folder
 
 Meshes are centred on their own origin and the build transform carries the
 placement, which is Bambu Studio's own convention. See plate_origin() for how
@@ -25,14 +25,16 @@ import zipfile
 
 import numpy as np
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STL = os.path.join(ROOT, "export", "stl")
-OUT = os.path.join(ROOT, "export", "3mf", "UCG_Fiber_LabRax-A1mini.3mf")
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.join(ROOT, "common", "src"))
+import devices  # noqa: E402
+
+OUT = os.path.join(ROOT, "ucg-fiber", "UCG_Fiber_LabRax-A1mini.3mf")
 # A complete A1 mini configuration, lifted from the stock Lab Rax rack project.
 # Without a valid one of these Bambu Studio refuses the whole config -- "The
 # 3mf file has invalid config, load geometry data only" -- and throws away the
 # plates and the per-object settings along with it.
-PROJECT_SETTINGS = os.path.join(ROOT, "tools", "a1mini_project.json")
+PROJECT_SETTINGS = os.path.join(ROOT, "common", "tools", "a1mini_project.json")
 
 BED = 180.0           # A1 mini, and there are no excluded areas on it
 PLATE_STRIDE = 216.0  # see plate_origin()
@@ -44,7 +46,7 @@ MARGIN = 4.0
 # Support does not stay inside the part it holds up -- on the trays it reaches
 # about 5 mm past the overhanging edge -- and which edge that is cannot be
 # known without slicing. This margin bounds the part itself; what actually
-# gets printed is measured by tools/checkplates.py.
+# gets printed is measured by common/tools/checkplates.py.
 # Parts get a 5 mm brim each, and two brims that run into one another make
 # Bambu Studio report "G-code conflicts detected after slicing".
 GAP = 12.0
@@ -87,6 +89,7 @@ CHASSIS_PLATES = [
 # it as a 12 mm shelf hanging over nothing.
 KITS = [
     {
+        "key": "ucg",
         "out": "UCG_Fiber_LabRax-A1mini.3mf",
         "title": "UCG-Fiber in a Lab Rax 10 inch rack",
         "plates": [
@@ -100,6 +103,7 @@ KITS = [
         ],
     },
     {
+        "key": "usw",
         "out": "USW_Flex_LabRax-A1mini.3mf",
         "title": "USW-Flex-2.5G-5 in a Lab Rax 10 inch rack",
         "plates": [
@@ -113,6 +117,7 @@ KITS = [
         ],
     },
     {
+        "key": "sg108e",
         "out": "TL_SG108E_LabRax-A1mini.3mf",
         "title": "TL-SG108E in a Lab Rax 10 inch rack",
         "plates": [
@@ -126,6 +131,7 @@ KITS = [
         ],
     },
     {
+        "key": "nuc",
         "out": "NUC6i7KYK_LabRax-A1mini.3mf",
         "title": "Intel NUC6i7KYK in a Lab Rax 10 inch rack",
         "plates": [
@@ -266,7 +272,7 @@ def build():
         instances = []
         placed = []   # (name, x0, x1, y0, y1) already put on this plate
         for name, (cx, cy), ops, opts in parts:
-            path = os.path.join(STL, name + ".stl")
+            path = devices.stl_path(name)
             if not os.path.exists(path):
                 problems.append("%s: no STL, run make first" % name)
                 continue
@@ -404,13 +410,18 @@ def build():
     return 0
 
 
+def kit_path(kit):
+    """A kit's 3MF lives in its device's folder, beside that device's STLs."""
+    return os.path.join(devices.BY_KEY[kit["key"]].dir, kit["out"])
+
+
 def main():
     """Write one 3MF per device, each carrying the chassis as well."""
     global PLATES, OUT, TITLE
     rc = 0
     for kit in KITS:
         PLATES = CHASSIS_PLATES + kit["plates"]
-        OUT = os.path.join(ROOT, "export", "3mf", kit["out"])
+        OUT = kit_path(kit)
         TITLE = kit["title"]
         rc |= build()
         print("")

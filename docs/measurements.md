@@ -1,14 +1,14 @@
 # Where the numbers came from
 
 The Lab Rax documentation quotes rounded figures ("222 mm between posts"), and
-the rack is itself a 3D print, so the interface dimensions in `src/params.py`
+the rack is itself a 3D print, so the interface dimensions in `common/src/params.py`
 were measured off the shipped models instead. This records what was measured
 and how, so it can be re-checked against a newer release of the rack.
 
 Reproduce with:
 
 ```sh
-python3 tools/measure_rack.py <object.model|part.stl>
+python3 common/tools/measure_rack.py <object.model|part.stl>
 ```
 
 Holes are found by collecting triangles whose normal is perpendicular to a
@@ -33,7 +33,7 @@ Unpack the 3MF and point the tool at `3D/Objects/object_81.model`:
 
 ```sh
 unzip -q ../5U+Lab+Rax+Bolt+Together-A1Mini.3mf -d /tmp/labrax
-python3 tools/measure_rack.py /tmp/labrax/3D/Objects/object_81.model
+python3 common/tools/measure_rack.py /tmp/labrax/3D/Objects/object_81.model
 ```
 
 ## Vertical hole spacing — EIA-310
@@ -74,7 +74,7 @@ Taken from `Side Panel Half.stl`, which spans the frame front to back and
 measures 175.9 mm. It is the one interface number here that has **not** been
 confirmed against an assembled rack: the 3MF is a print plate, so there is no
 assembled geometry to measure and no rear-post placement to read. The rear
-ears land on this figure; `RACK_D` in `src/params.py` is the single place to
+ears land on this figure; `RACK_D` in `common/src/params.py` is the single place to
 change it.
 
 ## Faceplate envelope — 254 × 44.45 mm
@@ -105,7 +105,7 @@ Both tabs snapped off when their M6 was tightened. A CalculiX study meshed the
 rear of each tray half and loaded the fastener where it actually bears. The
 tool and the saved analyses are not in the working tree any more — the tab
 they studied no longer exists — but they are in the history at commit
-`581951b`, and `git show 581951b:tools/fem.py > tools/fem.py` brings the study
+`581951b`, and `git show 581951b:tools/fem.py > common/tools/fem.py` brings the study
 back if another part ever needs one.
 
 | | tray_l | tray_r |

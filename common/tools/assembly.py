@@ -29,10 +29,10 @@ except Exception:
 ROOT = os.environ.get("UCG_ROOT")
 if not ROOT:
     try:
-        ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     except NameError:
         ROOT = os.getcwd()
-sys.path.insert(0, os.path.join(ROOT, "src"))
+sys.path.insert(0, os.path.join(ROOT, "common", "src"))
 
 import FreeCAD as App  # noqa: E402
 import Part  # noqa: E402

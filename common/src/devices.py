@@ -1,5 +1,11 @@
 """The devices this bracket carries, and the two parts that differ per device.
 
+Each device has a folder of its own at the top of the project -- ucg-fiber/,
+usw-flex-mini/ and so on -- holding its profile in device.py and everything
+made for it: its tray and faceplate STLs, its 3MF, its renders. The chassis,
+and the code, are in common/. This module holds the classes a profile is
+written with, loads the profiles, and says where each part's files go.
+
 The chassis -- side_l, side_r, leg_l, leg_r -- is sized by the RACK and knows
 nothing about what goes in it. Only the tray pair and the faceplate are drawn
 around a device, so a second device costs three prints, not seven.
@@ -18,6 +24,9 @@ Everything else -- where the case starts, where its lip goes, how high the
 faceplate's flange sits -- is derived from those, so a new device is a dozen
 numbers rather than a new set of drawings.
 """
+
+import importlib.util
+import os
 
 import params as P
 
@@ -145,89 +154,60 @@ class Device(object):
             return "%s_%s%s" % (base[:-2], self.key, base[-2:])
         return "%s_%s" % (base, self.key)
 
+    # --- where its files go -------------------------------------------------
+    # `dir` is the device's own folder, set when its device.py is loaded.
+    @property
+    def parts(self):
+        """The three prints drawn around this device."""
+        return tuple(self.part(b) for b in ("tray_l", "tray_r", "faceplate"))
 
-# The gateway this bracket was drawn for. Fanless: it vents underneath and on
-# both sides, and its display faces the rack front while the ports face back.
-UCG_FIBER = Device(
-    key="ucg", name="UCG-Fiber",
-    w=212.8, d=127.6, h=30.0, mass_g=734,
-    plinth=0.0,
-    keys_y=(20.0, 116.0),   # one pair inside the front edge, one near the back
-    front=Window(w=22.5, h=11.0, top_gap=7.0, fillet=6.0,
-                 disp_w=21.0, disp_h=10.0),
-)
+    @property
+    def stl_dir(self):
+        return os.path.join(self.dir, "stl")
 
-# UniFi Flex Mini 2.5G, five 2.5 GbE ports on one long face, USB-C powered.
-# 117.1 x 90 x 21.2, from techspecs.ui.com/unifi/switching/usw-flex-2-5g-5.
-#
-# It is 96.9 mm narrower than the bay, so its tray carries walls. It is also
-# 8.8 mm shorter, and its ports are what you look at, so the plinth lifts it
-# until the case is centred in the U rather than sitting on the floor with
-# 17 mm of blank plate above it.
-USW_FLEX_MINI = Device(
-    key="usw", name="USW-Flex-2.5G-5",
-    w=117.1, d=90.0, h=21.2, mass_g=206,
-    plinth=(P.RACK_U - 21.2) / 2.0 - P.TRAY_T,   # 5.625, centres it in the U
-    keys_y=(20.0, 85.0),    # its tray is shorter, so the back pair comes in
-    # The opening is 1 mm taller at the top than a centred one would be: with
-    # it centred, an RJ45 would not go in. The bottom edge is fixed -- that is
-    # the one a plug's body sits on -- so the extra millimetre comes off the
-    # top border, which drops from 1.85 to 0.85.
-    # 6 mm round-over on the opening's front edge, the same bezel the
-    # gateway's window has. It leaves 2 mm of the 8 mm plate behind it.
-    front=Frame(border_x=4.0, border_z=1.85, border_z_top=0.85, fillet=6.0),
-)
+    @property
+    def images_dir(self):
+        return os.path.join(self.dir, "images")
 
-# TP-Link TL-SG108E, eight gigabit ports on one long face, external 5 V brick.
-# 158 x 101 x 25, from tp-link.com/us/business-networking/soho-switch-easy-
-# smart/tl-sg108e. TP-Link do not publish a weight; 250 g is a guess, and it
-# only feeds the load checks, where the UCG-Fiber's 734 g is the tested case.
-#
-# Ports face front like the Flex Mini, so it gets a Frame. It is 25 mm tall
-# rather than 21.2, which buys a real border: 4 mm all round still leaves a
-# 17 mm opening, comfortably over the 16 an RJ45 plug with its latch needs.
-#
-# Its power jack is on the BACK. The tray's rear lip stands 3 mm above the
-# case floor, well under any barrel jack, and verify measures that nothing
-# else is behind the case above that line.
-TL_SG108E = Device(
-    key="sg108e", name="TL-SG108E",
-    w=158.0, d=101.0, h=25.0, mass_g=250,
-    plinth=(P.RACK_U - 25.0) / 2.0 - P.TRAY_T,   # 3.725, centres it in the U
-    keys_y=(20.0, 95.0),
-    front=Frame(border_x=4.0, border_z=4.0),
-)
 
-# Intel NUC6i7KYK, "Skull Canyon". 211 x 116 x 28 and 45 W, from intel.com.
-# Intel do not publish a weight; 700 g is a guess and only feeds the load
-# checks, where the gateway's 734 g is the tested case.
-#
-# At 211 mm it is the second device to fill the bay: the sides' own rails hold
-# it, so its tray needs no walls. The 3 mm it leaves across the bay is the
-# clearance, not the 1.2 the others use, so it says so rather than letting the
-# check go looking for a number that is not there.
-#
-# It is the first device here that is not passive. A 45 W part with a blower
-# takes its air in through the underside, and the tray sits flat against it,
-# so this tray is slotted -- see vent=True and VENT_* in params.
-#
-# Ports are on BOTH long faces: two USB 3.0 and the audio jack at the front,
-# and everything else -- Thunderbolt 3, HDMI, two mini-DP, Ethernet, two more
-# USB, the power inlet -- at the back. The frame shows the front pair; the
-# back is open to the rear of the rack as it is for every device here.
-#
-# The frame's border cannot be the 4 mm the other switches use: at 211 mm wide
-# a 4 mm border would put the opening at x = +/-101.5, straight through the
-# faceplate's own M6 nut pockets at +/-100. 16 mm keeps it 5.5 mm clear.
-NUC6I7KYK = Device(
-    key="nuc", name="NUC6i7KYK",
-    w=211.0, d=116.0, h=28.0, mass_g=700,
-    plinth=(P.RACK_U - 28.0) / 2.0 - P.TRAY_T,   # 2.225, centres it in the U
-    keys_y=(20.0, 110.0),
-    vent=True,
-    clr_w=3.0,
-    front=Frame(border_x=16.0, border_z=5.0),
-)
+# ------------------------------------------------------------------ layout --
+# common/src/devices.py -> the project root, unless the caller says otherwise.
+ROOT = os.environ.get("UCG_ROOT") or os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+COMMON = os.path.join(ROOT, "common")
 
-ALL = (UCG_FIBER, USW_FLEX_MINI, TL_SG108E, NUC6I7KYK)
+# The four parts every device shares. They are sized by the rack, not by a
+# device, so they live in common/.
+CHASSIS = ("side_l", "side_r", "leg_l", "leg_r")
+
+# One folder per device, in the order they are built and reported. Adding a
+# device is a folder with a device.py in it, and its name here.
+DIRS = ("ucg-fiber", "usw-flex-mini", "tl-sg108e", "nuc6i7kyk")
+
+
+def _load(folder):
+    path = os.path.join(ROOT, folder, "device.py")
+    spec = importlib.util.spec_from_file_location(
+        "device_" + folder.replace("-", "_"), path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    mod.DEVICE.dir = os.path.join(ROOT, folder)
+    return mod.DEVICE
+
+
+ALL = tuple(_load(f) for f in DIRS)
 BY_KEY = dict((d.key, d) for d in ALL)
+
+
+def stl_dir(part):
+    """Where a part's STL goes: common/stl for the chassis, else its device's."""
+    if part in CHASSIS:
+        return os.path.join(COMMON, "stl")
+    for dev in ALL:
+        if part in dev.parts:
+            return dev.stl_dir
+    raise KeyError("no device makes %r" % part)
+
+
+def stl_path(part):
+    return os.path.join(stl_dir(part), part + ".stl")

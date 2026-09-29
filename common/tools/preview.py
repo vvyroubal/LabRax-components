@@ -5,7 +5,7 @@ FreeCAD runs headless here, so there is no GUI to take a screenshot from.
 This projects the meshes itself -- triangles sorted back-to-front and filled
 with a shade taken from the face normal, which is enough to read the shape.
 
-    python3 tools/preview.py            # writes images/*.png
+    python3 common/tools/preview.py     # writes <device>/images/*.png
 """
 
 import os
@@ -14,10 +14,8 @@ import sys
 
 import numpy as np
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STL = os.path.join(ROOT, "export", "stl")
-sys.path.insert(0, os.path.join(ROOT, "src"))
-OUT = os.path.join(ROOT, "images")
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.join(ROOT, "common", "src"))
 
 # part -> fill hue, so the pieces stay distinguishable in the assembly views
 COLOUR = {
@@ -159,37 +157,27 @@ def render(tris_by_part, right, up, path, width=1100, pad=18, ss=2):
 
 
 def main():
-    os.makedirs(OUT, exist_ok=True)
     import devices
-    chassis = ("side_l", "side_r", "leg_l", "leg_r")
     made = 0
     VIEWS["iso"] = iso_basis()
     # One set of views per device: the chassis, plus that device's own parts.
     for dev in devices.ALL:
         parts = {}
-        for name in chassis + (dev.part("tray_l"), dev.part("tray_r"),
-                               dev.part("faceplate")):
-            p = os.path.join(STL, name + ".stl")
+        for name in devices.CHASSIS + dev.parts:
+            p = devices.stl_path(name)
             if os.path.exists(p):
                 parts[name] = load_stl(p)
         if not parts:
             continue
         made += 1
+        os.makedirs(dev.images_dir, exist_ok=True)
         for view, (right, up) in VIEWS.items():
-            f = os.path.join(OUT, "assembly-%s-%s.png" % (dev.key, view))
+            f = os.path.join(dev.images_dir, "assembly-%s-%s.png" % (dev.key, view))
             w, h = render(parts, right, up, f)
-            print("%-32s %d x %d" % (os.path.relpath(f, ROOT), w, h))
+            print("%-40s %d x %d" % (os.path.relpath(f, ROOT), w, h))
     if not made:
-        print("no STLs in %s -- run make first" % STL)
+        print("no STLs found -- run make first")
         return 1
-    parts = {}
-
-    # the two big parts on their own, in the orientation they are printed
-    for name in ("tray", "ear_r"):
-        if name in parts:
-            f = os.path.join(OUT, "part-%s.png" % name)
-            render({name: parts[name]}, *iso_basis(), path=f, width=700)
-            print("%-28s" % os.path.relpath(f, ROOT))
     return 0
 
 
