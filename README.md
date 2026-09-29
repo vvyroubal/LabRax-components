@@ -5,6 +5,9 @@
 **1U brackets for a [Lab Rax 10" rack](https://makerworld.com/en/models/1464819-lab-rax-10-server-rack-bolted-version-5u),
 bolted to the front *and* rear posts.**
 
+Lab Rax itself — the racks, panels and the rest of the system these brackets
+fit into — is the [Lab Rax collection on MakerWorld](https://makerworld.com/en/collections/5813742-lab-rax).
+
 ## What you can mount
 
 Four devices are modelled and checked today:
