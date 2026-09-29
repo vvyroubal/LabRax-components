@@ -1,6 +1,6 @@
 # Lab Rax 1U device brackets
 
-*(repo `LabRax-components`; it began as a bracket for the UCG-Fiber)*
+*someone might find it useful :-)*
 
 **1U brackets for a [Lab Rax 10" rack](https://makerworld.com/en/models/1464819-lab-rax-10-server-rack-bolted-version-5u),
 bolted to the front *and* rear posts.**
