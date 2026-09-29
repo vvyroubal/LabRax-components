@@ -391,3 +391,8 @@ Six plates in each device's 3MF, grouped as kits:
 Print the chassis once and then the kit for whatever you are racking: about
 259 g for the gateway, 245 g for the switch. Full details, and what survives
 from an earlier print, in [docs/bom.md](docs/bom.md).
+
+## License
+
+MIT; see [LICENSE](LICENSE). Lab Rax itself is not part of this repository
+and is published under its own terms on MakerWorld.
