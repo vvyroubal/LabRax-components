@@ -105,7 +105,7 @@ Both tabs snapped off when their M6 was tightened. A CalculiX study meshed the
 rear of each tray half and loaded the fastener where it actually bears. The
 tool and the saved analyses are not in the working tree any more — the tab
 they studied no longer exists — but they are in the history at commit
-`581951b`, and `git show 581951b:tools/fem.py > common/tools/fem.py` brings the study
+`46ebed8`, and `git show 46ebed8:tools/fem.py > common/tools/fem.py` brings the study
 back if another part ever needs one.
 
 | | tray_l | tray_r |

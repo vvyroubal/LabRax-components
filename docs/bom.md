@@ -68,7 +68,7 @@ the per-part support and brim settings — see
 
 **The sides are the only parts that have not changed.** `side_l` and `side_r`
 are still byte-identical to the STLs published with "One faceplate instead of
-two bars" (`50ea387`). If yours came from that version or later, reprint the
+two bars" (`94dc0ed`). If yours came from that version or later, reprint the
 two trays, the two legs and the faceplate — about 188 g and 7 h 14. Only the
 two sides carry over.
 
@@ -79,7 +79,7 @@ anything already quoted against them still means the same thing.
 
 | part | verdict |
 |---|---|
-| `side_l`, `side_r` | **keep**, if printed since `50ea387` |
+| `side_l`, `side_r` | **keep**, if printed since `94dc0ed` |
 | `leg_l`, `leg_r` | **reprint, both** — 11 mm shorter, and slotted so the splice adjusts twice as far |
 | `faceplate` | **reprint** — the oval moves up: its top edge now sits 7.0 mm below the top bar |
 | `tray_l`, `tray_r` | **reprint, both** — centre bolt tab deleted, four pegs instead of two, rear lip added |
