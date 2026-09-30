@@ -8,6 +8,13 @@ bolted to the front *and* rear posts.**
 Lab Rax itself — the racks, panels and the rest of the system these brackets
 fit into — is the [Lab Rax collection on MakerWorld](https://makerworld.com/en/collections/5813742-lab-rax).
 
+**Everything prints on a Bambu Lab A1 mini** — its 180 × 180 × 180 mm bed is
+the design limit for every part. Anything wider than the bed is split (the
+tray, in lapped halves) or turned to fit (the sides at 45°, the faceplate on
+edge), and each device's 3MF comes already plated for the A1 mini. `make
+verify` checks every part against the bed, and `make plates` slices every
+plate to prove the toolpaths fit too.
+
 ## What you can mount
 
 Four devices are modelled and checked today:
