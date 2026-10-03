@@ -3,7 +3,7 @@
 
 verify.py walks the parts and the stack-up arithmetic. This does something
 different and less forgiving: it puts a solid M6 x 12 screw and a solid M6 nut
-at every one of the twenty-two fastener positions and asks whether they fit
+at every one of the sixteen fastener positions and asks whether they fit
 the geometry that was actually built. Arithmetic can agree with itself while
 the hole is somewhere else entirely.
 
@@ -153,12 +153,8 @@ def fasteners():
                 "%s x%+.0f" % (tag, sx * P.BAR_SCREW_X),
                 (sx * P.BAR_SCREW_X, -P.EAR_T + P.BAR_CB_D, z), (0, 1, 0),
                 nut_at=P.EAR_T - P.BAR_CB_D + P.BAR_NUT_Y0, sunk=P.BAR_CB_D))
-    for sx in (-1, 1):
-        for y in P.SPLICE_BOLT_Y:
-            out.append(Fastener(
-                "splice x%+.0f y%.0f" % (sx * P.BODY_HW, y),
-                (sx * P.BODY_HW, y, P.SPLICE_BOLT_Z), (-sx, 0, 0),
-                nut_at=P.RAIL_T + P.SPLICE_BOSS_T - P.M6_HEX_D, washer=True))
+    # The sides and the rear legs take no screw: the leg is a runner the
+    # side slides into. See RUN_* in params.
     return out
 
 

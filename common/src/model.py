@@ -3,10 +3,10 @@
 Seven printed parts:
 
     side_l, side_r      front ear, side rail, the ledge the tray lands on,
-                        and the rear stop
+                        the rear stop, and the tongue the leg rides on
     leg_l, leg_r        the rear legs, which reach the back posts and carry
-                        the rear ears. Spliced to the sides through slots, so
-                        the rack's depth is set by sliding them
+                        the rear ears. Each is a runner: the side slides into
+                        it from the front, so the rack's depth sets itself
     tray_l, tray_r      the floor the device stands on, lapped on the
                         centreline
     faceplate           the front, in one piece, with a window for the
@@ -14,10 +14,14 @@ Seven printed parts:
 
 The bracket bolts to all four rack posts. Every rack screw is an M6 driven
 from outside the rack inwards into the hex nut the post already holds, so the
-ears only carry clearance slots. The top bar is bolted on last, from the
-front, through the ear and into a nut trapped in the bar with its pocket
-facing rear; the bar nests into a notch in the side so that the ear and the
-rail still meet below it.
+ears only carry clearance slots.
+
+It goes together in two stages. The legs are bolted to the rear posts, from
+behind. The sides, the faceplate, the tray and the device are put together on
+the bench -- four M6 through the ears into nuts slid into the ends of the
+faceplate -- and that goes into the rack from the front as one piece, each
+side's tongue running into its leg's groove, until the ears meet the posts.
+No screw in the bracket has to be reached from inside the rack.
 """
 
 import FreeCAD as App
@@ -39,6 +43,74 @@ def _ear_outline(sx):
             (sx * P.EAR_X0, P.RACK_U)]
 
 
+def _tongue(doc, bd, name, sx, y0, y1):
+    """The dovetail a rear leg rides on, along the inner face of a rail.
+
+    Narrow where it leaves the rail and wider at its tip, with both flanks at
+    45 degrees: the leg's groove cannot lift off it, drop off it or pull away
+    from it, and can only slide along it.
+    """
+    x, d, zc = P.POCKET_HW, P.RUN_D, P.RUN_Z
+    r, t = P.RUN_ROOT / 2.0, P.RUN_TIP / 2.0
+    s = sk.sketch(doc, bd, name + "_Sk_runner",
+                  sk.plane(Vector(0, y0, 0), sk.X, sk.Z))
+    # Rooted half a millimetre inside the rail, so the two are one solid
+    # rather than two that happen to share a face.
+    sk.polygon(s, [(sx * (x + 0.5), zc - r), (sx * x, zc - r),
+                   (sx * (x - d), zc - t), (sx * (x - d), zc + t),
+                   (sx * x, zc + r), (sx * (x + 0.5), zc + r)])
+    return sk.pad(doc, bd, s, y1 - y0, reversed_=True)
+
+
+def _runner(doc, bd, name, sx, y0, y1, y_end):
+    """The grooved length of a rear leg: plate, block, and the groove in it.
+
+    The plate stands RUN_FIT off the rail's inner face and the groove is the
+    tongue's outline grown by the same amount, so every face has that much
+    room. Its first few millimetres are opened out further, and the plate's
+    outer face cut back with them, so a tongue arriving a little high, low or
+    wide is steered in rather than stopped.
+    """
+    inward = sx > 0
+    fit, zc = P.RUN_FIT, P.RUN_Z
+    xo = P.POCKET_HW - fit                 # the leg's outer face
+    h = P.RUN_TIP / 2.0 + P.RUN_JAW        # the block's half-height
+
+    s = sk.sketch(doc, bd, name + "_Sk_plate",
+                  sk.plane(Vector(sx * xo, 0, 0), sk.Y, sk.Z))
+    sk.rect(s, y0, 0.0, y1, P.RAIL_TOP)
+    sk.pad(doc, bd, s, P.LEG_T, reversed_=inward)
+
+    s = sk.sketch(doc, bd, name + "_Sk_block",
+                  sk.plane(Vector(sx * xo, 0, 0), sk.Y, sk.Z))
+    sk.rect(s, y0, zc - h, y1, zc + h)
+    sk.pad(doc, bd, s, P.RUN_D + P.RUN_BACK, reversed_=inward)
+
+    def half(x, grow):
+        # The tongue's flank, moved RUN_FIT along its own normal.
+        return (P.RUN_ROOT / 2.0 + fit * 2 ** 0.5 + (P.POCKET_HW - x) + grow)
+
+    xe = xo + 0.5                          # past the face, into the air
+
+    g = P.RUN_MOUTH_FIT
+    xr, xf = xo - g, xo - P.RUN_D - g
+    s = sk.sketch(doc, bd, name + "_Sk_mouth",
+                  sk.plane(Vector(0, y0, 0), sk.X, sk.Z))
+    sk.polygon(s, [(sx * xe, -1.0), (sx * xe, P.RAIL_TOP + 1.0),
+                   (sx * xr, P.RAIL_TOP + 1.0), (sx * xr, zc + half(xr, g)),
+                   (sx * xf, zc + half(xf, g)), (sx * xf, zc - half(xf, g)),
+                   (sx * xr, zc - half(xr, g)), (sx * xr, -1.0)])
+    # Rearward, and said so: see the note on directions in faceplate().
+    sk.pocket(doc, bd, s, P.RUN_MOUTH, reversed_=False)
+
+    xf = xo - P.RUN_D
+    s = sk.sketch(doc, bd, name + "_Sk_groove",
+                  sk.plane(Vector(0, y0, 0), sk.X, sk.Z))
+    sk.polygon(s, [(sx * xe, zc - half(xe, 0.0)), (sx * xf, zc - half(xf, 0.0)),
+                   (sx * xf, zc + half(xf, 0.0)), (sx * xe, zc + half(xe, 0.0))])
+    return sk.pocket(doc, bd, s, y_end - y0, reversed_=False)
+
+
 def side(doc, sx, name):
     """One side of the bracket, front ear through to rear ear."""
     bd = sk.body(doc, name)
@@ -47,7 +119,7 @@ def side(doc, sx, name):
     # --- the rail that spans front to back -------------------------------
     s = sk.sketch(doc, bd, name + "_Sk_rail",
                   sk.plane(Vector(sx * P.POCKET_HW, 0, 0), sk.Y, sk.Z))
-    sk.rect(s, 0.0, 0.0, P.SPLICE_Y1, P.RAIL_TOP)
+    sk.rect(s, 0.0, 0.0, P.RAIL_Y1, P.RAIL_TOP)
     sk.pad(doc, bd, s, P.RAIL_T, reversed_=out)
 
     # --- the two ears ----------------------------------------------------
@@ -70,6 +142,12 @@ def side(doc, sx, name):
     sk.rect(s, sx * P.STOP_X0, 0.0, sx * P.BODY_HW, P.STOP_H)
     sk.pad(doc, bd, s, P.STOP_T, reversed_=True)
 
+    # --- the runner the rear leg rides on ---------------------------------
+    # From the back of the rear stop almost to the end of the rail. No bolt
+    # is in this joint: the leg is fixed to the rear posts and this slides
+    # into it, which is what lets the front be built on the bench.
+    _tongue(doc, bd, name, sx, P.RUN_Y0, P.RUN_Y1)
+
     # --- what gets taken away --------------------------------------------
     # The rack screws: three slots per ear, on the EIA pitch. Slotted because
     # a printed rack's posts do not land on the nominal pitch every time.
@@ -78,15 +156,6 @@ def side(doc, sx, name):
     for z in P.EIA_Z:
         sk.slot(s, sx * P.SCREW_X, z, P.SLOT_W, P.SLOT_H)
     sk.pocket(doc, bd, s, P.EAR_T)
-
-    # Slots for the rear leg, so the depth is set by sliding it. The rack's
-    # own numbers disagree by about 6 mm -- the side panel says 245.9 outer,
-    # the depth members say 240 -- and this covers both.
-    s = sk.sketch(doc, bd, name + "_Sk_splice",
-                  sk.plane(Vector(sx * P.POCKET_HW, 0, 0), sk.Y, sk.Z))
-    for y in P.SPLICE_BOLT_Y:
-        sk.slot(s, y, P.SPLICE_BOLT_Z, P.SPLICE_SLOT, P.M6_CLEAR)
-    sk.pocket(doc, bd, s, P.RAIL_T)
 
     # Clearance for the two screws that hold the bars on, one high, one low,
     # each with its head sunk a millimetre so a 12 mm screw reaches its nut.
@@ -126,17 +195,14 @@ def leg(doc, sx, name):
     forward of here -- so this is a tie, not a beam. What it does is stop the
     bracket hanging off the front posts alone.
 
-    It laps on the inner face of the side's rail and bolts through the slots
-    there, which is where the rack's depth is finally set: nothing in this
-    part depends on RACK_D being exactly right.
+    It goes into the rack FIRST, bolted to the rear posts from behind. Its
+    forward end is a grooved runner, and the side's tongue slides into that
+    from the front. Nothing in this part depends on RACK_D being exactly
+    right: a deeper or shallower rack just changes how far the tongue runs in.
     """
     bd = sk.body(doc, name)
-    inward = sx > 0
 
-    s = sk.sketch(doc, bd, name + "_Sk_plate",
-                  sk.plane(Vector(sx * P.POCKET_HW, 0, 0), sk.Y, sk.Z))
-    sk.rect(s, P.SPLICE_Y0, 0.0, P.RACK_D, P.RAIL_TOP)
-    sk.pad(doc, bd, s, P.SPLICE_T, reversed_=inward)
+    _runner(doc, bd, name, sx, P.LEG_Y0, P.RACK_D, P.RUN_END)
 
     # The rear ear, on the far side of the rear posts: the screws go into
     # them from outside the rack, like every other one.
@@ -150,35 +216,6 @@ def leg(doc, sx, name):
     for z in P.EIA_Z:
         sk.slot(s, sx * P.SCREW_X, z, P.SLOT_W, P.SLOT_H)
     sk.pocket(doc, bd, s, P.EAR_T)
-
-    # A boss at each splice bolt, thick enough to trap an M6 nut. They sit
-    # behind the device, where there is nothing to foul.
-    x_in = sx * (P.POCKET_HW - P.SPLICE_BOSS_T)
-    s = sk.sketch(doc, bd, name + "_Sk_bosses",
-                  sk.plane(Vector(sx * P.POCKET_HW, 0, 0), sk.Y, sk.Z))
-    for y in P.SPLICE_BOLT_Y:
-        sk.rect(s, y - P.SPLICE_SLOT / 2 - 4.0, P.SPLICE_BOLT_Z - P.SPLICE_BOSS_H / 2,
-                y + P.SPLICE_SLOT / 2 + 4.0, P.SPLICE_BOLT_Z + P.SPLICE_BOSS_H / 2)
-    sk.pad(doc, bd, s, P.SPLICE_BOSS_T, reversed_=inward)
-
-    # Slotted, like the side's half of the joint. The side alone gave +/-9.7,
-    # which was not enough once the rack turned out to be shallower than the
-    # side panel implied; slotting this end too doubles the travel and costs
-    # only a leg reprint, the side being the part that takes four hours.
-    s = sk.sketch(doc, bd, name + "_Sk_boltholes",
-                  sk.plane(Vector(x_in, 0, 0), sk.Y, sk.Z))
-    for y in P.SPLICE_BOLT_Y:
-        sk.slot(s, y, P.SPLICE_BOLT_Z, P.LEG_SLOT, P.M6_CLEAR)
-    sk.pocket(doc, bd, s, P.SPLICE_BOSS_T)
-
-    # The nut pocket is stretched with it, so the nut travels the length of
-    # the slot. Its two flats parallel to Y stay captured, so it still cannot
-    # turn while the bolt is done up.
-    s = sk.sketch(doc, bd, name + "_Sk_nuts",
-                  sk.plane(Vector(x_in, 0, 0), sk.Y, sk.Z))
-    for y in P.SPLICE_BOLT_Y:
-        sk.hexslot(s, y, P.SPLICE_BOLT_Z, P.M6_HEX_AF, P.LEG_NUT_SLOT)
-    sk.pocket(doc, bd, s, P.M6_HEX_D, reversed_=inward)
     return bd
 
 
@@ -195,16 +232,19 @@ def faceplate(doc, dev, name):
     onto the ports whose border overlaps the case, so the case can be reached
     but cannot come out. Either way the plate itself is identical.
 
-    It stops at the rails' inner faces rather than spanning the full opening,
-    so the sides need no notch cut in them -- one cut full height would have
-    separated each ear from its rail.
+    It stops just short of the rails' inner faces rather than spanning the
+    full opening, so the sides need no notch cut in them -- one cut full
+    height would have separated each ear from its rail.
+
+    Its four nuts go in from its ENDS, into slots closed front and back, so
+    they stay put while it is offered up to the sides.
     """
     bd = sk.body(doc, name)
     front = dev.front
 
     s = sk.sketch(doc, bd, name + "_Sk_plate",
                   sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
-    sk.rect(s, -P.POCKET_HW, 0.0, P.POCKET_HW, P.RACK_U)
+    sk.rect(s, -P.PLATE_HW, 0.0, P.PLATE_HW, P.RACK_U)
     sk.pad(doc, bd, s, P.BAR_T, reversed_=True)
 
     s = sk.sketch(doc, bd, name + "_Sk_window",
@@ -220,46 +260,35 @@ def faceplate(doc, dev, name):
     # device, so a short device brings it down with it.
     s = sk.sketch(doc, bd, name + "_Sk_flange",
                   sk.plane(Vector(0, P.BAR_T, 0), sk.X, sk.Z))
-    sk.rect(s, -P.POCKET_HW, dev.flange_z0, P.POCKET_HW, P.RACK_U)
+    sk.rect(s, -P.PLATE_HW, dev.flange_z0, P.PLATE_HW, P.RACK_U)
     sk.pad(doc, bd, s, P.BAR_FLANGE_D, reversed_=True)
 
     # Four M6, at the same places the two bars used, so the ears do not
-    # change: clearance from the front, then the nut, its pocket facing rear.
+    # change. The clearance hole goes right through, so a screw's tip can
+    # never bottom out behind its nut.
     s = sk.sketch(doc, bd, name + "_Sk_screws",
                   sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
     for sx in (-1, 1):
         for z in (P.BAR_SCREW_Z, P.BOT_SCREW_Z):
             sk.circle(s, sx * P.BAR_SCREW_X, z, P.M6_CLEAR)
-    sk.pocket(doc, bd, s, P.BAR_NUT_Y0)
+    sk.pocket(doc, bd, s, P.BAR_T)
 
+    # The nut slots, cut in from each end of the plate: as tall as the nut is
+    # across its flats, so it cannot turn, and as deep as it is thick. Each
+    # runs from the end face to just past the screw, and is closed in front
+    # and behind.
+    hh = (P.M6_HEX_AF + P.NUT_SLOT_FIT) / 2.0
+    x_in = P.BAR_SCREW_X - P.M6_HEX_AF / 3 ** 0.5 - P.NUT_SLOT_FIT
     s = sk.sketch(doc, bd, name + "_Sk_nuts",
-                  sk.plane(Vector(0, P.BAR_NUT_Y0 + P.M6_HEX_D, 0), sk.X, sk.Z))
+                  sk.plane(Vector(0, P.BAR_NUT_Y0 - P.NUT_SLOT_FIT / 2.0, 0),
+                           sk.X, sk.Z))
     for sx in (-1, 1):
         for z in (P.BAR_SCREW_Z, P.BOT_SCREW_Z):
-            sk.hexagon(s, sx * P.BAR_SCREW_X, z, P.M6_HEX_AF)
-    # Explicit: there is plate both sides of this plane, so the automatic
-    # choice would cut the pocket behind the nut instead of around it.
-    last = sk.pocket(doc, bd, s, P.M6_HEX_D, reversed_=True)
-
-    # The flange follows the device's height, so a short device pulls it down
-    # into the path a nut must travel to reach its pocket -- on the Flex Mini
-    # it sat 1.58 mm into that path and the upper nuts could not be fitted at
-    # all. Cut it back where that happens. At x = +/-100 the flange is
-    # outboard of every device carried so far, so the relief costs nothing.
-    nut_top = P.BAR_SCREW_Z + P.M6_HEX_AF / 2.0
-    if dev.flange_z0 < nut_top + P.NUT_FEED_CLEAR:
-        hw = P.M6_HEX_AF / 3 ** 0.5 + 0.5      # across corners, plus room
-        s = sk.sketch(doc, bd, name + "_Sk_nutrelief",
-                      sk.plane(Vector(0, P.BAR_T, 0), sk.X, sk.Z))
-        for sx in (-1, 1):
-            sk.rect(s, sx * P.BAR_SCREW_X - hw, dev.flange_z0,
-                    sx * P.BAR_SCREW_X + hw, nut_top + P.NUT_FEED_CLEAR)
-        # Rearward, into the flange. On an X-Z plane a pocket's reversed_ is
-        # -Y -- the nut pockets above rely on that -- so this one is False,
-        # and it has to be stated: there is material both sides of this plane,
-        # so letting the direction be worked out would notch the front plate
-        # above the nut instead and leave the flange where it was.
-        last = sk.pocket(doc, bd, s, P.BAR_FLANGE_D, reversed_=False)
+            sk.rect(s, sx * x_in, z - hh, sx * (P.PLATE_HW + 0.5), z + hh)
+    # Rearward, and said so. On an X-Z plane a pocket's reversed_ is -Y, and
+    # there is plate both sides of this one, so left to be worked out it would
+    # cut forward through the front face instead.
+    last = sk.pocket(doc, bd, s, P.M6_HEX_D + P.NUT_SLOT_FIT, reversed_=False)
 
     if not front.fillet:
         return bd
@@ -305,16 +334,23 @@ def tray(doc, dev, sx, name):
     bd = sk.body(doc, name)
     lap = P.CENTRE_LAP
     rear = dev.y1 - P.TRAY_FIT
+    # Every vertical face that meets another part stands off it: the outer
+    # edge from the rail, the step from the ledge's edge, and each half from
+    # the other at both ends of the lap. The faces the load goes through --
+    # rim on ledge, lap on lap -- still touch.
+    step = P.TRAY_STEP_X
+    lap_l = lap - P.LAP_FIT      # where the left half's tongue ends
+    lap_r = -lap + P.LAP_FIT     # where the right half's top lap starts
 
     if sx < 0:
         # outer edge laps ON TOP of the ledge; centre tongue runs underneath
-        pts = [(-P.TRAY_X1, P.LAP_T), (-P.LEDGE_X0, P.LAP_T),
-               (-P.LEDGE_X0, 0.0), (lap, 0.0), (lap, P.LAP_T),
+        pts = [(-P.TRAY_X1, P.LAP_T), (-step, P.LAP_T),
+               (-step, 0.0), (lap_l, 0.0), (lap_l, P.LAP_T),
                (-lap, P.LAP_T), (-lap, P.TRAY_T), (-P.TRAY_X1, P.TRAY_T)]
     else:
-        pts = [(-lap, P.LAP_T), (lap, P.LAP_T), (lap, 0.0),
-               (P.LEDGE_X0, 0.0), (P.LEDGE_X0, P.LAP_T),
-               (P.TRAY_X1, P.LAP_T), (P.TRAY_X1, P.TRAY_T), (-lap, P.TRAY_T)]
+        pts = [(lap_r, P.LAP_T), (lap, P.LAP_T), (lap, 0.0),
+               (step, 0.0), (step, P.LAP_T),
+               (P.TRAY_X1, P.LAP_T), (P.TRAY_X1, P.TRAY_T), (lap_r, P.TRAY_T)]
     s = sk.sketch(doc, bd, name + "_Sk_plate",
                   sk.plane(Vector(0, dev.y0, 0), sk.X, sk.Z))
     sk.polygon(s, pts)
@@ -331,7 +367,7 @@ def tray(doc, dev, sx, name):
     if rear < back - 1e-9:
         s = sk.sketch(doc, bd, name + "_Sk_rails",
                       sk.plane(Vector(0, rear, 0), sk.X, sk.Z))
-        sk.rect(s, sx * P.LEDGE_X0, P.LAP_T, sx * P.TRAY_X1, P.TRAY_T)
+        sk.rect(s, sx * step, P.LAP_T, sx * P.TRAY_X1, P.TRAY_T)
         sk.pad(doc, bd, s, back - rear, reversed_=True)
 
     # Four pegs key the two halves to each other. There is no bolt: the one
@@ -357,7 +393,10 @@ def tray(doc, dev, sx, name):
     # above it, which matters when its front face is the one you look at.
     # The plinth raises it until it is centred in the U.
     if dev.plinth > 0.0:
-        x0, x1 = ((-dev.hw, -lap) if sx < 0 else (-lap, dev.hw))
+        # Out to the case's pocket, but never past the tray's own edge: a
+        # case that fills the bay would otherwise put its plinth on the rail.
+        out = min(dev.hw, P.TRAY_X1)
+        x0, x1 = ((-out, -lap) if sx < 0 else (lap_r, out))
         s = sk.sketch(doc, bd, name + "_Sk_plinth",
                       sk.plane(Vector(0, 0, P.TRAY_T), sk.X, sk.Y))
         sk.rect(s, x0, dev.y0, x1, rear)
@@ -414,14 +453,37 @@ def tray(doc, dev, sx, name):
     else:
         # Steps down at the edge of the lap, where this half is only the top
         # 3 mm of the tray -- there is no material below it to stand on.
-        pts = [(-lap, P.LAP_T), (lap, P.LAP_T), (lap, 0.0),
-               (lip_x, 0.0), (lip_x, top), (-lap, top)]
+        pts = [(lap_r, P.LAP_T), (lap, P.LAP_T), (lap, 0.0),
+               (lip_x, 0.0), (lip_x, top), (lap_r, top)]
     s = sk.sketch(doc, bd, name + "_Sk_rearlip",
                   sk.plane(Vector(0, rear, 0), sk.X, sk.Z))
     sk.polygon(s, pts)
     sk.pad(doc, bd, s, P.REAR_LIP_T, reversed_=True)
 
     return bd
+
+
+def coupons(doc):
+    """Two short lengths of the runner, to try the fit before the real thing.
+
+    A side is a two-hour print and a pair of legs another two, and whether a
+    sliding dovetail runs freely, binds or rattles depends on the printer far
+    more than on RUN_FIT. These are 25 mm of rail with its tongue and 25 mm of
+    leg with its groove, made by the same two functions that make the real
+    ones. Print them standing as exported, slide one into the other, and
+    change RUN_FIT if they disagree with it.
+    """
+    n = 25.0
+    a = sk.body(doc, "coupon_tongue")
+    s = sk.sketch(doc, a, "coupon_tongue_Sk_rail",
+                  sk.plane(Vector(P.POCKET_HW, 0, 0), sk.Y, sk.Z))
+    sk.rect(s, 0.0, 0.0, n, P.RAIL_TOP)
+    sk.pad(doc, a, s, P.RAIL_T)
+    _tongue(doc, a, "coupon_tongue", 1, 0.0, n)
+
+    b = sk.body(doc, "coupon_groove")
+    _runner(doc, b, "coupon_groove", 1, 0.0, n, n)
+    return {"coupon_tongue": a, "coupon_groove": b}
 
 
 def build(doc, only=None):

@@ -77,9 +77,13 @@ def main():
 
     doc = App.newDocument(DOC)
     bodies = model.build(doc)
+    # Two short lengths of the runner, to try its fit on before a side is
+    # printed. They are not part of any kit, so they are not plated.
+    coupons = model.coupons(doc)
+    bodies.update(coupons)
     doc.recompute()
 
-    bad = bad_solids(bodies, PARTS)
+    bad = bad_solids(bodies, PARTS + tuple(coupons))
     if bad:
         print("NOT A SINGLE VALID SOLID: %s" % ", ".join(bad))
 
@@ -90,6 +94,11 @@ def main():
                                       LinearDeflection=0.02,
                                       AngularDeflection=0.25, Relative=False)
         mesh.write(devices.stl_path(name))
+    for name in coupons:
+        mesh = MeshPart.meshFromShape(Shape=bodies[name].Shape,
+                                      LinearDeflection=0.02,
+                                      AngularDeflection=0.25, Relative=False)
+        mesh.write(os.path.join(devices.COMMON, "stl", name + ".stl"))
     Part.export([bodies[n] for n in PARTS],
                 os.path.join(devices.COMMON, "step", DOC + ".step"))
 

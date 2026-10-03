@@ -97,7 +97,10 @@ Everything is in `common/src/params.py`; rebuild with `make`.
 | Device is a tight push fit | raise `CLR_W` from 1.2 |
 | Sides will not pass between the posts | lower `RAIL_T` from 3.2 |
 | Rack screws will not line up | raise `SLOT_W` from 11.0 |
-| Rear ears miss the rear posts | change `RACK_D` from 175.9 |
+| Side will not slide into its leg, or rattles in it | raise or lower `RUN_FIT` from 0.25 — try it on the two coupons in `common/stl/` first |
+| Faceplate is tight between the sides | raise `PLATE_FIT` from 0.2 |
+| Tray is tight between the rails | raise `TRAY_SIDE_FIT` from 0.2 |
+| Tray halves will not close on each other | raise `LAP_FIT` from 0.3, `KEY_FIT` from 0.5 |
 | Device rattles vertically | lower `CLR_H` from 0.8 |
 
 ## Checking a 3MF from the command line

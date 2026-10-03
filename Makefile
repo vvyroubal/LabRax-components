@@ -12,7 +12,9 @@ DEVICE_DIRS := ucg-fiber usw-flex-mini tl-sg108e nuc6i7kyk
 
 # A device's three prints, from its folder and its key.
 kit = $(1)/stl/tray_$(2)_l.stl $(1)/stl/tray_$(2)_r.stl $(1)/stl/faceplate_$(2).stl
-STLS  := $(addprefix common/stl/,$(addsuffix .stl,side_l side_r leg_l leg_r)) \
+# The two coupons are 25 mm of the side-to-leg runner, for trying its fit.
+STLS  := $(addprefix common/stl/,$(addsuffix .stl,side_l side_r leg_l leg_r \
+           coupon_tongue coupon_groove)) \
          $(call kit,ucg-fiber,ucg) \
          $(call kit,usw-flex-mini,usw) \
          $(call kit,tl-sg108e,sg108e) \

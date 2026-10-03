@@ -71,10 +71,12 @@ TRAY = dict(SUPPORT, **NO_BRIM)
 # and how many are in it -- opening a file should not need the README.
 CHASSIS_PLATES = [
     # A side is 212 mm long, so it only goes on the bed turned 45 degrees.
+    # Each sits 1.4 mm off centre: the support under its runner's tongue
+    # reaches out one way only, and this evens the margin up to about 6 mm.
     ("Chassis 1 of 3 - left side",
-     [("side_l", (90.0, 90.0), [("z", 45)], SUPPORT)]),
+     [("side_l", (90.0, 88.6), [("z", 45)], SUPPORT)]),
     ("Chassis 2 of 3 - right side",
-     [("side_r", (90.0, 90.0), [("z", 45)], SUPPORT)]),
+     [("side_r", (91.4, 90.0), [("z", 45)], SUPPORT)]),
     ("Chassis 3 of 3 - rear legs", [
         ("leg_l", (90.0, 55.0), [("z", 90)], SUPPORT),
         ("leg_r", (90.0, 125.0), [("z", 90)], SUPPORT),

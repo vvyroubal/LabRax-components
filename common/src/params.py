@@ -58,26 +58,39 @@ POST_D = 32.5                   # [rack] cross-section is 30 x 35 and the
                                 # mesh does not say which way; take the midpoint
 RACK_D = RACK_INNER + 2 * POST_D  # [rack] 235.0, front face to rear face
 
-# 245.9 + two 8 mm ears is 261.9 mm, and a 180 mm bed takes 225.6 mm even
-# cornerwise, so each side is two pieces: a front section carrying everything
-# that touches the device, and a rear leg that reaches the back posts. They
-# splice behind the device, where there is nothing in the way, and the splice
-# is slotted -- so the depth is set by sliding it rather than by trusting the
-# number above. That matters: the rack's own depth members are 170 mm, which
-# would imply 240 rather than 245.9, and the slot covers both.
-SPLICE_Y0 = 146.0     # [design] front of the overlap, behind the device
-SPLICE_Y1 = 206.0     # [design] rear end of the front section
-SPLICE_T = 3.2        # [design] the leg's lap plate, same as the rail
-SPLICE_BOLT_Y = (161.0, 191.0)  # [design] nominal; the slots move +/-10
-SPLICE_BOLT_Z = 20.0  # [design]
-SPLICE_SLOT = 26.0    # [design] slot length in the SIDE -> +/-9.7 mm
-# The leg is slotted too, and its nut pocket with it: a hexagon swept along Y
-# holds the nut against turning while letting it travel. Two slotted parts in
-# series double the adjustment without the side being touched, which matters
-# because the side is the expensive print and the leg is the cheap one.
-LEG_SLOT = 26.0       # [design] slot length in the LEG -> another +/-9.7 mm
-SPLICE_BOSS_T = 8.0   # [design] the leg thickens here to hold an M6 nut
-SPLICE_BOSS_H = 18.0  # [design] and is this tall around each one
+# A side with an ear at each end would be about 248 mm long, and a 180 mm bed
+# takes about 212 even cornerwise, so each side is two pieces: a front section
+# carrying everything that touches the device, and a rear leg that reaches the
+# back posts.
+#
+# They used to be bolted together through slots, two M6 a side driven in from
+# OUTSIDE the rail. That joint could only ever be made inside the rack -- the
+# side goes in from the front and the leg from the rear, each stopped by its
+# own ear -- and in there its screw heads faced the rack's side wall, 0.9 mm
+# from the post line, where no driver reaches. The leg's boss also sat hard
+# against the side's rear stop, so the "adjustment" only ever went one way.
+#
+# So there is no fastener here now. The side carries a dovetail tongue along
+# the inner face of its rail and the leg a groove to match. The leg is bolted
+# to the rear posts first, from behind, where there is room to work; the side
+# then slides into it from the front like a drawer onto a runner. The rack's
+# depth is taken up by how far it slides, not by the number above.
+RAIL_Y1 = 206.0       # [design] rear end of the side's rail
+RUN_Z = 20.0          # [design] height of the runner's centreline
+RUN_D = 4.0           # [design] how far the tongue stands off the rail
+RUN_ROOT = 10.0       # [design] its height at the rail. The flanks are at
+                      # 45 degrees, so neither part needs support for them
+RUN_TIP = RUN_ROOT + 2 * RUN_D   # 18.0, its height at the tip
+RUN_FIT = 0.25        # [design] clearance on every face of the groove. Print
+                      # the two coupons in common/stl before the sides and
+                      # legs to find out whether your printer agrees
+RUN_BACK = 3.2        # [design] what the leg keeps behind the groove
+RUN_JAW = 5.0         # [design] and above and below it, past the tongue's tip
+LEG_T = 3.2           # [design] the leg's plate, same as the rail
+LEG_Y0 = 152.0        # [design] front of the leg, 8 mm behind the rear stop
+RUN_MOUTH = 6.0       # [design] the groove opens out over its first 6 mm...
+RUN_MOUTH_FIT = 1.0   # [design] ...by this much, so the tongue finds its way
+RUN_MIN = 30.0        # [design] the least engagement worth calling a joint
 
 # --------------------------------------------------------------- device ----
 # UniFi Cloud Gateway Fiber. Fanless: vents underneath and on both sides.
@@ -138,10 +151,24 @@ STOP_X0 = 99.0     # [design]
 # drawn around it -- but the side does not read the device any more. A device
 # shorter than this simply leaves the stop unused behind it and is caught by
 # its own tray's lip instead, which is what lets one pair of sides serve both.
-LEDGE_Y0 = 8.0     # [design] = DEV_Y0, the front of the ledge
+# The faceplate stands between the back of the ears and the front of the
+# ledge. Drawn 8.0 into an 8.0 gap it had to be forced, so the ledge starts a
+# little further back than the plate ends.
+LEDGE_Y0 = DEV_Y0 + 0.3   # [design] 8.3, the front of the ledge
 LEDGE_Y1 = 137.0   # [design] the deepest tray the chassis supports
 STOP_Y = 137.0     # [design] front face of the sides' rear stop
 STOP_H = 36.0      # [design] how tall it stands
+
+# The runner's tongue starts on the back of the rear stop and stops its own
+# depth short of the end of the rail. Run right to the end, its inner corner
+# is the furthest point of the side when it lies cornerwise on the bed, and
+# the print came within 1.75 mm of the plate's edge; held back by RUN_D the
+# rail's own corner is the furthest again, as it always was. The leg's groove
+# is blind, and long enough to take the tongue with the leg as far forward as
+# the stop lets it come.
+RUN_Y0 = STOP_Y + STOP_T                       # 144.0
+RUN_Y1 = RAIL_Y1 - RUN_D                       # 202.0
+RUN_END = RUN_Y1 + (LEG_Y0 - RUN_Y0) + 4.0     # 214.0
 
 # Ventilation in the side rails -- the device vents through its sides.
 RAIL_VENT_Z0 = 10.0
@@ -157,11 +184,18 @@ RAIL_VENTS_Y = ((24.0, 52.0), (60.0, 88.0), (96.0, 124.0))  # [design]
 # It is a light load over a wide plate -- 734 g on a 214 x 129 x 6 span works
 # out around 0.2 mm of deflection -- so the tray does not need stiffening; it
 # needs to be held together and located, which is what the joints below do.
-TRAY_X1 = POCKET_HW   # 107, out to the inner face of the side rail
+# Every face of the tray used to be drawn touching what it meets: 214.0 mm of
+# tray in a 214.0 mm bay, its step on the ledge's edge, the two halves on each
+# other. None of that overlaps, so every check passed, and none of it goes
+# together once it is printed. These are the gaps.
+TRAY_SIDE_FIT = 0.2   # [design] per side, to the rail and to the ledge's edge
+LAP_FIT = 0.3         # [design] between the two halves, at each end of the lap
+TRAY_X1 = POCKET_HW - TRAY_SIDE_FIT   # 106.8, just short of the side rail
+TRAY_STEP_X = LEDGE_X0 - TRAY_SIDE_FIT  # 98.8, where the full thickness ends
 # The tray drops into the gap between the ledge's front nib and the rear stop.
 # Modelled flush it is exactly as long as that gap, which in printed plastic
 # is an interference fit, so it is made this much shorter.
-TRAY_FIT = 0.4        # [design]
+TRAY_FIT = 0.6        # [design]
 # 60 mm of overlap, and no fastener anywhere in this joint.
 #
 # There was one: a tab behind the device carrying two M6. Both tabs snapped
@@ -182,7 +216,7 @@ TRAY_FIT = 0.4        # [design]
 CENTRE_LAP = 30.0     # [design] half-width of the centre lap
 
 KEY_D = 5.0           # [design] peg diameter
-KEY_FIT = 0.3         # [design] clearance in its socket
+KEY_FIT = 0.5         # [design] clearance in its socket, on the diameter
 KEY_X = 22.0          # [design] near the edges of the lap, so a pair holds the
                       # halves square as well as together
 KEY_Y = (20.0, 116.0)  # [design] one pair just inside the gateway's front edge,
@@ -220,16 +254,27 @@ VENT_W = 8.0        # [design] slot width
 VENT_RIB = 5.0      # [design] material between slots
 VENT_MARGIN = 6.0   # [design] solid border kept round the vented panel
 
-REAR_LIP_X = STOP_X0  # [design] it stops where the sides' rear stops start,
-                      # so the two together span the full rear face
+REAR_LIP_X = STOP_X0 - LAP_FIT  # [design] it stops just short of where the
+                      # sides' rear stops start, so the two together span the
+                      # rear face without the lip being wedged between them
 
 # ---------------------------------------------------------- the top bar ----
 # Bolted on last, from the front, through the ear and into a hex nut trapped
 # in the bar with the pocket facing rear. It nests into a notch in the side so
 # the ear and the rail still meet below it.
 BAR_T = 8.0         # [design] thickness, front to back
-BAR_NUT_Y0 = 3.0    # [design] where the nut's near face sits, 5 mm of nut
-                    # behind it filling the bar to its back face
+# The plate is a little narrower than the bay it stands in. At the full 214.0
+# it was a press fit between two rails that nothing else spaces.
+PLATE_FIT = 0.2     # [design] per end
+PLATE_HW = POCKET_HW - PLATE_FIT   # 106.8
+# The nuts are slid in from the ENDS of the plate, into slots that are closed
+# front and back. They used to be fed in from behind, into pockets open to the
+# rear: nothing held them, and the upper pair had to be worked 12 mm under the
+# flange with a fingertip. In a slot a nut cannot fall out of the back, and
+# once the plate is between the rails it cannot come out of the end either.
+BAR_NUT_Y0 = 1.5    # [design] where the nut's near face sits. A 12 mm screw
+                    # ends at 6.5, flush with the far face of the nut
+NUT_SLOT_FIT = 0.3  # [design] room for the nut in its slot, across and through
 BAR_CB_D = 1.0      # [design] the bar screws' heads sink this far into the
                     # ear. It is the millimetre that lets a 12 mm screw reach
                     # the nut without moving the nut -- which matters, because
@@ -241,12 +286,6 @@ BAR_END_X0 = 96.0   # [design] the taller end block starts here
 BAR_END_Z0 = 23.7   # [design] deep enough for an M6 nut across its flats
 BAR_FLANGE_D = 12.0  # [design] how far it reaches back over the device.
                      # Every millimetre here costs 0.7 mm of bed diagonal.
-# A nut is fed into its pocket from the rear, so it has to travel under the
-# flange to get there. The flange follows the DEVICE's height while the nut
-# positions are fixed by the sides, which are shared -- so a short device
-# pulls the flange down into that path. Where the gap is smaller than this,
-# the flange is cut back at the two upper screws.
-NUT_FEED_CLEAR = 0.8   # [design] vertical room for a nut to slide in
 
 BAR_FLANGE_Z0 = BAR_Z0      # flush with the bar's underside
 
@@ -326,9 +365,3 @@ EAR_CHAMFER = 4.0     # [design]
 M6_CLEAR = 6.4      # [rack]
 M6_HEX_AF = 10.09   # [rack] 11.65 across corners
 M6_HEX_D = 5.0      # [rack] nut thickness
-
-# The leg's nut pocket has to be LONGER than its bolt slot, not equal to it:
-# the nut must travel as far as the bolt does, and if the two end flush the
-# slot's end arc lands exactly on the hexagon's point -- a tangency the solid
-# modeller will not clean up ("Bnd_Box is void" on removeSplitter).
-LEG_NUT_SLOT = (LEG_SLOT - M6_CLEAR) + 2 * M6_HEX_AF / 3 ** 0.5  # 31.05

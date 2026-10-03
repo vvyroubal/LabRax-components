@@ -93,20 +93,6 @@ def hexnut3(cx, cz, af, y0, y1):
         Vector(0, y1 - y0, 0))
 
 
-def hexnut4(sx, y, z, af):
-    """An M6 nut in a splice boss, axis along X."""
-    r = af / math.sqrt(3.0)
-    x0 = sx * (P.POCKET_HW - P.SPLICE_BOSS_T) + sx * 0.05
-    x1 = x0 + sx * (P.M6_HEX_D - 0.1)
-    # Same phase as sk.hexagon, which is what cut the pocket: vertices along
-    # Y, flats top and bottom. Thirty degrees out and the corners foul.
-    pts = [Vector(x0, y + r * math.cos(math.radians(a)),
-                  z + r * math.sin(math.radians(a)))
-           for a in (0, 60, 120, 180, 240, 300)]
-    return Part.Face(Part.makePolygon(pts + [pts[0]])).extrude(
-        Vector(x1 - x0, 0, 0))
-
-
 def stadium(cx, cz, w, h, y0, y1):
     """A slot-shaped solid bored along +Y: `w` long, `h` across, round ends."""
     r = h / 2.0
@@ -217,90 +203,63 @@ def one_device(parts, bodies, dev):
     check(abs(P.RACK_INNER - 170.0) < 1e-9,
           "the clear gap comes from the frame beams, not the side panel",
           "170.0, the length of three members in the rack's own 3MF")
-    # The nut must travel as far as its bolt, and its pocket must not end
-    # flush with the slot -- that tangency is what broke the solid before.
-    check(abs((P.LEG_NUT_SLOT - 2 * P.M6_HEX_AF / 3 ** 0.5)
-              - (P.LEG_SLOT - P.M6_CLEAR)) < 1e-6,
-          "the leg's nut travels exactly as far as its bolt",
-          "%.2f mm each" % (P.LEG_SLOT - P.M6_CLEAR))
-    check(P.LEG_NUT_SLOT > P.LEG_SLOT + 1.0,
-          "the nut pocket runs past the ends of the bolt slot",
-          "%.2f vs %.2f" % (P.LEG_NUT_SLOT, P.LEG_SLOT))
+    # The joint is a runner, not a bolted lap: the leg is fixed to the rear
+    # posts and the side's tongue slides into its groove. How far forward the
+    # leg can sit is set by the side's rear stop; how far back, by how much
+    # tongue is still in the groove.
+    fwd = P.LEG_Y0 - P.RUN_Y0
+    back = (P.RUN_Y1 - P.LEG_Y0) - P.RUN_MIN
+    lo, hi = P.RACK_D - fwd, P.RACK_D + back
     for sx, nm in ((-1, "leg_l"), (1, "leg_r")):
         lg = parts[nm]
+        side = parts["side_l" if sx < 0 else "side_r"]
         b = lg.BoundBox
         check(abs(b.YMax - (P.RACK_D + P.EAR_T)) < 1e-6,
               "%s reaches the back of the rear post" % nm,
               "ends at Y %.1f, post rear face at %.1f" % (b.YMax, P.RACK_D))
-        # It has to lap the side over a real length, not just touch it.
-        lap = box(sx * P.POCKET_HW, sx * (P.POCKET_HW - P.SPLICE_T),
-                  P.SPLICE_Y0, P.SPLICE_Y1, 0.0, P.RAIL_TOP)
-        vl = vol(lg.common(lap))
-        side = parts["side_l" if sx < 0 else "side_r"]
-        vs = vol(side.common(box(sx * P.POCKET_HW, sx * P.BODY_HW,
-                                 P.SPLICE_Y0, P.SPLICE_Y1, 0.0, P.RAIL_TOP)))
-        check(vl > 3000.0 and vs > 3000.0, "%s laps the side over %.0f mm"
-              % (nm, P.SPLICE_Y1 - P.SPLICE_Y0),
-              "%.0f mm3 of leg against %.0f mm3 of rail" % (vl, vs))
         check(vol(lg.common(side)) < VOID, "%s does not foul the side" % nm,
               "%.3f mm3" % vol(lg.common(side)))
-    # The splice bolts, and the range they give. Both halves are slotted, so
-    # the travel is the sum: the side's slot plus the leg's.
-    adj = ((P.SPLICE_SLOT - P.M6_CLEAR) + (P.LEG_SLOT - P.M6_CLEAR)) / 2.0
-    lo, hi = P.RACK_D - adj, P.RACK_D + adj
-    check(adj >= 18.0, "the splice adjusts far enough to be set by fitting",
-          "+/-%.1f mm, so %.1f..%.1f outer depth" % (adj, lo, hi))
+        # There has to be tongue in the groove, over a real length.
+        eng = box(sx * (P.POCKET_HW - P.RUN_D), sx * P.POCKET_HW,
+                  P.LEG_Y0, P.RUN_Y1,
+                  P.RUN_Z - P.RUN_TIP / 2, P.RUN_Z + P.RUN_TIP / 2)
+        vt = vol(side.common(eng))
+        check(vt > 2000.0, "%s rides %.0f mm of the side's tongue"
+              % (nm, P.RUN_Y1 - P.LEG_Y0), "%.0f mm3 of tongue in it" % vt)
+        # Held every way but one. Move the leg half the fit and nothing
+        # touches; move it a millimetre and the tongue is in the way. That is
+        # the whole joint, so it is measured rather than read off the sketch.
+        for tag, d in (("up", Vector(0, 0, 1)), ("down", Vector(0, 0, -1)),
+                       ("off the rail", Vector(-sx, 0, 0)),
+                       ("into the rail", Vector(sx, 0, 0))):
+            near = vol(lg.translated(d * (P.RUN_FIT / 2.0)).common(side))
+            far = vol(lg.translated(d * 1.0).common(side))
+            check(near < VOID and far > VOID,
+                  "%s cannot move %s on the tongue" % (nm, tag),
+                  "free at %.3f mm, %.0f mm3 in the way at 1 mm"
+                  % (P.RUN_FIT / 2.0, far))
+        # ...and free along the rack's depth, over the whole range claimed.
+        for d in (-(fwd - 0.1), back):
+            v = vol(lg.translated(Vector(0, d, 0)).common(side))
+            check(v < VOID, "%s slides %+5.1f mm along it" % (nm, d),
+                  "%.3f mm3" % v)
+        # The side arrives from the front with the leg already in the rack.
+        for out in (20.0, 60.0, 150.0, 220.0):
+            v = vol(side.translated(Vector(0, -out, 0)).common(lg))
+            check(v < VOID, "%s lets the side in from %3.0f mm out" % (nm, out),
+                  "%.3f mm3" % v)
+    check(P.RUN_END - fwd >= P.RUN_Y1,
+          "the groove takes the tongue with the leg fully forward",
+          "groove ends at %.1f, tongue at %.1f" % (P.RUN_END - fwd, P.RUN_Y1))
+    check(P.RUN_Y1 - P.LEG_Y0 >= P.RUN_MIN + 10.0,
+          "the runner takes up the rack's depth with no fastener",
+          "%.1f..%.1f mm outer depth, %.0f mm engaged at nominal and never "
+          "under %.0f" % (lo, hi, P.RUN_Y1 - P.LEG_Y0, P.RUN_MIN))
     # It must reach BOTH readings the rack's own parts give, since the mesh
     # does not say which way the 30 x 35 post faces.
     for d in (170.0 + 2 * 30.0, 170.0 + 2 * 35.0):
         check(lo <= d <= hi, "it reaches a %.0f mm rack" % d,
               "%.1f..%.1f covers it" % (lo, hi))
-    # And it must NOT still reach the reading that caused the problem, or the
-    # same mistake just gets made at the other end of the slot.
-    check(hi < 245.9 + 10.0, "the old 245.9 reading is no longer the middle",
-          "nominal now %.1f" % P.RACK_D)
-    for sx in (-1, 1):
-        lg = parts["leg_l" if sx < 0 else "leg_r"]
-        side = parts["side_l" if sx < 0 else "side_r"]
-        for y in P.SPLICE_BOLT_Y:
-            shank = Part.makeCylinder(
-                3.0, P.RAIL_T + P.SPLICE_T + P.SPLICE_BOSS_T,
-                Vector(sx * P.BODY_HW, y, P.SPLICE_BOLT_Z), Vector(-sx, 0, 0))
-            v = vol(side.common(shank)) + vol(lg.common(shank))
-            check(v < VOID, "splice M6 passes both at y=%5.1f" % y,
-                  "%.3f mm3" % v)
-            n = hexnut4(sx, y, P.SPLICE_BOLT_Z, 10.0)
-            check(vol(lg.common(n)) < VOID, "its nut seats at y=%5.1f" % y,
-                  "%.3f mm3" % vol(lg.common(n)))
-        # And both really are slots, not holes. The travel adds up across the
-        # joint, but each part only ever sees its OWN slot's half of it --
-        # testing either one at the full +/-19.6 would be testing a position
-        # the bolt never reaches in that part.
-        side_adj = (P.SPLICE_SLOT - P.M6_CLEAR) / 2.0
-        leg_adj = (P.LEG_SLOT - P.M6_CLEAR) / 2.0
-        for y in P.SPLICE_BOLT_Y:
-            for d in (-side_adj, side_adj):
-                sh = Part.makeCylinder(3.0, P.RAIL_T + 0.2,
-                                       Vector(sx * P.BODY_HW, y + d,
-                                              P.SPLICE_BOLT_Z),
-                                       Vector(-sx, 0, 0))
-                check(vol(side.common(sh)) < VOID,
-                      "side slot clears at y=%5.1f%+5.1f" % (y, d),
-                      "%.3f mm3" % vol(side.common(sh)))
-            for d in (-leg_adj, leg_adj):
-                sh = Part.makeCylinder(
-                    3.0, P.SPLICE_BOSS_T + 0.2,
-                    Vector(sx * (P.POCKET_HW - P.SPLICE_BOSS_T), y + d,
-                           P.SPLICE_BOLT_Z), Vector(sx, 0, 0))
-                check(vol(lg.common(sh)) < VOID,
-                      "leg slot clears at y=%5.1f%+5.1f" % (y, d),
-                      "%.3f mm3" % vol(lg.common(sh)))
-            # the nut has to follow the bolt the whole way
-            for d in (-leg_adj, leg_adj):
-                n = hexnut4(sx, y + d, P.SPLICE_BOLT_Z, 10.0)
-                check(vol(lg.common(n)) < VOID,
-                      "its nut still seats at y=%5.1f%+5.1f" % (y, d),
-                      "%.3f mm3" % vol(lg.common(n)))
 
     print("\n[the front face -- one plate, with a window for the display]")
     fp = parts[dev.part("faceplate")]
@@ -471,10 +430,11 @@ def one_device(parts, bodies, dev):
                   "%.1f mm radius in a %.1f mm plate, %.1f mm left"
                   % (r, P.BAR_T, P.BAR_T - r))
             # and it must not eat into the nut pockets beside it
-            check(w / 2 + r < P.BAR_SCREW_X - P.M6_HEX_AF / 2,
-                  "and stays clear of the faceplate's own nuts",
-                  "rim reaches x=%.2f, nut starts %.2f"
-                  % (w / 2 + r, P.BAR_SCREW_X - P.M6_HEX_AF / 2))
+            slot_x = (P.BAR_SCREW_X - P.M6_HEX_AF / 3 ** 0.5
+                      - P.NUT_SLOT_FIT)
+            check(w / 2 + r < slot_x,
+                  "and stays clear of the faceplate's own nut slots",
+                  "rim reaches x=%.2f, slot starts %.2f" % (w / 2 + r, slot_x))
 
     ahead = box(-P.FACE_HW, P.FACE_HW, -P.EAR_T + 0.01, 0.0, 0.0, P.RACK_U)
     stray = [n for n in names
@@ -493,19 +453,26 @@ def one_device(parts, bodies, dev):
             check(vol(asm.common(n)) < VOID,
                   "M6 nut seats clear of everything at x=%+7.2f z=%5.2f" % (x, z),
                   "%.3f mm3" % vol(asm.common(n)))
-            # Seating is not fitting. The nut goes in from the rear, so it has
-            # to travel the whole way to its pocket -- and the flange follows
-            # the device's height while this position does not, so on a short
-            # device the flange can sit squarely in that path. It did: the
-            # Flex Mini's upper nuts could not be fitted at all, and every
-            # check passed, because none of them swept the nut in.
-            feed = hexnut3(x, z, 10.0, P.BAR_NUT_Y0 + 0.05,
-                           P.BAR_T + P.BAR_FLANGE_D)
-            v = vol(asm.common(feed))
+            # Seating is not fitting. The nut goes in from the END of the
+            # plate, so it has to travel the whole way along its slot -- flats
+            # top and bottom, which is also what stops it turning.
+            ny0, ny1 = P.BAR_NUT_Y0 + 0.05, P.BAR_NUT_Y0 + P.M6_HEX_D - 0.05
+            feed = n.fuse(box(x, sx * (P.PLATE_HW + 1.0), ny0, ny1,
+                              z - 5.0, z + 5.0))
+            v = vol(fp.common(feed))
             check(v < VOID,
-                  "and can be fed in from the rear at x=%+7.2f z=%5.2f" % (x, z),
-                  "%.3f mm3 in its way over the %.1f mm it travels"
-                  % (v, P.BAR_T + P.BAR_FLANGE_D - P.BAR_NUT_Y0))
+                  "and slides in from the end of the plate at x=%+7.2f z=%5.2f"
+                  % (x, z), "%.3f mm3 in its way over the %.1f mm it travels"
+                  % (v, P.PLATE_HW - P.BAR_SCREW_X))
+            # Once in, it must stay in: plate behind it, so it cannot fall out
+            # of the back, and the rail across the slot's mouth, so it cannot
+            # come back out of the end.
+            vb = vol(fp.common(n.translated(Vector(0, 2.0, 0))))
+            ve = vol(asm.common(n.translated(Vector(sx * 8.0, 0, 0))))
+            check(vb > VOID and ve > VOID,
+                  "and is trapped there at x=%+7.2f z=%5.2f" % (x, z),
+                  "%.0f mm3 of plate behind it, %.0f mm3 of rail across the "
+                  "slot" % (vb, ve))
             through = Part.makeCylinder(3.0, P.EAR_T + P.BAR_NUT_Y0 + 0.1,
                                         Vector(x, -P.EAR_T - 0.05, z),
                                         Vector(0, 1, 0))
@@ -736,7 +703,7 @@ def one_device(parts, bodies, dev):
     edge = box(P.LEDGE_X0, P.TRAY_X1, -50, 400, P.LAP_T, P.TRAY_T)
     strip = trays.common(edge).BoundBox
     got = strip.YLength
-    gap = P.STOP_Y - P.LEDGE_Y0
+    gap = P.STOP_Y - P.DEV_Y0
     check(gap - got >= 0.3, "the tray drops into the gap it has to sit in",
           "%.2f mm long, %.2f mm gap, %.2f mm of fit" % (got, gap, gap - got))
     check(gap - got <= P.TRAY_FIT + 0.2,
@@ -772,9 +739,35 @@ def one_device(parts, bodies, dev):
           limit=P.EAR_T + P.POST_HOLE_D)
     screw("faceplate screw reaches its nut", P.EAR_T - P.BAR_CB_D,
           P.EAR_T - P.BAR_CB_D + P.BAR_NUT_Y0, P.M6_HEX_D)
-    screw("splice screw reaches its nut", P.RAIL_T,
-          P.RAIL_T + P.SPLICE_BOSS_T - P.M6_HEX_D, P.M6_HEX_D)
 
+
+    # Not overlapping is not the same as fitting. Every face here used to be
+    # drawn touching the one it meets -- 214.0 mm of faceplate and of tray in
+    # a 214.0 mm bay -- and all of it passed, because touching is not
+    # overlapping. So each part is moved a little and has to stay clear.
+    print("\n[room to assemble -- parts moved, not just placed]")
+    sides = parts["side_l"].fuse(parts["side_r"])
+    t_l, t_r = parts[dev.part("tray_l")], parts[dev.part("tray_r")]
+
+    def room(what, a, b_, vec):
+        v = vol(a.translated(vec).common(b_))
+        check(v < VOID, what, "%.3f mm3 when moved %.2f mm"
+              % (v, vec.Length))
+
+    for sx in (-1, 1):
+        tag = "left" if sx < 0 else "right"
+        room("the faceplate has room between the rails, %s" % tag,
+             fp, sides, Vector(sx * 0.15, 0, 0))
+        room("the tray has room between the rails, %s" % tag,
+             trays, sides, Vector(sx * 0.15, 0, 0))
+        room("the tray halves have room in the lap, %s" % tag,
+             t_l, t_r, Vector(sx * 0.2, 0, 0))
+    room("the faceplate has room in front of the ledge",
+         fp, sides, Vector(0, 0.2, 0))
+    room("the tray has room in front of the rear stops",
+         trays, sides, Vector(0, 0.4, 0))
+    for d in (-0.2, 0.2):
+        room("the pegs have room fore and aft", t_l, t_r, Vector(0, d, 0))
 
     print("\n[clearances]")
     check(abs((P.POST_CLEAR_HW - P.BODY_HW) - 0.925) < 1e-9,
