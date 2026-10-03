@@ -248,6 +248,69 @@ def one_device(parts, bodies, dev):
             v = vol(side.translated(Vector(0, -out, 0)).common(lg))
             check(v < VOID, "%s lets the side in from %3.0f mm out" % (nm, out),
                   "%.3f mm3" % v)
+    # --- the end stop -----------------------------------------------------
+    # Drawn out, the frame has to stop: clear just short of CATCH_PULL, and
+    # the rail's notch hard against the tooth just past it. On a deeper or
+    # shallower rack the leg sits elsewhere and the travel changes with it.
+    for sx, nm in ((-1, "leg_l"), (1, "leg_r")):
+        lg = parts[nm]
+        side = parts["side_l" if sx < 0 else "side_r"]
+        for depth in (230.0, P.RACK_D, 240.0):
+            d = depth - P.RACK_D
+            pull = P.CATCH_PULL - d
+            leg_d = lg.translated(Vector(0, d, 0))
+            free = vol(side.translated(Vector(0, -(pull - 0.3), 0)).common(leg_d))
+            held = vol(side.translated(Vector(0, -(pull + 1.0), 0)).common(leg_d))
+            check(free < VOID and held > VOID,
+                  "%s stops the frame %.0f mm out on a %.0f mm rack"
+                  % (nm, pull, depth),
+                  "clear at %.1f, %.1f mm3 of tooth in the way at %.1f"
+                  % (pull - 0.3, held, pull + 1.0))
+        # On the way in, the rail rides over the tooth. That is interference,
+        # on purpose, and the finger gives. It must be the tooth and nothing
+        # else, and there must be room behind the finger for it to give into.
+        tooth = box(sx * (P.POCKET_HW - P.RUN_FIT),
+                    sx * (P.POCKET_HW - P.RUN_FIT + P.CATCH_TOOTH + 0.1),
+                    P.CATCH_Y0 - 0.1, P.CATCH_Y + 0.1, -0.1, P.CATCH_TOOTH_Z + 0.1)
+        over = side.translated(Vector(0, -(P.CATCH_PULL + 5.0), 0))
+        v_all = vol(over.common(lg))
+        v_tooth = vol(over.common(lg.common(tooth)))
+        check(v_all > VOID and abs(v_all - v_tooth) < VOID,
+              "%s: going in, the rail meets the catch's tooth and only that"
+              % nm, "%.1f mm3, %.1f of it tooth" % (v_all, v_tooth))
+        finger = box(sx * (P.POCKET_HW - P.RUN_FIT - P.LEG_T - P.CATCH_TAB),
+                     sx * (P.POCKET_HW - P.RUN_FIT + P.CATCH_TOOTH),
+                     P.CATCH_Y0, P.CATCH_Y0 + P.CATCH_L, 0.0, P.CATCH_Z)
+        swept = finger.translated(Vector(-sx * (P.CATCH_TOOTH + 0.5), 0, 0))
+        others = [parts[n] for n in names if n != nm]
+        v = sum(vol(swept.common(o)) for o in others)
+        check(v < VOID, "%s: the finger has room to give" % nm,
+              "%.3f mm3 behind it over %.1f mm" % (v, P.CATCH_TOOTH + 0.5))
+        check(len(lg.Solids) == 1 and vol(lg.common(finger)) > 300.0,
+              "%s: the finger is still part of the leg" % nm,
+              "%.0f mm3 of it, one solid" % vol(lg.common(finger)))
+    left = (P.RUN_Y1 - P.LEG_Y0) - P.CATCH_PULL
+    check(left >= 15.0, "tongue is still in the groove at the stop",
+          "%.0f mm, whatever the rack's depth" % left)
+    # At the stop the faceplate goes down into its place from above. It has
+    # to be in front of whatever is in the U above -- on the deepest rack,
+    # which draws out least -- and has to pass the sides, the tray and the
+    # device on the way down.
+    back_of_plate = (P.BAR_T + P.BAR_FLANGE_D) - (P.CATCH_PULL - 5.0)
+    check(back_of_plate <= -P.NEIGHBOUR_PROUD,
+          "at the stop the faceplate is clear in front of the U above",
+          "its flange is %.1f mm in front of the posts on a 240 mm rack; a "
+          "neighbour stands %.1f proud" % (-back_of_plate, P.NEIGHBOUR_PROUD - 1.0))
+    fp_ = parts[dev.part("faceplate")]
+    case_ = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d, dev.z0, dev.z1)
+    below = [parts[n] for n in ("side_l", "side_r", dev.part("tray_l"),
+                                dev.part("tray_r"))] + [case_]
+    hit = [h for h in (2.0, 6.0, 12.0, 20.0, 30.0, 45.0, 60.0)
+           if sum(vol(fp_.translated(Vector(0, 0, h)).common(o))
+                  for o in below) > VOID]
+    check(not hit, "and slides straight down between the sides onto its screws",
+          "fouls at %s mm up" % hit if hit else "clear from 60 mm above to home")
+
     check(P.RUN_END - fwd >= P.RUN_Y1,
           "the groove takes the tongue with the leg fully forward",
           "groove ends at %.1f, tongue at %.1f" % (P.RUN_END - fwd, P.RUN_Y1))

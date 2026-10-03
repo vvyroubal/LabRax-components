@@ -111,6 +111,37 @@ def _runner(doc, bd, name, sx, y0, y1, y_end):
     return sk.pocket(doc, bd, s, y_end - y0, reversed_=False)
 
 
+def _catch(doc, bd, name, sx):
+    """The end stop's sprung finger, at the foot of a rear leg.
+
+    A slit frees a strip along the bottom of the plate, rooted at its rear
+    end. The tooth on its tip stands into the rail's notch: ramped where the
+    rail arrives, square where it leaves. The tab on the other face is what a
+    fingertip finds from the back of the rack.
+    """
+    xo = P.POCKET_HW - P.RUN_FIT           # the leg's outer face
+    xi = xo - P.LEG_T                      # and its inner one
+    y0, y1 = P.CATCH_Y0, P.CATCH_Y0 + P.CATCH_L
+    s = sk.sketch(doc, bd, name + "_Sk_catch_slit",
+                  sk.plane(Vector(sx * xo, 0, 0), sk.Y, sk.Z))
+    # One cut: a gap in front of the tip, and the slit over the finger.
+    sk.polygon(s, [(y0 - 1.0, -1.0), (y0, -1.0), (y0, P.CATCH_Z),
+                   (y1, P.CATCH_Z), (y1, P.CATCH_Z + P.CATCH_SLIT),
+                   (y0 - 1.0, P.CATCH_Z + P.CATCH_SLIT)])
+    sk.pocket(doc, bd, s, P.LEG_T)
+
+    s = sk.sketch(doc, bd, name + "_Sk_catch_tooth",
+                  sk.plane(Vector(0, 0, 0), sk.X, sk.Y))
+    t = P.CATCH_TOOTH
+    # Each rooted a little inside the finger, so they are one solid with it.
+    sk.polygon(s, [(sx * (xo - 0.3), y0),
+                   (sx * (xo + t), y0 + P.CATCH_RAMP),
+                   (sx * (xo + t), P.CATCH_Y),
+                   (sx * (xo - 0.3), P.CATCH_Y)])
+    sk.rect(s, sx * (xi - P.CATCH_TAB), y0, sx * (xi + 0.3), y0 + 4.0)
+    return sk.pad(doc, bd, s, P.CATCH_TOOTH_Z)
+
+
 def side(doc, sx, name):
     """One side of the bracket, front ear through to rear ear."""
     bd = sk.body(doc, name)
@@ -156,6 +187,15 @@ def side(doc, sx, name):
     for z in P.EIA_Z:
         sk.slot(s, sx * P.SCREW_X, z, P.SLOT_W, P.SLOT_H)
     sk.pocket(doc, bd, s, P.EAR_T)
+
+    # The notch the leg's catch runs in, along the rail's bottom edge. Its
+    # rear end is the end stop: draw the frame out and that is what meets the
+    # tooth. Behind it the rail is full height again, and rides over the tooth
+    # on the way in.
+    s = sk.sketch(doc, bd, name + "_Sk_notch",
+                  sk.plane(Vector(sx * P.POCKET_HW, 0, 0), sk.Y, sk.Z))
+    sk.rect(s, P.NOTCH_Y0, -1.0, P.NOTCH_Y1, P.NOTCH_Z)
+    sk.pocket(doc, bd, s, P.RAIL_T)
 
     # Clearance for the two screws that hold the bars on, one high, one low,
     # each with its head sunk a millimetre so a 12 mm screw reaches its nut.
@@ -203,6 +243,7 @@ def leg(doc, sx, name):
     bd = sk.body(doc, name)
 
     _runner(doc, bd, name, sx, P.LEG_Y0, P.RACK_D, P.RUN_END)
+    _catch(doc, bd, name, sx)
 
     # The rear ear, on the far side of the rear posts: the screws go into
     # them from outside the rack, like every other one.

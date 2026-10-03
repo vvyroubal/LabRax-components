@@ -87,8 +87,9 @@ RUN_FIT = 0.25        # [design] clearance on every face of the groove. Print
 RUN_BACK = 3.2        # [design] what the leg keeps behind the groove
 RUN_JAW = 5.0         # [design] and above and below it, past the tongue's tip
 LEG_T = 3.2           # [design] the leg's plate, same as the rail
-LEG_Y0 = 152.0        # [design] front of the leg, 8 mm behind the rear stop
-RUN_MOUTH = 6.0       # [design] the groove opens out over its first 6 mm...
+LEG_Y0 = 150.0        # [design] front of the leg, 6 mm behind the rear stop:
+                      # a 230 mm rack brings it 5 of those forward
+RUN_MOUTH = 4.0       # [design] the groove opens out over its first 4 mm...
 RUN_MOUTH_FIT = 1.0   # [design] ...by this much, so the tongue finds its way
 RUN_MIN = 30.0        # [design] the least engagement worth calling a joint
 
@@ -168,7 +169,52 @@ STOP_H = 36.0      # [design] how tall it stands
 # the stop lets it come.
 RUN_Y0 = STOP_Y + STOP_T                       # 144.0
 RUN_Y1 = RAIL_Y1 - RUN_D                       # 202.0
-RUN_END = RUN_Y1 + (LEG_Y0 - RUN_Y0) + 4.0     # 214.0
+RUN_END = RUN_Y1 + (LEG_Y0 - RUN_Y0) + 4.0     # 212.0
+
+# The end stop. Drawn forward, the frame used to run off the end of its
+# runners with nothing to say it had: 50 mm and it was in your hands. Each leg
+# now carries a sprung catch -- a finger cut out of the foot of its plate,
+# with a tooth on the tip -- and each rail a notch along its bottom edge that
+# the tooth runs in. Going in, the end of the rail rides up the tooth's ramp
+# and pushes the finger aside; coming out, the back of the notch meets the
+# tooth's square face and stops.
+#
+# WHERE it stops is set by the faceplate. With the frame at the stop the
+# faceplate has to go down into its place from above, flange and all, in front
+# of whatever is in the U above -- and the worst thing to have up there is
+# another of these, whose faceplate screws stand 8.8 mm proud of the posts.
+# The plate and its flange are 20 mm deep, so the frame has to come out 30 at
+# the very least; a 240 mm rack takes 5 off the travel, hence 35. That leaves
+# 17 mm of tongue in the groove at the stop, on any rack: the travel and the
+# engagement move together with the rack's depth and their sum does not.
+#
+# The finger is at the foot of the leg so that it prints flat on the bed, with
+# the plate bridging over the slit above it. Anywhere higher it would be a
+# 30 mm cantilever printed in the air.
+CATCH_PULL = 35.0     # [design] how far the frame draws out before it stops,
+                      # on a rack of nominal depth
+CATCH_L = 30.0        # [design] the finger's length; 2 mm at the tip strains
+                      # it about 1%
+CATCH_Z = 4.0         # [design] the finger's height, off the bed
+CATCH_SLIT = 1.2      # [design] the slit above it, which the plate bridges
+CATCH_TOOTH = 2.0     # [design] how far the tooth stands off the leg's face;
+                      # 1.75 of that is in the rail
+CATCH_TOOTH_Z = 3.5   # [design] the tooth's height, half a millimetre under
+                      # the notch
+CATCH_RAMP = 3.0      # [design] the tooth's ramp, on the side the rail arrives
+CATCH_FLAT = 2.0      # [design] and its flat top, behind the ramp
+CATCH_TAB = 6.0       # [design] a tab on the finger's tip, standing into the
+                      # bay: push both towards the middle to let the frame out
+CATCH_Y0 = LEG_Y0 + RUN_MOUTH + 2.0             # 156.0, the finger's tip
+CATCH_Y = CATCH_Y0 + CATCH_RAMP + CATCH_FLAT    # 161.0, the tooth's square face
+# The notch in the rail: from where the tooth sits with the leg fully forward
+# to where it has to be met with the frame drawn out.
+NOTCH_Y0 = CATCH_Y0 - (LEG_Y0 - RUN_Y0) - 0.5   # 149.5
+NOTCH_Y1 = CATCH_Y + CATCH_PULL                 # 196.0
+NOTCH_Z = CATCH_Z + 0.5                         # 4.5
+# What the faceplate has to clear on its way down: the proudest thing in the
+# U above, plus a millimetre.
+NEIGHBOUR_PROUD = EAR_T + 2.3 + 1.0             # 9.8
 
 # Ventilation in the side rails -- the device vents through its sides.
 RAIL_VENT_Z0 = 10.0

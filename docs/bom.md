@@ -14,10 +14,10 @@ whichever you open is a complete build. Open it, print all six plates, done.
 
 | file | plates | |
 |---|---|---|
-| `ucg-fiber/UCG_Fiber_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 UCG-Fiber | 260.0 g, 11 h 20 |
-| `usw-flex-mini/USW_Flex_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 USW-Flex | 247.7 g, 11 h 06 |
-| `tl-sg108e/TL_SG108E_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 TL-SG108E | 254.6 g, 11 h 20 |
-| `nuc6i7kyk/NUC6i7KYK_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 NUC6i7KYK | 245.3 g, 11 h 18 |
+| `ucg-fiber/UCG_Fiber_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 UCG-Fiber | 261.0 g, 11 h 23 |
+| `usw-flex-mini/USW_Flex_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 USW-Flex | 248.7 g, 11 h 09 |
+| `tl-sg108e/TL_SG108E_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 TL-SG108E | 255.6 g, 11 h 23 |
+| `nuc6i7kyk/NUC6i7KYK_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 NUC6i7KYK | 246.3 g, 11 h 21 |
 
 Every plate carries its own label in Bambu Studio — `Chassis 2 of 3 - right
 side`, `UCG-Fiber 3 of 3 - faceplate` — so the tab tells you which kit a plate
@@ -25,7 +25,7 @@ belongs to without reference to this table.
 
 | kit | parts | filament | time |
 |---|---|---|---|
-| chassis | `side_l`, `side_r`, `leg_l`, `leg_r` | 111.0 g | 5 h 44 |
+| chassis | `side_l`, `side_r`, `leg_l`, `leg_r` | 112.1 g | 5 h 46 |
 | UCG-Fiber | `tray_ucg_l`, `tray_ucg_r`, `faceplate_ucg` | 149.0 g | 5 h 37 |
 | USW-Flex-2.5G-5 | `tray_usw_l`, `tray_usw_r`, `faceplate_usw` | 136.7 g | 5 h 22 |
 | TL-SG108E | `tray_sg108e_l`, `tray_sg108e_r`, `faceplate_sg108e` | 143.6 g | 5 h 36 |
@@ -34,14 +34,14 @@ belongs to without reference to this table.
 **If you are building both**, print the chassis once — the three chassis
 plates are identical in the two files.
 
-Chassis plus one device is about **260 g / 11 h 20** for the gateway, or
-**248 g / 11 h 06** for the switch. All fifteen plates, 674.5 g.
+Chassis plus one device is about **261 g / 11 h 23** for the gateway, or
+**249 g / 11 h 09** for the switch. All fifteen plates, 675.5 g.
 
 | plate | part | size (mm) | filament | time | support |
 |---|---|---|---|---|---|
-| 1 | `side_l` | 33 × 212.5 × 44.5 | 36.1 g | 1 h 55 | yes |
-| 2 | `side_r` | 33 × 212.5 × 44.5 | 36.1 g | 1 h 55 | yes |
-| 3 | `leg_l` + `leg_r` | 33 × 89.5 × 44.5 each | 38.9 g | 1 h 54 | yes |
+| 1 | `side_l` | 33 × 212.5 × 44.5 | 36.1 g | 1 h 56 | yes |
+| 2 | `side_r` | 33 × 212.5 × 44.5 | 36.1 g | 1 h 56 | yes |
+| 3 | `leg_l` + `leg_r` | 33 × 91.5 × 44.5 each | 40.0 g | 1 h 55 | yes |
 | 4 | `tray_ucg_l` | 136.5 × 131.4 × 9 | 49.0 g | 1 h 45 | yes |
 | 5 | `tray_ucg_r` | 136.5 × 131.4 × 9 | 57.3 g | 2 h 07 | yes |
 | 6 | `faceplate_ucg` | 213.6 × 20 × 44.5 | 42.7 g | 1 h 45 | no |
@@ -68,7 +68,7 @@ the per-part support and brim settings — see
 **Nothing carries over from the version with a bolted splice.** The joint
 between each side and its rear leg is now a runner, which changes both of
 them, and the faceplate and the trays were given the clearance they never
-had. A full chassis and one kit is about 260 g and 11 h 20.
+had. A full chassis and one kit is about 261 g and 11 h 23.
 
 Plate numbers 1 to 6 are unchanged, so anything already quoted against them
 still means the same thing.
@@ -76,7 +76,7 @@ still means the same thing.
 | part | verdict |
 |---|---|
 | `side_l`, `side_r` | **reprint, both** — the splice slots are gone and a dovetail tongue runs along the inside of the rail; the ledge starts 0.3 mm further back |
-| `leg_l`, `leg_r` | **reprint, both** — no bosses, no nuts: a grooved runner the side slides into |
+| `leg_l`, `leg_r` | **reprint, both** — no bosses, no nuts: a grooved runner the side slides into, with a sprung catch at its foot for the end stop |
 | `faceplate` | **reprint** — 0.4 mm narrower, and its nuts now go in from the ends |
 | `tray_l`, `tray_r` | **reprint, both** — 0.2 mm of room a side, 0.3 in the lap, looser pegs |
 | `top_bar`, bottom bar | **gone** — replaced by the faceplate |

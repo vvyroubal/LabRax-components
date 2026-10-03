@@ -105,7 +105,7 @@ Seven prints for one device, none over a 180 mm bed.
 | part | size (mm) | qty | kit |
 |---|---|---|---|
 | `side_l` / `side_r` | 33 × 212.5 × 44.5 | 1 each | chassis |
-| `leg_l` / `leg_r` | 33 × 89.5 × 44.5 | 1 each | chassis |
+| `leg_l` / `leg_r` | 33 × 91.5 × 44.5 | 1 each | chassis |
 | `tray_ucg_l` / `tray_ucg_r` | 136.5 × 131.4 × 9 | 1 each | UCG-Fiber |
 | `faceplate_ucg` | 213.6 × 20 × 44.5 | 1 | UCG-Fiber |
 | `tray_usw_l` / `tray_usw_r` | 136.5 × 128.4 × 19.6 | 1 each | Flex Mini |
@@ -122,7 +122,8 @@ printer before the sides and legs are printed.
 A **side** carries the front ear, the side rail, the ledge the tray lands on,
 a rear stop, and behind that a **dovetail tongue** along the inner face of the
 rail. A **rear leg** carries the rear ear and a **groove** that tongue slides
-into. There is no screw between them.
+into. There is no screw between them. At the foot of each leg is a sprung
+**catch**, and along the bottom of each rail a notch it runs in: the end stop.
 
 The **tray** comes in halves — at 214 mm it will not fit the bed in any
 orientation — lapping 60 mm across the centreline, the left half passing
@@ -159,12 +160,38 @@ Everything with a screw in it is done either behind the rack or on the bench.
    faceplate's flange, and drops behind the tray's rear lip.
 6. **Slide it in.** Offer the whole frame to the front of the rack and push:
    each side's tongue runs into its leg's groove, which opens out over its
-   first 6 mm to catch it. Stop when the front ears meet the posts.
+   first 4 mm to catch it. About 35 mm from home the two catches click into
+   their notches. Carry on until the front ears meet the posts.
 7. **Bolt up.** Six M6 with washers through the front ears, then tighten the
    six at the back.
 
-To take the device out, undo the six front screws and draw the frame forward;
-the legs stay in the rack.
+### The end stop
+
+Undo the six front screws and the frame draws forward **35 mm and stops** —
+40 on a 230 mm rack, 30 on a 240 — with 17 mm of each tongue still in its
+groove. It no longer runs off the end of its runners into your hands.
+
+**At the stop the faceplate can go on or come off in the rack.** It stands
+wholly in front of the posts there, flange and all, with 10 mm to spare on the
+deepest rack — clear of a neighbour in the U above, whose own faceplate
+screws stand 8.8 mm proud. So the two sides can be slid in on their own until
+they click, the faceplate lowered between them from above, behind the ears,
+and its four screws put in from the front; or a faceplate changed without
+taking anything else out.
+
+That does not get the tray or the device in. They go in from above too, and
+at 35 mm out most of the bay is still under whatever is in the U above. With
+that U empty, everything can be done in the rack. Otherwise the tray and the
+device go into the frame on the bench, as above.
+
+Seventeen millimetres of tongue locates the frame; it does not carry it.
+**Hold the front up while it is at the stop**, or let it rest on what is
+below.
+
+**To take the frame right out**, reach in from the back of the rack and push
+the two tabs at the foot of the legs towards the middle, then draw it
+forward. Each tab is the tip of its catch; a screwdriver does as well as a
+finger.
 
 **Why it is this way round.** The side goes in from the front and the leg
 from the rear — each is stopped by its own ear, which is wider than the gap
@@ -219,8 +246,8 @@ into a groove at each end, and 170.0 + 2 × 2.95 is 175.9 exactly. Reading
 175.9 as the gap once made this bracket 16 mm too long. The post's section is
 30 × 35 and the mesh does not say which way it faces, so the outer depth is
 either 230 or 240; the nominal sits between them at 235 and **the runner
-takes up the difference by itself, covering 227 – 255 mm**: 8 mm shallower
-than nominal before the leg meets the side's rear stop, 20 mm deeper before
+takes up the difference by itself, covering 229 – 257 mm**: 6 mm shallower
+than nominal before the leg meets the side's rear stop, 22 mm deeper before
 less than 30 mm of tongue is left in the groove.
 
 ## Fasteners
@@ -327,13 +354,15 @@ leg behind it. Keep plugs out of that last 7.4 mm.
 Two tools, each run once per device, and they check different things.
 
 `make verify` measures the **built solids**, not the parameters, so a feature
-that silently does nothing is caught rather than assumed away. **179 checks for
-the gateway and the NUC, 178 for the Flex Mini, 175 for the TL-SG108E.** That each body is one valid solid built from
+that silently does nothing is caught rather than assumed away. **194 checks for
+the gateway and the NUC, 193 for the Flex Mini, 190 for the TL-SG108E.** That each body is one valid solid built from
 sketches driving pads and pockets; that it fits the bed, turned on the diagonal
 if it has to; that no two parts foul each other; that an M6 passes all twelve
 rack slots and does not bottom out in the post's blind hole; that each leg
 is held on its tongue every way but along the rack's depth, and slides the
-whole range claimed; that the faceplate and the tray still clear what is
+whole range claimed; that the frame stops where it should when drawn out, on
+racks of either depth, and that the faceplate can then be lowered into it
+clear of the U above; that the faceplate and the tray still clear what is
 beside them when they are *moved*, not just where they are drawn; that the
 tray is solid under the device all the
 way across, that the halves lap rather than butt, that all four pegs meet a
@@ -396,11 +425,16 @@ first printed bracket was very hard to assemble, with every check passing:
 
 - **The depth sets itself.** The rack's own parts give 230 or 240 depending
   on which way the post faces; 235 is the midpoint and the runner covers
-  227 – 255 mm. Leave the rear screws finger-tight until the frame is in.
+  229 – 257 mm. Leave the rear screws finger-tight until the frame is in.
 - **Print the two coupons first.** `common/stl/coupon_tongue.stl` and
   `coupon_groove.stl` are 25 mm of the runner. If they bind, raise `RUN_FIT`
   from 0.25; if they rattle, lower it. A dovetail's fit depends on the printer
   far more than on the number, and a side is a two-hour print.
+- **The catch is a printed spring.** Its finger is 30 mm long and bends
+  2 mm, about 1% strain, and it prints flat on the bed with the leg's plate
+  bridging a 1.2 mm slit above it. If the slicer fills that slit with
+  support, clear it out, or the finger cannot move. If the catch is too stiff
+  or too weak, change `CATCH_L`; if it will not hold, raise `CATCH_TOOTH`.
 - **Clearances are 0.2 mm a side** on the faceplate and the tray
   (`PLATE_FIT`, `TRAY_SIDE_FIT`), 0.3 between the tray halves (`LAP_FIT`) and
   0.5 on the pegs' diameter (`KEY_FIT`). Open them up if yours are still
@@ -434,7 +468,7 @@ common/
                     pockets, fillets, and finding edges by where they are
     model.py        four chassis bodies plus three per device
   tools/
-    verify.py       175 - 179 checks per device against the rack and the bed
+    verify.py       190 - 194 checks per device against the rack and the bed
     assembly.py     87 checks with real M6 solids at all sixteen positions
     measure_rack.py re-derives the [rack] numbers from the Lab Rax mesh files
     preview.py      renders each device's images/ (FreeCAD is headless here)
@@ -463,14 +497,14 @@ Six plates in each device's 3MF, grouped as kits:
 
 | plates | kit | filament | time |
 |---|---|---|---|
-| 1–3 | chassis (in every file) | 111.0 g | 5 h 44 |
+| 1–3 | chassis (in every file) | 112.1 g | 5 h 46 |
 | 4–6 | UCG-Fiber | 149.0 g | 5 h 37 |
 | 4–6 | Flex Mini 2.5G | 136.7 g | 5 h 22 |
 | 4–6 | TL-SG108E | 143.6 g | 5 h 36 |
 | 4–6 | NUC6i7KYK | 134.3 g | 5 h 35 |
 
 Print the chassis once and then the kit for whatever you are racking: about
-260 g for the gateway, 248 g for the switch. Full details, and what survives
+261 g for the gateway, 249 g for the switch. Full details, and what survives
 from an earlier print, in [docs/bom.md](docs/bom.md).
 
 ## License
