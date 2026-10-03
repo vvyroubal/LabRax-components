@@ -8,6 +8,7 @@ from devices import Device, Window
 # both sides, and its display faces the rack front while the ports face back.
 DEVICE = Device(
     key="ucg", name="UCG-Fiber",
+    doc="UCG_Fiber_LabRax",
     w=212.8, d=127.6, h=30.0, mass_g=734,
     plinth=0.0,
     keys_y=(20.0, 116.0),   # one pair inside the front edge, one near the back

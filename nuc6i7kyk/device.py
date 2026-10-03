@@ -28,6 +28,7 @@ from devices import Device, Frame
 # faceplate's own M6 nut pockets at +/-100. 16 mm keeps it 5.5 mm clear.
 DEVICE = Device(
     key="nuc", name="NUC6i7KYK",
+    doc="NUC6i7KYK_LabRax",
     w=211.0, d=116.0, h=28.0, mass_g=700,
     plinth=(P.RACK_U - 28.0) / 2.0 - P.TRAY_T,   # 2.225, centres it in the U
     keys_y=(20.0, 110.0),

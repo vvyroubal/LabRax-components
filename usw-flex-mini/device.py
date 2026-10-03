@@ -14,6 +14,7 @@ from devices import Device, Frame
 # 17 mm of blank plate above it.
 DEVICE = Device(
     key="usw", name="USW-Flex-2.5G-5",
+    doc="USW_Flex_LabRax",
     w=117.1, d=90.0, h=21.2, mass_g=206,
     plinth=(P.RACK_U - 21.2) / 2.0 - P.TRAY_T,   # 5.625, centres it in the U
     keys_y=(20.0, 85.0),    # its tray is shorter, so the back pair comes in

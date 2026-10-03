@@ -342,10 +342,10 @@ Geometry that fits is not geometry that holds.
   unit — first RJ45's left edge to the USB-C's right edge, and its height. The
   opening exposes all but a 4 mm border and should clear everything, but this
   project has already had two calliper readings drive a reprint.
-- `common/cad/*.FCStd` and `common/step/*` embed a build timestamp, so `make`
-  leaves them looking modified even when nothing changed. The 3MF and the STLs
-  are reproducible. Discard that churn with
-  `git checkout -- common/cad common/step`.
+- Every `.FCStd` and `.step` embeds a build timestamp, so `make` leaves them
+  looking modified even when nothing changed. The 3MF and the STLs are
+  reproducible. Discard that churn with
+  `git checkout -- '*.FCStd' '*.step'`.
 
 ## Layout
 
@@ -373,10 +373,12 @@ common/
 ucg-fiber/          one folder per device:
   device.py           its profile: case, mass, plinth, front opening
   stl/                its tray pair and faceplate
+  *.FCStd  *.step     the chassis and its three parts, as FreeCAD and STEP
   *.3mf               the chassis and its kit, plated for the A1 mini
   images/             renders of it assembled
 usw-flex-mini/  tl-sg108e/  nuc6i7kyk/
-build.py            writes common/cad, common/step and every stl/
+build.py            writes common/cad, common/step, every stl/ and each
+                    device's own FCStd and STEP
 docs/
   bom.md          what to print, what to keep, what to buy
   measurements.md where every number came from

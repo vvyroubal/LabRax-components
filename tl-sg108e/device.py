@@ -19,6 +19,7 @@ from devices import Device, Frame
 # else is behind the case above that line.
 DEVICE = Device(
     key="sg108e", name="TL-SG108E",
+    doc="TL_SG108E_LabRax",
     w=158.0, d=101.0, h=25.0, mass_g=250,
     plinth=(P.RACK_U - 25.0) / 2.0 - P.TRAY_T,   # 3.725, centres it in the U
     keys_y=(20.0, 95.0),

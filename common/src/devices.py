@@ -2,7 +2,8 @@
 
 Each device has a folder of its own at the top of the project -- ucg-fiber/,
 usw-flex-mini/ and so on -- holding its profile in device.py and everything
-made for it: its tray and faceplate STLs, its 3MF, its renders. The chassis,
+made for it: its tray and faceplate STLs, its FreeCAD document and STEP, its
+3MF, its renders. The chassis,
 and the code, are in common/. This module holds the classes a profile is
 written with, loads the profiles, and says where each part's files go.
 
@@ -12,6 +13,8 @@ around a device, so a second device costs three prints, not seven.
 
 What a profile has to say:
 
+    doc          what its FreeCAD document and STEP are called, less the
+                 extension: the same stem its 3MF has
     w, d, h      the case, in mm
     mass_g       what it weighs, for the load checks
     plinth       how far the tray lifts it above its own top face. 0 puts the
@@ -87,10 +90,11 @@ class Frame(object):
 
 
 class Device(object):
-    def __init__(self, key, name, w, d, h, mass_g, front, keys_y, plinth=0.0,
-                 vent=False, clr_w=None, clr_h=None, clr_d=None):
+    def __init__(self, key, name, doc, w, d, h, mass_g, front, keys_y,
+                 plinth=0.0, vent=False, clr_w=None, clr_h=None, clr_d=None):
         self.key = key
         self.name = name
+        self.doc = doc
         self.w = w
         self.d = d
         self.h = h
@@ -164,6 +168,15 @@ class Device(object):
     @property
     def stl_dir(self):
         return os.path.join(self.dir, "stl")
+
+    @property
+    def cad_path(self):
+        """Its own document: the chassis and its three parts, nothing else."""
+        return os.path.join(self.dir, self.doc + ".FCStd")
+
+    @property
+    def step_path(self):
+        return os.path.join(self.dir, self.doc + ".step")
 
     @property
     def images_dir(self):

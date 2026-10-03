@@ -2,6 +2,8 @@
 """Build the bracket: common/cad/UCG_Fiber_LabRax.FCStd plus STL and STEP.
 
 The chassis STLs go to common/stl, each device's to its own folder's stl/.
+Each device's folder also gets a document and a STEP of its own, holding the
+chassis and that device's three parts -- the same split its 3MF makes.
 
 Each part is a PartDesign Body made of sketches with pads and pockets, so the
 document opens as something you can edit feature by feature.
@@ -42,6 +44,31 @@ DOC = "UCG_Fiber_LabRax"
 PARTS = devices.CHASSIS + tuple(p for d in devices.ALL for p in d.parts)
 
 
+def bad_solids(bodies, names):
+    return [n for n in names
+            if not bodies[n].Shape.isValid() or len(bodies[n].Shape.Solids) != 1]
+
+
+def one_device(dev):
+    """The chassis and one device's three parts, saved in that device's folder.
+
+    Built afresh rather than copied out of the big document, so each body
+    keeps the sketches, pads and pockets it is made of.
+    """
+    names = devices.CHASSIS + dev.parts
+    doc = App.newDocument(dev.doc)
+    bodies = model.build(doc, only=dev)
+    doc.recompute()
+
+    bad = bad_solids(bodies, names)
+    if bad:
+        print("NOT A SINGLE VALID SOLID in %s: %s" % (dev.doc, ", ".join(bad)))
+
+    doc.saveAs(dev.cad_path)
+    Part.export([bodies[n] for n in names], dev.step_path)
+    App.closeDocument(doc.Name)
+
+
 def main():
     for sub in ("cad", "stl", "step"):
         os.makedirs(os.path.join(devices.COMMON, sub), exist_ok=True)
@@ -52,8 +79,7 @@ def main():
     bodies = model.build(doc)
     doc.recompute()
 
-    bad = [n for n in PARTS
-           if not bodies[n].Shape.isValid() or len(bodies[n].Shape.Solids) != 1]
+    bad = bad_solids(bodies, PARTS)
     if bad:
         print("NOT A SINGLE VALID SOLID: %s" % ", ".join(bad))
 
@@ -66,6 +92,9 @@ def main():
         mesh.write(devices.stl_path(name))
     Part.export([bodies[n] for n in PARTS],
                 os.path.join(devices.COMMON, "step", DOC + ".step"))
+
+    for dev in devices.ALL:
+        one_device(dev)
 
     print("\n%-16s %-34s %12s %8s" % ("part", "bounding box (mm)",
                                        "volume (cm3)", "features"))

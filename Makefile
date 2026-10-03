@@ -17,6 +17,9 @@ STLS  := $(addprefix common/stl/,$(addsuffix .stl,side_l side_r leg_l leg_r)) \
          $(call kit,usw-flex-mini,usw) \
          $(call kit,tl-sg108e,sg108e) \
          $(call kit,nuc6i7kyk,nuc)
+# Each device's own document and STEP: the chassis plus its three parts.
+DEVICE_CAD := $(foreach s,ucg-fiber/UCG_Fiber_LabRax usw-flex-mini/USW_Flex_LabRax \
+                tl-sg108e/TL_SG108E_LabRax nuc6i7kyk/NUC6i7KYK_LabRax,$(s).FCStd $(s).step)
 
 .PHONY: all model verify assembly images plate plates clean
 
@@ -25,7 +28,7 @@ all: model verify assembly images plate
 model: $(CAD)
 
 # One build produces the document and every export, so they share a rule.
-$(CAD) $(STLS): build.py $(wildcard $(SRC)/*.py) $(addsuffix /device.py,$(DEVICE_DIRS))
+$(CAD) $(STLS) $(DEVICE_CAD): build.py $(wildcard $(SRC)/*.py) $(addsuffix /device.py,$(DEVICE_DIRS))
 	$(FREECAD) build.py
 
 # Check the built solids against the rack interface and each device envelope.
@@ -60,4 +63,5 @@ plates: plate
 clean:
 	rm -rf common/stl common/step common/cad/*.FCStd common/cad/*.FCBak
 	rm -rf $(addsuffix /stl,$(DEVICE_DIRS)) $(addsuffix /images,$(DEVICE_DIRS))
-	rm -f $(addsuffix /*.3mf,$(DEVICE_DIRS))
+	rm -f $(addsuffix /*.3mf,$(DEVICE_DIRS)) $(DEVICE_CAD)
+	rm -f $(addsuffix /*.FCBak,$(DEVICE_DIRS))
