@@ -4,6 +4,7 @@ __pycache__/
 result.json
 .plates-*/
 .fem-*/
+graphify-out/
 # The FEM documents are 28 MB each and `make fem` rebuilds them in a few
 # minutes. Keeping them out of the history rather than out of reach.
 common/cad/fem_*.FCStd
