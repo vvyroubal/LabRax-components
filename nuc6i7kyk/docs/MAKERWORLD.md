@@ -1,35 +1,35 @@
-# MakerWorld listing: USW_Flex_LabRax-A1mini.3mf
+# MakerWorld listing: NUC6i7KYK_LabRax-A1mini.3mf
 
-Text to post with `usw-flex-mini/USW_Flex_LabRax-A1mini.3mf`. Paste each part into the matching field.
+Text to post with `../NUC6i7KYK_LabRax-A1mini.3mf`. Paste each part into the matching field.
 
 ## Title
 
-Lab Rax 1U bracket for UniFi Flex Mini 2.5G (USW-Flex-2.5G-5), A1 mini
+Lab Rax 1U bracket for Intel NUC6i7KYK (Skull Canyon), A1 mini
 
 ## Summary
 
-A 1U bracket that carries a UniFi Flex Mini 2.5G in a Lab Rax 10 inch rack, bolted to the front and rear posts. Ports at the front. Every part fits an A1 mini.
+A 1U bracket that carries an Intel NUC6i7KYK (Skull Canyon) in a Lab Rax 10 inch rack, bolted to the front and rear posts, on a slotted tray that lets it breathe. Every part fits an A1 mini.
 
 ## Tags
 
-Lab Rax, 10 inch rack, 1U, UniFi, USW-Flex-2.5G-5, Flex Mini, switch, rack mount, homelab, A1 mini
+Lab Rax, 10 inch rack, 1U, Intel NUC, NUC6i7KYK, Skull Canyon, rack mount, homelab, A1 mini
 
 ## Pictures
 
-Isometric views from FreeCAD, in `usw-flex-mini/images/`, 1200 x 1600 (3:4) on white:
+Isometric views from FreeCAD, in `../images/`, 1200 x 1600 (3:4) on white:
 
-1. `makerworld-usw-assembled.png` — cover picture: the bracket with the
+1. `makerworld-nuc-assembled.png` — cover picture: the bracket with the
    device in place and all sixteen screws fitted.
-2. `makerworld-usw-empty.png` — the bracket without the device, showing the
+2. `makerworld-nuc-empty.png` — the bracket without the device, showing the
    tray and the runners at the back.
-3. `makerworld-usw-exploded.png` — the seven printed parts and the device,
+3. `makerworld-nuc-exploded.png` — the seven printed parts and the device,
    drawn apart to show how they go together.
 
 The device is shown as a plain translucent block the size of its case.
 
 ## Description
 
-**A 1U bracket for the UniFi Flex Mini 2.5G (USW-Flex-2.5G-5), for a Lab Rax 10 inch rack.**
+**A 1U bracket for the Intel NUC6i7KYK, "Skull Canyon", for a Lab Rax 10 inch rack.**
 
 It bolts to the front and the rear posts, so the device is carried at four
 points rather than hung off the front. It goes in like a drawer: two legs
@@ -43,11 +43,11 @@ https://makerworld.com/en/collections/5813742-lab-rax
 
 **The device**
 
-UniFi Flex Mini 2.5G (USW-Flex-2.5G-5), 117.1 x 90 x 21.2 mm, 206 g.
+Intel NUC6i7KYK, "Skull Canyon", 211 x 116 x 28 mm.
 
-The switch's five ports face the front through an open frame in the faceplate, 109.1 x 18.5 mm, with a rounded front edge.
+The NUC's front USB ports and audio jack face the front through an open frame in the faceplate, 179 x 18 mm, with a rounded front edge. Everything else is at the back.
 
-The switch is much narrower than the rack, so its tray carries walls that hold it straight and a plinth that lifts it until it is centred in the U. The frame's border is smaller than the case, so the switch cannot come out through the front.
+The NUC fills the bay, so the bracket's own side rails hold it straight. It draws its cooling air through its underside, so the tray under it is slotted from front to back.
 
 **What is in the file**
 
@@ -72,8 +72,8 @@ Plates 4 to 6 are made for this device.
   poor choice.
 - Profile: 0.20 mm Standard for the A1 mini, as carried in the file. 2 walls,
   15% infill.
-- Filament: about 249 g for all six plates.
-- Time: about 11 h 09 min for all six plates.
+- Filament: about 246 g for all six plates.
+- Time: about 11 h 21 min for all six plates.
 
 Each rear leg has a small sprung catch at its foot, printed flat on the bed
 with a thin slit above it. When the legs come off the plate, check that slit
@@ -120,11 +120,10 @@ of the rack and push the two tabs at the foot of the legs towards the middle.
   covers 229 to 257 mm over the outside of the posts.
 - The gap between the bracket and the rack's posts is under a millimetre a
   side. Print one side first and offer it up to your rack.
-- Before printing the faceplate, measure the port strip on your unit against
-  the 109.1 x 18.5 mm opening. Case dimensions are Ubiquiti's published
-  figures.
-- The opening is deliberately not centred on the case: it is shifted so that
-  an RJ45 plug with its latch goes in.
+- The outer 7 mm at each end of the NUC's back panel sits behind the
+  bracket's rear stops. Keep plugs out of that last 7 mm.
+- Before printing the faceplate, check the front ports on your unit against
+  the 179 x 18 mm opening. Case dimensions are Intel's published figures.
 
 **Source, other devices and full documentation**
 

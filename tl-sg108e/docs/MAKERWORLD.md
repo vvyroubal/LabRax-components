@@ -1,35 +1,35 @@
-# MakerWorld listing: UCG_Fiber_LabRax-A1mini.3mf
+# MakerWorld listing: TL_SG108E_LabRax-A1mini.3mf
 
-Text to post with `ucg-fiber/UCG_Fiber_LabRax-A1mini.3mf`. Paste each part into the matching field.
+Text to post with `../TL_SG108E_LabRax-A1mini.3mf`. Paste each part into the matching field.
 
 ## Title
 
-Lab Rax 1U bracket for UniFi Cloud Gateway Fiber (UCG-Fiber), A1 mini
+Lab Rax 1U bracket for TP-Link TL-SG108E, A1 mini
 
 ## Summary
 
-A 1U bracket that carries a UniFi Cloud Gateway Fiber in a Lab Rax 10 inch rack, bolted to the front and rear posts. Display at the front, cables at the back. Every part fits an A1 mini.
+A 1U bracket that carries a TP-Link TL-SG108E 8-port switch in a Lab Rax 10 inch rack, bolted to the front and rear posts. Ports at the front. Every part fits an A1 mini.
 
 ## Tags
 
-Lab Rax, 10 inch rack, 1U, UniFi, UCG-Fiber, Cloud Gateway Fiber, rack mount, homelab, A1 mini
+Lab Rax, 10 inch rack, 1U, TP-Link, TL-SG108E, switch, rack mount, homelab, A1 mini
 
 ## Pictures
 
-Isometric views from FreeCAD, in `ucg-fiber/images/`, 1200 x 1600 (3:4) on white:
+Isometric views from FreeCAD, in `../images/`, 1200 x 1600 (3:4) on white:
 
-1. `makerworld-ucg-assembled.png` — cover picture: the bracket with the
+1. `makerworld-sg108e-assembled.png` — cover picture: the bracket with the
    device in place and all sixteen screws fitted.
-2. `makerworld-ucg-empty.png` — the bracket without the device, showing the
+2. `makerworld-sg108e-empty.png` — the bracket without the device, showing the
    tray and the runners at the back.
-3. `makerworld-ucg-exploded.png` — the seven printed parts and the device,
+3. `makerworld-sg108e-exploded.png` — the seven printed parts and the device,
    drawn apart to show how they go together.
 
 The device is shown as a plain translucent block the size of its case.
 
 ## Description
 
-**A 1U bracket for the UniFi Cloud Gateway Fiber (UCG-Fiber), for a Lab Rax 10 inch rack.**
+**A 1U bracket for the TP-Link TL-SG108E Easy Smart switch, for a Lab Rax 10 inch rack.**
 
 It bolts to the front and the rear posts, so the device is carried at four
 points rather than hung off the front. It goes in like a drawer: two legs
@@ -43,11 +43,11 @@ https://makerworld.com/en/collections/5813742-lab-rax
 
 **The device**
 
-UniFi Cloud Gateway Fiber (UCG-Fiber), 212.8 x 127.6 x 30 mm, 734 g.
+TP-Link TL-SG108E Easy Smart switch, 158 x 101 x 25 mm.
 
-The gateway's display shows through a small oval window in the faceplate. Its ports and power are on the opposite face, so the cables leave from the back of the rack.
+The switch's eight ports face the front through an open frame in the faceplate, 150 x 17 mm, with a rounded front edge. Its power jack is at the back.
 
-The gateway fills the bay, so the bracket's own side rails hold it straight. A flange on the faceplate sits over its top and a low lip on the tray sits behind it.
+The switch is narrower than the rack, so its tray carries walls that hold it straight and a plinth that lifts it until it is centred in the U. The frame leaves a 4 mm border all round, so the switch cannot come out through the front.
 
 **What is in the file**
 
@@ -72,8 +72,8 @@ Plates 4 to 6 are made for this device.
   poor choice.
 - Profile: 0.20 mm Standard for the A1 mini, as carried in the file. 2 walls,
   15% infill.
-- Filament: about 261 g for all six plates.
-- Time: about 11 h 23 min for all six plates.
+- Filament: about 255 g for all six plates.
+- Time: about 11 h 22 min for all six plates.
 
 Each rear leg has a small sprung catch at its foot, printed flat on the bed
 with a thin slit above it. When the legs come off the plate, check that slit
@@ -120,11 +120,8 @@ of the rack and push the two tabs at the foot of the legs towards the middle.
   covers 229 to 257 mm over the outside of the posts.
 - The gap between the bracket and the rack's posts is under a millimetre a
   side. Print one side first and offer it up to your rack.
-- The outer 7 mm at each end of the gateway's back panel sits behind the
-  bracket's rear stops. Keep plugs out of that last 7 mm.
-- The window is 22.5 x 11 mm, a little larger than the 21 x 10 mm display.
-  If the display on your unit sits elsewhere, its position is one number in
-  the source on GitHub.
+- Before printing the faceplate, measure the port strip on your unit against
+  the 150 x 17 mm opening. Case dimensions are TP-Link's published figures.
 
 **Source, other devices and full documentation**
 
