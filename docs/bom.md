@@ -16,7 +16,7 @@ whichever you open is a complete build. Open it, print all six plates, done.
 |---|---|---|
 | `ucg-fiber/UCG_Fiber_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 UCG-Fiber | 261.0 g, 11 h 23 |
 | `usw-flex-mini/USW_Flex_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 USW-Flex | 248.7 g, 11 h 09 |
-| `tl-sg108e/TL_SG108E_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 TL-SG108E | 255.6 g, 11 h 23 |
+| `tl-sg108e/TL_SG108E_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 TL-SG108E | 254.7 g, 11 h 22 |
 | `nuc6i7kyk/NUC6i7KYK_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 NUC6i7KYK | 245.8 g, 11 h 21 |
 
 Every plate carries its own label in Bambu Studio — `Chassis 2 of 3 - right
@@ -28,14 +28,14 @@ belongs to without reference to this table.
 | chassis | `side_l`, `side_r`, `leg_l`, `leg_r` | 112.1 g | 5 h 46 |
 | UCG-Fiber | `tray_ucg_l`, `tray_ucg_r`, `faceplate_ucg` | 149.0 g | 5 h 37 |
 | USW-Flex-2.5G-5 | `tray_usw_l`, `tray_usw_r`, `faceplate_usw` | 136.7 g | 5 h 22 |
-| TL-SG108E | `tray_sg108e_l`, `tray_sg108e_r`, `faceplate_sg108e` | 143.6 g | 5 h 36 |
+| TL-SG108E | `tray_sg108e_l`, `tray_sg108e_r`, `faceplate_sg108e` | 142.7 g | 5 h 35 |
 | NUC6i7KYK | `tray_nuc_l`, `tray_nuc_r`, `faceplate_nuc` | 133.7 g | 5 h 34 |
 
 **If you are building both**, print the chassis once — the three chassis
 plates are identical in the two files.
 
 Chassis plus one device is about **261 g / 11 h 23** for the gateway, or
-**249 g / 11 h 09** for the switch. All fifteen plates, 675.0 g.
+**249 g / 11 h 09** for the switch. All fifteen plates, 674.1 g.
 
 | plate | part | size (mm) | filament | time | support |
 |---|---|---|---|---|---|
@@ -50,7 +50,7 @@ Chassis plus one device is about **261 g / 11 h 23** for the gateway, or
 | 6* | `faceplate_usw` | 213.6 × 20 × 44.5 | 38.6 g | 1 h 40 | no |
 | 4† | `tray_sg108e_l` | 136.5 × 128.4 × 17.7 | 47.3 g | 1 h 45 | yes |
 | 5† | `tray_sg108e_r` | 136.5 × 128.4 × 17.7 | 59.2 g | 2 h 12 | yes |
-| 6† | `faceplate_sg108e` | 213.6 × 20 × 44.5 | 37.1 g | 1 h 39 | no |
+| 6† | `faceplate_sg108e` | 213.6 × 20 × 44.5 | 36.2 g | 1 h 38 | no |
 | 4‡ | `tray_nuc_l` | 136.5 × 128.4 × 11.2 | 44.4 g | 1 h 45 | yes |
 | 5‡ | `tray_nuc_r` | 136.5 × 128.4 × 11.2 | 55.4 g | 2 h 12 | yes |
 | 6‡ | `faceplate_nuc` | 213.6 × 20 × 44.5 | 33.9 g | 1 h 37 | no |

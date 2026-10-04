@@ -17,11 +17,15 @@ from devices import Device, Frame
 # Its power jack is on the BACK. The tray's rear lip stands 3 mm above the
 # case floor, well under any barrel jack, and verify measures that nothing
 # else is behind the case above that line.
+#
+# The opening's front edge is rounded over by 6 mm, as the gateway's window
+# and the Flex Mini's frame are. There is room for it here: the opening ends
+# at x = +/-75, so the rim reaches 81, well short of the nut slots at 93.87.
 DEVICE = Device(
     key="sg108e", name="TL-SG108E",
     doc="TL_SG108E_LabRax",
     w=158.0, d=101.0, h=25.0, mass_g=250,
     plinth=(P.RACK_U - 25.0) / 2.0 - P.TRAY_T,   # 3.725, centres it in the U
     keys_y=(20.0, 95.0),
-    front=Frame(border_x=4.0, border_z=4.0),
+    front=Frame(border_x=4.0, border_z=4.0, fillet=6.0),
 )

@@ -355,7 +355,7 @@ Two tools, each run once per device, and they check different things.
 
 `make verify` measures the **built solids**, not the parameters, so a feature
 that silently does nothing is caught rather than assumed away. **197 checks for
-the NUC, 194 for the gateway, 193 for the Flex Mini, 190 for the TL-SG108E.** That each body is one valid solid built from
+the NUC, 194 for the gateway, 193 each for the Flex Mini and the TL-SG108E.** That each body is one valid solid built from
 sketches driving pads and pockets; that it fits the bed, turned on the diagonal
 if it has to; that no two parts foul each other; that an M6 passes all twelve
 rack slots and does not bottom out in the post's blind hole; that each leg
@@ -468,7 +468,7 @@ common/
                     pockets, fillets, and finding edges by where they are
     model.py        four chassis bodies plus three per device
   tools/
-    verify.py       190 - 197 checks per device against the rack and the bed
+    verify.py       193 - 197 checks per device against the rack and the bed
     assembly.py     87 checks with real M6 solids at all sixteen positions
     measure_rack.py re-derives the [rack] numbers from the Lab Rax mesh files
     preview.py      renders each device's images/ (FreeCAD is headless here)
@@ -500,7 +500,7 @@ Six plates in each device's 3MF, grouped as kits:
 | 1–3 | chassis (in every file) | 112.1 g | 5 h 46 |
 | 4–6 | UCG-Fiber | 149.0 g | 5 h 37 |
 | 4–6 | Flex Mini 2.5G | 136.7 g | 5 h 22 |
-| 4–6 | TL-SG108E | 143.6 g | 5 h 36 |
+| 4–6 | TL-SG108E | 142.7 g | 5 h 35 |
 | 4–6 | NUC6i7KYK | 133.7 g | 5 h 34 |
 
 Print the chassis once and then the kit for whatever you are racking: about
