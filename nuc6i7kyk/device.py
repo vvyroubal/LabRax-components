@@ -26,6 +26,11 @@ from devices import Device, Frame
 # The frame's border cannot be the 4 mm the other switches use: at 211 mm wide
 # a 4 mm border would put the opening at x = +/-101.5, straight through the
 # faceplate's own M6 nut pockets at +/-100. 16 mm keeps it 5.5 mm clear.
+#
+# The opening's front edge is rounded over like the gateway's window and the
+# Flex Mini's frame, but by 4 mm rather than their 6. The opening ends at
+# x = +/-89.5 and the nut slots start at +/-93.87: a 6 mm round would run its
+# rim to 95.5, into them. 4 mm stops at 93.5 and leaves half the plate behind.
 DEVICE = Device(
     key="nuc", name="NUC6i7KYK",
     doc="NUC6i7KYK_LabRax",
@@ -34,5 +39,5 @@ DEVICE = Device(
     keys_y=(20.0, 110.0),
     vent=True,
     clr_w=3.0,
-    front=Frame(border_x=16.0, border_z=5.0),
+    front=Frame(border_x=16.0, border_z=5.0, fillet=4.0),
 )
