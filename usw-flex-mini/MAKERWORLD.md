@@ -16,7 +16,7 @@ Lab Rax, 10 inch rack, 1U, UniFi, USW-Flex-2.5G-5, Flex Mini, switch, rack mount
 
 ## Pictures
 
-Isometric views from FreeCAD, in `images/`, 1600 x 1200 on white:
+Isometric views from FreeCAD, in `images/`, 1200 x 1600 (3:4) on white:
 
 1. `makerworld-usw-assembled.png` — cover picture: the bracket with the
    device in place and all sixteen screws fitted.

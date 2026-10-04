@@ -16,7 +16,7 @@ Lab Rax, 10 inch rack, 1U, Intel NUC, NUC6i7KYK, Skull Canyon, rack mount, homel
 
 ## Pictures
 
-Isometric views from FreeCAD, in `images/`, 1600 x 1200 on white:
+Isometric views from FreeCAD, in `images/`, 1200 x 1600 (3:4) on white:
 
 1. `makerworld-nuc-assembled.png` — cover picture: the bracket with the
    device in place and all sixteen screws fitted.
