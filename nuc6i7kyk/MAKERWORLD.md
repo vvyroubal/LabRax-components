@@ -14,6 +14,19 @@ A 1U bracket that carries an Intel NUC6i7KYK (Skull Canyon) in a Lab Rax 10 inch
 
 Lab Rax, 10 inch rack, 1U, Intel NUC, NUC6i7KYK, Skull Canyon, rack mount, homelab, A1 mini
 
+## Pictures
+
+Isometric views from FreeCAD, in `images/`, 1600 x 1200 on white:
+
+1. `makerworld-nuc-assembled.png` — cover picture: the bracket with the
+   device in place and all sixteen screws fitted.
+2. `makerworld-nuc-empty.png` — the bracket without the device, showing the
+   tray and the runners at the back.
+3. `makerworld-nuc-exploded.png` — the seven printed parts and the device,
+   drawn apart to show how they go together.
+
+The device is shown as a plain translucent block the size of its case.
+
 ## Description
 
 **A 1U bracket for the Intel NUC6i7KYK, "Skull Canyon", for a Lab Rax 10 inch rack.**
