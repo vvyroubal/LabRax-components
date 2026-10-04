@@ -1,6 +1,6 @@
 # MakerWorld listing: NUC6i7KYK_LabRax-A1mini.3mf
 
-Text to post with `NUC6i7KYK_LabRax-A1mini.3mf`. Paste each part into the matching field.
+Text to post with `nuc6i7kyk/NUC6i7KYK_LabRax-A1mini.3mf`. Paste each part into the matching field.
 
 ## Title
 
@@ -16,7 +16,7 @@ Lab Rax, 10 inch rack, 1U, Intel NUC, NUC6i7KYK, Skull Canyon, rack mount, homel
 
 ## Pictures
 
-Isometric views from FreeCAD, in `images/`, 1200 x 1600 (3:4) on white:
+Isometric views from FreeCAD, in `nuc6i7kyk/images/`, 1200 x 1600 (3:4) on white:
 
 1. `makerworld-nuc-assembled.png` — cover picture: the bracket with the
    device in place and all sixteen screws fitted.
