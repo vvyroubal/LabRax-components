@@ -27,6 +27,10 @@ Isometric views from FreeCAD, in `../images/`, 1200 x 1600 (3:4) on white:
 
 The device is shown as a plain translucent block the size of its case.
 
+Photographs of four of these brackets fitted in a rack are in `../../images/`:
+`rack-front.jpg`, `rack-side.jpg` and `rack-rear.jpg`. They show the whole
+rack rather than this bracket alone.
+
 ## Description
 
 **A 1U bracket for the UniFi Cloud Gateway Fiber (UCG-Fiber), for a Lab Rax 10 inch rack.**

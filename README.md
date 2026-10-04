@@ -12,6 +12,14 @@ fit into — is the [Lab Rax collection on MakerWorld](https://makerworld.com/en
 the design limit for every part, and each device's 3MF comes already plated
 for it.
 
+<p>
+<img src="images/rack-front.jpg" width="32%" alt="Four brackets in a Lab Rax rack, from the front">
+<img src="images/rack-side.jpg" width="32%" alt="The same rack from the side">
+<img src="images/rack-rear.jpg" width="32%" alt="The same rack from the back">
+</p>
+
+*Four of these brackets in a Lab Rax, from the front, the side and the back.*
+
 ## Quick start
 
 You do not need FreeCAD, Python or anything else in this repository to print
@@ -442,6 +450,7 @@ ucg-fiber/          one folder per device:
   docs/MAKERWORLD.md  the text posted with that 3MF on MakerWorld
 usw-flex-mini/  tl-sg108e/  nuc6i7kyk/
 build.py            writes every FCStd, STEP and STL
+images/             photographs of the brackets fitted in a rack
 docs/
   bom.md            what to print and what to buy, plate by plate
   measurements.md   where the rack's numbers came from
