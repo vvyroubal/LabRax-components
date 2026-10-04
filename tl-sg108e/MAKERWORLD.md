@@ -1,0 +1,120 @@
+# MakerWorld listing: TL_SG108E_LabRax-A1mini.3mf
+
+Text to post with `TL_SG108E_LabRax-A1mini.3mf`. Paste each part into the matching field.
+
+## Title
+
+Lab Rax 1U bracket for TP-Link TL-SG108E, A1 mini
+
+## Summary
+
+A 1U bracket that carries a TP-Link TL-SG108E 8-port switch in a Lab Rax 10 inch rack, bolted to the front and rear posts. Ports at the front. Every part fits an A1 mini.
+
+## Tags
+
+Lab Rax, 10 inch rack, 1U, TP-Link, TL-SG108E, switch, rack mount, homelab, A1 mini
+
+## Description
+
+**A 1U bracket for the TP-Link TL-SG108E Easy Smart switch, for a Lab Rax 10 inch rack.**
+
+It bolts to the front and the rear posts, so the device is carried at four
+points rather than hung off the front. It goes in like a drawer: two legs
+bolt to the rear posts, and the rest is built on the bench and slid in from
+the front. No screw has to be reached from inside the rack.
+
+The rack itself is not included. It is the Lab Rax bolted 5U rack:
+https://makerworld.com/en/models/1464819-lab-rax-10-server-rack-bolted-version-5u
+and the rest of the system is in the Lab Rax collection:
+https://makerworld.com/en/collections/5813742-lab-rax
+
+**The device**
+
+TP-Link TL-SG108E Easy Smart switch, 158 x 101 x 25 mm.
+
+The switch's eight ports face the front through an open frame in the faceplate, 150 x 17 mm, with a rounded front edge. Its power jack is at the back.
+
+The switch is narrower than the rack, so its tray carries walls that hold it straight and a plinth that lifts it until it is centred in the U. The frame leaves a 4 mm border all round, so the switch cannot come out through the front.
+
+**What is in the file**
+
+Six plates, already arranged for a Bambu Lab A1 mini (180 x 180 mm bed):
+
+- Plate 1: left side
+- Plate 2: right side
+- Plate 3: both rear legs
+- Plate 4: left half of the tray
+- Plate 5: right half of the tray
+- Plate 6: faceplate
+
+Every part is already turned the way it prints, and supports and brims are
+set per part. Open the file and print all six plates.
+
+Plates 1 to 3 are a chassis that is the same for every device in this series.
+Plates 4 to 6 are made for this device.
+
+**Printing**
+
+- Material: PETG. PLA will work in a cool room, but a warm device makes it a
+  poor choice.
+- Profile: 0.20 mm Standard for the A1 mini, as carried in the file. 2 walls,
+  15% infill.
+- Filament: about 255 g for all six plates.
+- Time: about 11 h 22 min for all six plates.
+
+Each rear leg has a small sprung catch at its foot, printed flat on the bed
+with a thin slit above it. When the legs come off the plate, check that slit
+is clear and pick out any support left in it, or the catch cannot move.
+
+**Hardware to buy**
+
+- 16 x M6 x 12 button head screws
+- 4 x M6 nuts
+- 12 x M6 washers (12.5 mm outside diameter)
+
+The rack's posts already hold the nuts for the twelve rack screws. The four
+loose nuts are for the faceplate. The washers are needed: the rack screws go
+through slots, and a bare screw head will sink into the plastic.
+
+**Assembly**
+
+1. Bolt each rear leg to its rear post from behind, three screws with
+   washers. Leave them finger-tight. The grooves face forward.
+2. Slide a nut into each of the four slots in the ends of the faceplate.
+3. On the bench, stand the two sides facing each other and lay the tray
+   across their ledges: the left half first, then the right half onto it.
+4. Set the device down onto the tray.
+5. Lower the faceplate from above, behind the ears and in front of the
+   device, and put four screws through the ears into its nuts. The faceplate
+   goes on after the device, not before.
+6. Slide the whole frame into the rack from the front. Each side runs into
+   the groove of its leg. About 35 mm from home the two catches click.
+7. Put six screws with washers through the front ears, then tighten the six
+   at the back.
+
+To take it out again, undo the six front screws and draw the frame forward.
+It stops after about 35 mm. To remove it completely, reach in from the back
+of the rack and push the two tabs at the foot of the legs towards the middle.
+
+**Good to know**
+
+- The sides slide into the legs on a printed dovetail, and how freely that
+  runs depends on the printer. Two small test pieces for it are on GitHub
+  (`common/stl/coupon_tongue.stl` and `coupon_groove.stl`). Print those first:
+  they are small, and they tell you whether the fit suits your printer before
+  you print a two-hour side.
+- The rack's depth sets itself. The joint between side and leg slides, and
+  covers 229 to 257 mm over the outside of the posts.
+- The gap between the bracket and the rack's posts is under a millimetre a
+  side. Print one side first and offer it up to your rack.
+- Before printing the faceplate, measure the port strip on your unit against
+  the 150 x 17 mm opening. Case dimensions are TP-Link's published figures.
+
+**Source, other devices and full documentation**
+
+https://github.com/vvyroubal/LabRax-components
+
+The parts are generated by a FreeCAD script, so every dimension can be
+changed and the files rebuilt. The repository also has the STL, STEP and
+FreeCAD files, brackets for other devices on the same chassis, and what to
+change if a fit is tight on your printer. MIT licence.

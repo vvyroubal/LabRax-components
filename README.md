@@ -438,6 +438,7 @@ ucg-fiber/          one folder per device:
   stl/                its tray pair and faceplate
   *.FCStd  *.step     the chassis and its three parts, as FreeCAD and STEP
   *.3mf               the chassis and its kit, plated for the A1 mini
+  MAKERWORLD.md       the text posted with that 3MF on MakerWorld
   images/             renders of it assembled
 usw-flex-mini/  tl-sg108e/  nuc6i7kyk/
 build.py            writes every FCStd, STEP and STL
