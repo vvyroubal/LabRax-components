@@ -163,7 +163,7 @@ def main():
     # One set of views per device: the chassis, plus that device's own parts.
     for dev in devices.ALL:
         parts = {}
-        for name in devices.CHASSIS + dev.parts:
+        for name in dev.chassis + dev.parts:
             p = devices.stl_path(name)
             if os.path.exists(p):
                 parts[name] = load_stl(p)

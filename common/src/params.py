@@ -300,6 +300,14 @@ VENT_W = 8.0        # [design] slot width
 VENT_RIB = 5.0      # [design] material between slots
 VENT_MARGIN = 6.0   # [design] solid border kept round the vented panel
 
+# A case wider than the bay -- the NUC6i7KYK is about 223 mm across the bulges
+# on its ends -- cannot sit between the rails. It passes between the posts
+# themselves, so its own sides have the rail cut down below the case for the
+# length of it. The stub behind the ear stays full height, and so does
+# everything from the rear stop back, where the runner is.
+RELIEF_CLR_Z = 0.5    # [design] between the cut-down rail and the case
+RELIEF_CLR_Y = 0.5    # [design] in front of the case, and past its rear lip
+
 REAR_LIP_X = STOP_X0 - LAP_FIT  # [design] it stops just short of where the
                       # sides' rear stops start, so the two together span the
                       # rear face without the lip being wedged between them

@@ -47,18 +47,18 @@ https://makerworld.com/en/collections/5813742-lab-rax
 
 **The device**
 
-Intel NUC6i7KYK, "Skull Canyon", 211 x 116 x 28 mm.
+Intel NUC6i7KYK, "Skull Canyon", 223 x 116 x 28 mm measured across the bulges on its ends (Intel quote 211 wide).
 
 The NUC's front USB ports and audio jack face the front through an open frame in the faceplate, 179 x 18 mm, with a rounded front edge. Everything else is at the back.
 
-The NUC fills the bay, so the bracket's own side rails hold it straight. It draws its cooling air through its underside, so the tray under it is slotted from front to back.
+The NUC is wider than the space between the bracket's side rails, so this kit has its own pair of sides, with the rails cut down below the case. The NUC stands between the rack's posts themselves, with about half a millimetre to spare at each end. It draws its cooling air through its underside, so the tray under it is slotted from front to back.
 
 **What is in the file**
 
 Six plates, already arranged for a Bambu Lab A1 mini (180 x 180 mm bed):
 
-- Plate 1: left side
-- Plate 2: right side
+- Plate 1: left side, the NUC's own, with the rail cut down below the case
+- Plate 2: right side, the same
 - Plate 3: both rear legs
 - Plate 4: left half of the tray
 - Plate 5: right half of the tray
@@ -124,10 +124,10 @@ of the rack and push the two tabs at the foot of the legs towards the middle.
   covers 229 to 257 mm over the outside of the posts.
 - The gap between the bracket and the rack's posts is under a millimetre a
   side. Print one side first and offer it up to your rack.
-- The outer 7 mm at each end of the NUC's back panel sits behind the
-  bracket's rear stops. Keep plugs out of that last 7 mm.
+- The outer 12.8 mm at each end of the NUC's back panel sits behind the
+  bracket's rear stops. Keep plugs out of that last 12.8 mm.
 - Before printing the faceplate, check the front ports on your unit against
-  the 179 x 18 mm opening. Case dimensions are Intel's published figures.
+  the 179 x 18 mm opening. Measure your NUC across its end bulges too: it has to pass between your rack's posts.
 
 **Source, other devices and full documentation**
 

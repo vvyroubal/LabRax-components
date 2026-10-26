@@ -148,9 +148,25 @@ KITS = [
     },
 ]
 
+def chassis_plates(kit):
+    """The chassis plates for a kit, with its own sides in if it has them.
+
+    A device wider than the bay prints its own pair, laid out exactly as the
+    shared pair is: they are the same parts with less rail.
+    """
+    sides = dict(zip(devices.CHASSIS[:2], devices.BY_KEY[kit["key"]].sides))
+    return [(title.replace("Chassis", "Chassis (%s)" % kit["key"].upper())
+             if any(n in sides and sides[n] != n for n, _, _, _ in parts)
+             else title,
+             [(sides.get(n, n), at, rot, opt) for n, at, rot, opt in parts])
+            for title, parts in CHASSIS_PLATES]
+
+
 # Every plate there is, in one list. checkplates.py slices from this, and it
 # is the default for a build() called without a kit chosen.
-PLATES = CHASSIS_PLATES + [p for k in KITS for p in k["plates"]]
+PLATES = CHASSIS_PLATES + [p for k in KITS
+                           for p in chassis_plates(k) if p not in CHASSIS_PLATES
+                           ] + [p for k in KITS for p in k["plates"]]
 TITLE = "Lab Rax 1U device bracket"
 
 
@@ -422,7 +438,7 @@ def main():
     global PLATES, OUT, TITLE
     rc = 0
     for kit in KITS:
-        PLATES = CHASSIS_PLATES + kit["plates"]
+        PLATES = chassis_plates(kit) + kit["plates"]
         OUT = kit_path(kit)
         TITLE = kit["title"]
         rc |= build()

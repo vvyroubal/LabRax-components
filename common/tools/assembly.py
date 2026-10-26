@@ -173,7 +173,7 @@ def main():
 
 
 def one_device(parts, dev):
-    names = ["side_l", "side_r", "leg_l", "leg_r",
+    names = list(dev.chassis) + [
              dev.part("tray_l"), dev.part("tray_r"), dev.part("faceplate")]
     asm = parts[names[0]]
     for n in names[1:]:

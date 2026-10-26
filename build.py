@@ -39,9 +39,10 @@ import devices  # noqa: E402
 
 DOC = "UCG_Fiber_LabRax"
 
-# Four shared, then three per device. Listed this way so adding a device's
-# folder is the whole change -- nothing here has to be edited with it.
-PARTS = devices.CHASSIS + tuple(p for d in devices.ALL for p in d.parts)
+# Four shared, then three per device -- five for one with sides of its own.
+# Listed this way so adding a device's folder is the whole change -- nothing
+# here has to be edited with it.
+PARTS = devices.CHASSIS + tuple(p for d in devices.ALL for p in d.prints)
 
 
 def bad_solids(bodies, names):
@@ -55,7 +56,7 @@ def one_device(dev):
     Built afresh rather than copied out of the big document, so each body
     keeps the sketches, pads and pockets it is made of.
     """
-    names = devices.CHASSIS + dev.parts
+    names = dev.chassis + dev.parts
     doc = App.newDocument(dev.doc)
     bodies = model.build(doc, only=dev)
     doc.recompute()

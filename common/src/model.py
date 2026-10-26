@@ -142,8 +142,11 @@ def _catch(doc, bd, name, sx):
     return sk.pad(doc, bd, s, P.CATCH_TOOTH_Z)
 
 
-def side(doc, sx, name):
-    """One side of the bracket, front ear through to rear ear."""
+def side(doc, sx, name, dev=None):
+    """One side of the bracket, front ear through to rear ear.
+
+    Given a device wider than the bay, its rail is cut down to clear the case.
+    """
     bd = sk.body(doc, name)
     out = sx < 0
 
@@ -224,6 +227,17 @@ def side(doc, sx, name):
                   sk.plane(Vector(sx * P.POCKET_HW, 0, 0), sk.Y, sk.Z))
     for y0, y1 in P.RAIL_VENTS_Y:
         sk.rect(s, y0, P.RAIL_VENT_Z0, y1, P.RAIL_VENT_Z1)
+    sk.pocket(doc, bd, s, P.RAIL_T)
+
+    if dev is None:
+        return bd
+    # A case wider than the bay stands where the rail is. Take the rail away
+    # above the case's underside for its whole depth, so the case passes over
+    # what is left. The ledge is under the tray and is not touched.
+    s = sk.sketch(doc, bd, name + "_Sk_relief",
+                  sk.plane(Vector(sx * P.POCKET_HW, 0, 0), sk.Y, sk.Z))
+    sk.rect(s, dev.y0 - P.RELIEF_CLR_Y, dev.z0 - P.RELIEF_CLR_Z,
+            dev.y1 + P.RELIEF_CLR_Y, P.RAIL_TOP + 1.0)
     sk.pocket(doc, bd, s, P.RAIL_T)
     return bd
 
@@ -531,7 +545,8 @@ def build(doc, only=None):
     """Every part, as its own Body. Returns {name: body}.
 
     Four of them are the chassis and are shared: they are sized by the rack
-    and never read a device. The rest come in threes, one set per device.
+    and never read a device. The rest come in threes, one set per device --
+    fives, for a device too wide for the shared sides.
 
     `only` restricts it to one device's set plus the chassis. The checkers use
     that to work on one device at a time: a document holding every part of
@@ -545,6 +560,10 @@ def build(doc, only=None):
         "leg_r": leg(doc, +1, "leg_r"),
     }
     for dev in (devices.ALL if only is None else (only,)):
+        if dev.own_sides:
+            nl, nr = dev.sides
+            out[nl] = side(doc, -1, nl, dev)
+            out[nr] = side(doc, +1, nr, dev)
         out[dev.part("tray_l")] = tray(doc, dev, -1, dev.part("tray_l"))
         out[dev.part("tray_r")] = tray(doc, dev, +1, dev.part("tray_r"))
         out[dev.part("faceplate")] = faceplate(doc, dev,

@@ -9,7 +9,9 @@ written with, loads the profiles, and says where each part's files go.
 
 The chassis -- side_l, side_r, leg_l, leg_r -- is sized by the RACK and knows
 nothing about what goes in it. Only the tray pair and the faceplate are drawn
-around a device, so a second device costs three prints, not seven.
+around a device, so a second device costs three prints, not seven. The one
+exception is a case wider than the bay between the rails: that gets a pair of
+sides of its own, with the rails cut down beneath it, so it costs five.
 
 What a profile has to say:
 
@@ -148,6 +150,16 @@ class Device(object):
         """
         return self.hw < P.POCKET_HW - 1.0
 
+    @property
+    def own_sides(self):
+        """True when the case is wider than the bay between the rails.
+
+        Such a case cannot sit between the shared sides. It gets a pair of its
+        own, with each rail cut down below the case along its depth, and goes
+        between the rack's posts with nothing of the bracket beside it.
+        """
+        return self.hw > P.POCKET_HW
+
     def part(self, base):
         """tray_l -> tray_ucg_l, faceplate -> faceplate_ucg.
 
@@ -164,6 +176,23 @@ class Device(object):
     def parts(self):
         """The three prints drawn around this device."""
         return tuple(self.part(b) for b in ("tray_l", "tray_r", "faceplate"))
+
+    @property
+    def sides(self):
+        """The pair of sides it goes in: the shared one, or its own."""
+        if self.own_sides:
+            return (self.part("side_l"), self.part("side_r"))
+        return CHASSIS[:2]
+
+    @property
+    def chassis(self):
+        return self.sides + CHASSIS[2:]
+
+    @property
+    def prints(self):
+        """Everything printed for this device alone, kept in its folder."""
+        own = self.sides if self.own_sides else ()
+        return own + self.parts
 
     @property
     def stl_dir(self):
@@ -217,7 +246,7 @@ def stl_dir(part):
     if part in CHASSIS:
         return os.path.join(COMMON, "stl")
     for dev in ALL:
-        if part in dev.parts:
+        if part in dev.prints:
             return dev.stl_dir
     raise KeyError("no device makes %r" % part)
 

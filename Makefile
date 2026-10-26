@@ -18,7 +18,8 @@ STLS  := $(addprefix common/stl/,$(addsuffix .stl,side_l side_r leg_l leg_r \
          $(call kit,ucg-fiber,ucg) \
          $(call kit,usw-flex-mini,usw) \
          $(call kit,tl-sg108e,sg108e) \
-         $(call kit,nuc6i7kyk,nuc)
+         $(call kit,nuc6i7kyk,nuc) \
+         nuc6i7kyk/stl/side_nuc_l.stl nuc6i7kyk/stl/side_nuc_r.stl
 # Each device's own document and STEP: the chassis plus its three parts.
 DEVICE_CAD := $(foreach s,ucg-fiber/UCG_Fiber_LabRax usw-flex-mini/USW_Flex_LabRax \
                 tl-sg108e/TL_SG108E_LabRax nuc6i7kyk/NUC6i7KYK_LabRax,$(s).FCStd $(s).step)

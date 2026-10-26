@@ -42,7 +42,7 @@ two small test pieces tell you whether the sliding joint fits on your printer.
 | **UniFi Cloud Gateway Fiber** | `UCG-Fiber` | 212.8 × 127.6 × 30, 734 g | its 0.96" display, through an oval window | `ucg-fiber/UCG_Fiber_LabRax-A1mini.3mf` |
 | **UniFi Flex Mini 2.5G** | `USW-Flex-2.5G-5` | 117.1 × 90 × 21.2, 206 g | its 5 × 2.5 GbE ports, through an open frame | `usw-flex-mini/USW_Flex_LabRax-A1mini.3mf` |
 | **TP-Link Easy Smart switch** | `TL-SG108E` | 158 × 101 × 25 | its 8 × GbE ports, through an open frame | `tl-sg108e/TL_SG108E_LabRax-A1mini.3mf` |
-| **Intel NUC, Skull Canyon** | `NUC6i7KYK` | 211 × 116 × 28 (about 223 wide across its end bulges), 45 W — prints its own sides, `nuc6i7kyk/stl/side_*_nuc.stl` | its front USB and audio, through an open frame | `nuc6i7kyk/NUC6i7KYK_LabRax-A1mini.3mf` |
+| **Intel NUC, Skull Canyon** | `NUC6i7KYK` | 223 × 116 × 28 across its end bulges (Intel say 211), 45 W | its front USB and audio, through an open frame | `nuc6i7kyk/NUC6i7KYK_LabRax-A1mini.3mf` |
 
 ![the gateway](ucg-fiber/images/assembly-ucg-front.png)
 ![the Flex Mini](usw-flex-mini/images/assembly-usw-front.png)
@@ -57,7 +57,7 @@ own — see [Adding a device](#adding-a-device).
 
 | | limit | set by |
 |---|---|---|
-| width | **up to 212.8 mm** | the bay between the rails, 214.0 less clearance |
+| width | **up to 212.8 mm**, or wider with sides of its own | the bay between the rails, 214.0 less clearance; past that, the rack's posts |
 | depth | **up to 127.6 mm** | the sides' rear stops, 129 mm behind the faceplate |
 | height | **up to 33.65 mm** | 1U, less the tray and a flange to cap the device |
 | weight | the gateway's 734 g is the heaviest modelled | a 214 × 132 × 6 tray deflects about 0.2 mm under it |
@@ -66,7 +66,10 @@ own — see [Adding a device](#adding-a-device).
 A device that fills the bay is held straight by the sides' own rails. One
 narrower than **210.8 mm** gets walls on its tray instead, and those walls
 need the device to be **204 mm or less**, so widths between about 204 and
-210.8 mm are the one gap in the range. A device shorter than the U gets a
+210.8 mm are the one gap in the range. A device wider than the bay gets a
+pair of sides of its own, with the rail cut down below the case, and stands
+between the rack's posts themselves: the NUC, at 223 mm, goes between a
+printed Lab Rax's posts with about a millimetre to spare. A device shorter than the U gets a
 plinth under it to centre it in the opening. The faceplate is either a
 **window** onto a display or a **frame** onto ports.
 
@@ -77,7 +80,8 @@ go to the back.
 
 ## Parts
 
-Seven prints for one device, none over a 180 mm bed.
+Seven prints for one device, none over a 180 mm bed. The NUC's file swaps
+its own pair of sides in for the shared one.
 
 | part | size (mm) | qty | kit |
 |---|---|---|---|
@@ -89,13 +93,15 @@ Seven prints for one device, none over a 180 mm bed.
 | `faceplate_usw` | 213.6 × 20 × 44.5 | 1 | Flex Mini |
 | `tray_sg108e_l` / `tray_sg108e_r` | 136.5 × 128.4 × 17.7 | 1 each | TL-SG108E |
 | `faceplate_sg108e` | 213.6 × 20 × 44.5 | 1 | TL-SG108E |
+| `side_nuc_l` / `side_nuc_r` | 33 × 212.5 × 44.5 | 1 each | NUC6i7KYK, in place of `side_l` / `side_r` |
 | `tray_nuc_l` / `tray_nuc_r` | 136.5 × 128.4 × 11.2 | 1 each | NUC6i7KYK |
 | `faceplate_nuc` | 213.6 × 20 × 44.5 | 1 | NUC6i7KYK |
 
 **Four of the seven are a chassis that takes no notice of what is in it.**
 The sides and the rear legs are sized by the rack alone; only the tray pair
 and the faceplate are drawn around a device. A second device therefore costs
-three prints rather than seven.
+three prints rather than seven. The exception is a case wider than the
+bay, like the NUC: it needs its own sides as well, so it costs five.
 
 A **side** carries the front ear, the side rail, the ledge the tray lands on,
 a rear stop, and behind that a **dovetail tongue** along the inner face of the
@@ -124,7 +130,8 @@ leg that reaches the back posts — four mounting points, twelve screws.
 1–3 the shared chassis, 4–6 that device's own tray pair and faceplate. Open
 one, print all six, done. Every plate is labelled in Bambu Studio with the kit
 it belongs to. If you build more than one device, plates 1–3 are identical in
-every file — print them once per bracket.
+every file — print them once per bracket — except in the NUC's, whose plates
+1 and 2 are its own cut-down sides.
 
 | plates | kit | filament | time |
 |---|---|---|---|
@@ -267,7 +274,7 @@ finger.
 |---|---|---|---|---|
 | lifted by a plinth | no | 5.625 mm | 3.725 mm | 2.225 mm |
 | sits at (z) | 6.0 – 36.0 | 11.625 – 32.825 | 9.725 – 34.725 | 8.225 – 36.225 |
-| held sideways by | the rails, 0.6 mm a side | walls on its tray | walls on its tray | the rails, 1.5 mm a side |
+| held sideways by | the rails, 0.6 mm a side | walls on its tray | walls on its tray | the rack's posts, about 0.5 mm a side |
 | held down by | the faceplate's flange, 0.8 mm over the case | the same | the same | the same |
 | held back by | its tray's rear lip | the same | the same | the same |
 | opening (mm) | 22.5 × 11.0 window | 109.1 × 18.5 frame | 150 × 17 frame | 179 × 18 frame |
@@ -291,9 +298,12 @@ latch would not go in, so the extra millimetre comes off the top border.
 **The TL-SG108E** is held the same way, with a 4 mm border all round its
 opening.
 
-**The NUC** fills the bay like the gateway. Its border is 16 mm at each side
-— a narrower one would run into the faceplate's nut slots — and 5 mm above and
-below. It draws its cooling air through its underside, so its tray is slotted:
+**The NUC** is wider than the bay: 223 mm across the bulges on its ends,
+where Intel quote 211. It has sides of its own, `side_nuc_l` and `side_nuc_r`,
+whose rails are cut down to 0.5 mm below the case for its whole depth, so it
+stands between the rack's posts with nothing of the bracket beside it. Its
+frame's border is 22 mm at each side — a narrower one would run into the
+faceplate's nut slots — and 5 mm above and below. It draws its cooling air through its underside, so its tray is slotted:
 fore-and-aft slots open 27% of the width, floor to case. The centre lap stays
 solid, because it is the joint holding the tray's halves together.
 
@@ -392,7 +402,7 @@ Then add its three plates to `KITS` in `common/tools/plate.py` and run `make`.
 ### What is checked
 
 `make verify` measures the **built solids**, not the parameters, so a feature
-that silently does nothing is caught rather than assumed away: 197 checks for
+that silently does nothing is caught rather than assumed away: 204 checks for
 the NUC, 194 for the gateway, 193 each for the Flex Mini and the TL-SG108E.
 Among them:
 

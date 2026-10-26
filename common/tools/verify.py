@@ -149,7 +149,7 @@ def main():
 
 
 def one_device(parts, bodies, dev):
-    names = ["side_l", "side_r", "leg_l", "leg_r",
+    names = list(dev.chassis) + [
              dev.part("tray_l"), dev.part("tray_r"), dev.part("faceplate")]
     asm = parts[names[0]]
     for n in names[1:]:
@@ -212,7 +212,7 @@ def one_device(parts, bodies, dev):
     lo, hi = P.RACK_D - fwd, P.RACK_D + back
     for sx, nm in ((-1, "leg_l"), (1, "leg_r")):
         lg = parts[nm]
-        side = parts["side_l" if sx < 0 else "side_r"]
+        side = parts[dev.sides[0 if sx < 0 else 1]]
         b = lg.BoundBox
         check(abs(b.YMax - (P.RACK_D + P.EAR_T)) < 1e-6,
               "%s reaches the back of the rear post" % nm,
@@ -254,7 +254,7 @@ def one_device(parts, bodies, dev):
     # shallower rack the leg sits elsewhere and the travel changes with it.
     for sx, nm in ((-1, "leg_l"), (1, "leg_r")):
         lg = parts[nm]
-        side = parts["side_l" if sx < 0 else "side_r"]
+        side = parts[dev.sides[0 if sx < 0 else 1]]
         for depth in (230.0, P.RACK_D, 240.0):
             d = depth - P.RACK_D
             pull = P.CATCH_PULL - d
@@ -303,8 +303,8 @@ def one_device(parts, bodies, dev):
           "neighbour stands %.1f proud" % (-back_of_plate, P.NEIGHBOUR_PROUD - 1.0))
     fp_ = parts[dev.part("faceplate")]
     case_ = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d, dev.z0, dev.z1)
-    below = [parts[n] for n in ("side_l", "side_r", dev.part("tray_l"),
-                                dev.part("tray_r"))] + [case_]
+    below = [parts[n] for n in dev.sides + (dev.part("tray_l"),
+                                            dev.part("tray_r"))] + [case_]
     hit = [h for h in (2.0, 6.0, 12.0, 20.0, 30.0, 45.0, 60.0)
            if sum(vol(fp_.translated(Vector(0, 0, h)).common(o))
                   for o in below) > VOID]
@@ -330,8 +330,15 @@ def one_device(parts, bodies, dev):
     b = fp.BoundBox
     check(abs(b.ZMin) < 1e-6 and abs(b.ZMax - P.RACK_U) < 1e-6,
           "it covers the whole height of the U", "Z %.2f..%.2f" % (b.ZMin, b.ZMax))
-    check(b.XLength >= dev.w, "and the whole width of the gateway's face",
-          "%.1f mm across a %.1f mm face" % (b.XLength, dev.w))
+    if dev.own_sides:
+        # A case wider than the bay is wider than the plate can be, too: the
+        # plate stops at the rails. Its ends are behind the ears instead.
+        check(b.XLength >= 2 * P.EAR_X0,
+              "and meets the ears, which cover the ends of the case",
+              "%.1f mm of plate, ears from x=+/-%.1f" % (b.XLength, P.EAR_X0))
+    else:
+        check(b.XLength >= dev.w, "and the whole width of the gateway's face",
+              "%.1f mm across a %.1f mm face" % (b.XLength, dev.w))
     for sx in (-1, 1):
         rail = box(sx * P.POCKET_HW, sx * P.BODY_HW, -1.0, P.RACK_D,
                    0.0, P.RAIL_TOP)
@@ -501,7 +508,7 @@ def one_device(parts, bodies, dev):
 
     ahead = box(-P.FACE_HW, P.FACE_HW, -P.EAR_T + 0.01, 0.0, 0.0, P.RACK_U)
     stray = [n for n in names
-             if n not in ("side_l", "side_r")
+             if n not in dev.sides
              and vol(parts[n].common(ahead)) > VOID]
     check(not stray, "nothing protrudes into the reveal",
           ", ".join(stray) if stray else "clear")
@@ -548,7 +555,7 @@ def one_device(parts, bodies, dev):
                dev.z0, dev.z1)
     check(vol(asm.common(case)) < VOID, "device sits without interference",
           "%.3f mm3" % vol(asm.common(case)))
-    cradle = parts["side_l"].fuse(parts["side_r"]).fuse(
+    cradle = parts[dev.sides[0]].fuse(parts[dev.sides[1]]).fuse(
         parts[dev.part("tray_l")]).fuse(parts[dev.part("tray_r")])
     drop = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d,
                dev.z0, 400)
@@ -602,7 +609,7 @@ def one_device(parts, bodies, dev):
         check(v > 300.0, "tray carries the device at x=%+7.1f" % x,
               "%.0f mm3" % v)
     # Each half laps onto its side's ledge for the whole depth.
-    for sx, side in ((-1, "side_l"), (1, "side_r")):
+    for sx, side in zip((-1, 1), dev.sides):
         band = box(sx * P.LEDGE_X0, sx * P.TRAY_X1, dev.y0, dev.y1,
                    0.0, P.TRAY_T)
         vt = vol(trays.common(band))
@@ -719,7 +726,7 @@ def one_device(parts, bodies, dev):
           "unbacked at x = %s" % (gaps[:6] if gaps else "nowhere"))
 
     # The lip must not foul the sides' rear stops, which start where it ends.
-    v = vol(trays.common(parts["side_l"].fuse(parts["side_r"])))
+    v = vol(trays.common(parts[dev.sides[0]].fuse(parts[dev.sides[1]])))
     check(v < VOID, "the tray's lip clears the sides' rear stops",
           "%.3f mm3 shared" % v)
 
@@ -809,7 +816,7 @@ def one_device(parts, bodies, dev):
     # a 214.0 mm bay -- and all of it passed, because touching is not
     # overlapping. So each part is moved a little and has to stay clear.
     print("\n[room to assemble -- parts moved, not just placed]")
-    sides = parts["side_l"].fuse(parts["side_r"])
+    sides = parts[dev.sides[0]].fuse(parts[dev.sides[1]])
     t_l, t_r = parts[dev.part("tray_l")], parts[dev.part("tray_r")]
 
     def room(what, a, b_, vec):
@@ -847,6 +854,26 @@ def one_device(parts, bodies, dev):
               "and those walls fit the bay",
               "%.1f mm across a %.1f mm bay"
               % (2 * (dev.hw + P.TRAY_WALL_T), P.POCKET_W))
+    elif dev.own_sides:
+        # Wider than the bay: it stands between the posts, over rails cut down
+        # beneath it. The posts are what hold it straight.
+        rails = box(-P.BODY_HW, P.BODY_HW, dev.y0 - P.RELIEF_CLR_Y,
+                    dev.y1 + P.RELIEF_CLR_Y, dev.z0 - P.RELIEF_CLR_Z + 0.01,
+                    P.RACK_U)
+        v = vol(sides.common(rails))
+        check(v < VOID, "the rails are cut down %.2f mm below the case"
+              % P.RELIEF_CLR_Z, "%.3f mm3 of rail left beside it" % v)
+        check(dev.w > P.POCKET_W,
+              "it is wider than the bay, so it needs its own sides",
+              "%.1f mm case, %.1f mm bay" % (dev.w, P.POCKET_W))
+        # The rack's model puts the posts 222.25 apart; the NUC, measured at
+        # 223, goes between a printed rack's posts with about 1 mm to spare.
+        # So this is reported, not checked: set it by the rack you have.
+        print("  note  %.2f mm between the posts by the rack's model, "
+              "%.2f mm case" % (P.POST_CLEAR_W, dev.w))
+        check(2 * P.EAR_X0 < dev.w,
+              "the ears overlap the device's ends, so it cannot slide out",
+              "opening %.1f vs device %.1f" % (2 * P.EAR_X0, dev.w))
     else:
         check(abs((P.POCKET_W - dev.w) - dev.clr_w) < 1e-9,
               "width clearance %.2f mm" % (P.POCKET_W - dev.w))
