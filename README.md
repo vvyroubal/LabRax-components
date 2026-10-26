@@ -42,7 +42,7 @@ two small test pieces tell you whether the sliding joint fits on your printer.
 | **UniFi Cloud Gateway Fiber** | `UCG-Fiber` | 212.8 × 127.6 × 30, 734 g | its 0.96" display, through an oval window | `ucg-fiber/UCG_Fiber_LabRax-A1mini.3mf` |
 | **UniFi Flex Mini 2.5G** | `USW-Flex-2.5G-5` | 117.1 × 90 × 21.2, 206 g | its 5 × 2.5 GbE ports, through an open frame | `usw-flex-mini/USW_Flex_LabRax-A1mini.3mf` |
 | **TP-Link Easy Smart switch** | `TL-SG108E` | 158 × 101 × 25 | its 8 × GbE ports, through an open frame | `tl-sg108e/TL_SG108E_LabRax-A1mini.3mf` |
-| **Intel NUC, Skull Canyon** | `NUC6i7KYK` | 211 × 116 × 28, 45 W | its front USB and audio, through an open frame | `nuc6i7kyk/NUC6i7KYK_LabRax-A1mini.3mf` |
+| **Intel NUC, Skull Canyon** | `NUC6i7KYK` | 211 × 116 × 28 (about 223 wide across its end bulges), 45 W — prints its own sides, `nuc6i7kyk/stl/side_*_nuc.stl` | its front USB and audio, through an open frame | `nuc6i7kyk/NUC6i7KYK_LabRax-A1mini.3mf` |
 
 ![the gateway](ucg-fiber/images/assembly-ucg-front.png)
 ![the Flex Mini](usw-flex-mini/images/assembly-usw-front.png)

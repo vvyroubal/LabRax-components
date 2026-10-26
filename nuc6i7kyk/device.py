@@ -6,6 +6,16 @@ from devices import Device, Frame
 
 
 # Intel NUC6i7KYK, "Skull Canyon". 211 x 116 x 28 and 45 W, from intel.com.
+#
+# Intel's 211 leaves out the bulges on its ends: the real case measures about
+# 221-223 mm across them, and passes between the rack's posts with about 1 mm
+# to spare. That is wider than the 214 bay, so the NUC does NOT fit the shared
+# sides. Its sides were edited by hand in NUC6i7KYK_LabRax.FCStd: a
+# SubtractiveBox on each (side_l_nuc_relief, side_r_nuc_relief) cuts the rail
+# down to z = 7.7 from y = 7.5 to 126, below the case, and they are exported
+# as stl/side_l_nuc.stl and stl/side_r_nuc.stl. Print those instead of
+# common/stl/side_*.stl. `make` rebuilds this document from the script and
+# would drop that edit; the numbers below are still Intel's.
 # Intel do not publish a weight; 700 g is a guess and only feeds the load
 # checks, where the gateway's 734 g is the tested case.
 #
