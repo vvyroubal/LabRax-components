@@ -57,8 +57,8 @@ The rear legs are the same as for every other device in this series, so if you a
   poor choice.
 - Profile: 0.20 mm Standard for the A1 mini, as carried in the file. 2 walls,
   15% infill.
-- Filament: about 109 g for all three plates.
-- Time: about 5 h 28 min for all three plates.
+- Filament: about 112 g for all three plates.
+- Time: about 5 h 32 min for all three plates.
 
 Each rear leg has a small sprung catch at its foot, printed flat on the bed
 with a thin slit above it. When the legs come off the plate, check that slit

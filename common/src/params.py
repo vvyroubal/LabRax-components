@@ -324,6 +324,13 @@ BULK_X1 = 97.0        # [design] the bulkhead's outboard face
 BULK_Y1 = 150.0       # [design] and its back
 YOKE_GAP = 0.5        # [design] between the flange and the top of the leg
 YOKE_Y1 = 200.0       # [design] where the flange ends, short of the rail's end
+# Behind the bulkhead a web carries on under the flange as far as it goes, so
+# the yoke is a channel over the leg rather than a post with a lid on it. It
+# stops short of the floor, because the catch's tab is down there and has to
+# be reached from the bay -- it deflects 2 mm inboard to 95.55, so the web
+# stays outboard of nothing it can meet.
+WEB_X1 = 95.0         # [design] the web's outboard face
+WEB_Z0 = 15.0         # [design] its bottom edge, a fingertip over the tab
 
 REAR_LIP_X = STOP_X0 - LAP_FIT  # [design] it stops just short of where the
                       # sides' rear stops start, so the two together span the

@@ -284,8 +284,15 @@ def _seat(doc, bd, name, sx):
     sk.rect(s, sx * P.POCKET_HW, P.RAIL_TOP - 0.5, x1, P.RACK_U)
     sk.pad(doc, bd, s, P.YOKE_Y1 - P.RUN_Y0, reversed_=True)
 
-    # ...and a flange over the top of the leg joining the two. It prints as a
-    # bridge between the bulkhead and the rail.
+    # ...a web from the bulkhead back under the flange, clear of the catch's
+    # tab below it...
+    s = sk.sketch(doc, bd, name + "_Sk_web",
+                  sk.plane(Vector(0, P.BULK_Y1 - 0.5, 0), sk.X, sk.Z))
+    sk.rect(s, x0, P.WEB_Z0, sx * P.WEB_X1, P.RACK_U)
+    sk.pad(doc, bd, s, P.YOKE_Y1 - P.BULK_Y1 + 0.5, reversed_=True)
+
+    # ...and a flange over the top of the leg joining them to the rail. It
+    # prints as a bridge between the web and the rail.
     s = sk.sketch(doc, bd, name + "_Sk_flange",
                   sk.plane(Vector(0, P.RUN_Y0, 0), sk.X, sk.Z))
     sk.rect(s, x0, P.RAIL_TOP + P.YOKE_GAP, sx * (P.POCKET_HW + 0.5),

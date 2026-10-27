@@ -307,7 +307,9 @@ flange in one U, so it goes in **bare**. Its own sides, `side_nuc_l` and
 the case, and stand it on a **seat** 3.5 mm thick and 19.2 mm wide, joined
 across its whole width into a chin on the ear at the front and into a
 **yoke** round the leg at the back: a full-height bulkhead inboard of the
-leg, a flange over its top, and the rail raised to meet the flange. The seat
+leg, a web carrying on from it under a flange over the leg's top, and the
+rail raised to meet the flange -- a channel 44 mm deep over the leg. The web
+stops 15 mm off the floor so the catch's tab can still be reached. The seat
 is as wide as a side can be and still go on the bed. The NUC stands on the
 two seats, between the rack's posts, with its face 0.5 mm behind the
 ears and its back 0.5 mm short of the runners' tongues: the ears overlap its
@@ -321,8 +323,11 @@ through CalculiX in FreeCAD's FEM workbench, one side with its ear clamped
 and its tongue held, the NUC's own weight on it peaks at about 2 MPa with
 0.25 mm of sag, against the 35–50 MPa printed PETG takes: some 17 times
 over. Fifty newtons pressed on one seat -- someone leaning on the NUC -- is
-about 31 MPa, at the joint of seat and rail just behind the case. It draws its air through its
-underside, and with no tray there is nothing under it but the U below.
+about 31 MPa, at the joint of seat and rail just behind the case, and
+20 N pushed sideways about 7 MPa at the same corner; the yoke itself sees
+under 2 MPa in either.
+
+The NUC draws its air through its underside, and with no tray there is nothing under it but the U below.
 
 Because nothing ties the two sides together at the front, put the NUC on the
 sides on the bench and slide all three in together. The ears are in front of
