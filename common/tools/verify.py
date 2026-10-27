@@ -60,6 +60,35 @@ def vol(s):
     return 0.0 if s is None or not s.Solids else s.Volume
 
 
+def diff(a, b):
+    """How far two shapes are from being the same solid, in mm3 or so.
+
+    Not done by cutting or intersecting them: given two solids that are the
+    same face for face -- the very case this is for -- the kernel returns a
+    null shape for both. So compare what identical solids must share: volume,
+    surface area, centre of mass and bounding box. Any of those that differs
+    makes the result at least VOID.
+    """
+    def mass(sh):
+        v = sum(x.Volume for x in sh.Solids)
+        if not v:
+            return 0.0, Vector()
+        c = Vector()
+        for x in sh.Solids:
+            c = c + x.CenterOfMass * x.Volume
+        return v, c * (1.0 / v)
+    (va, ca), (vb, cb) = mass(a), mass(b)
+    if not va or not vb:
+        return va + vb
+    ba, bb = a.BoundBox, b.BoundBox
+    off = (abs(va - vb) + abs(a.Area - b.Area) * 0.1
+           + (ca - cb).Length * 100
+           + sum(abs(p - q) for p, q in ((ba.XMin, bb.XMin), (ba.XMax, bb.XMax),
+                                        (ba.YMin, bb.YMin), (ba.YMax, bb.YMax),
+                                        (ba.ZMin, bb.ZMin), (ba.ZMax, bb.ZMax))) * 100)
+    return 0.0 if off < 0.5 else max(off, VOID)
+
+
 def hexnut(cx, cz, af, y0, y1):
     r = af / math.sqrt(3.0)
     pts = [Vector(cx + r * math.cos(math.radians(a)), y0,
@@ -183,16 +212,34 @@ def bare_device(doc, parts, dev):
           "stays inside 1U", "Z %.2f .. %.2f" % (bb.ZMin, bb.ZMax))
 
     print("\n[the sides are the shared sides wherever they meet the rack]")
+    added = {}
     for sx, n in zip((-1, 1), dev.sides):
         ref = model.side(doc, sx, "ref_" + n)
         doc.recompute()
-        for what, zone in (("at the ear", box(-200, 200, -20, 0.0, -5, 60)),
-                           ("behind the tongue's front face",
-                            box(-200, 200, P.RUN_Y0, 300, -5, 60))):
-            a, b_ = ref.Shape.common(zone), parts[n].common(zone)
-            v = vol(a.cut(b_)) + vol(b_.cut(a))
+        added[n] = parts[n].cut(ref.Shape)
+        # The ear outboard of its chin, and the rail, tongue and notch the
+        # leg runs on, below where the rail is raised to meet the flange.
+        def zone(xa, y0, y1, z1):
+            return box(min(sx * xa, sx * 200), max(sx * xa, sx * 200),
+                       y0, y1, -5, z1)
+        for what, z_ in (("at the ear", zone(P.EAR_X0 + 0.5, -20, 0.0, 60)),
+                         ("where the leg runs on it",
+                          zone(P.LEDGE_X0, P.RUN_Y0, 300, P.RAIL_TOP - 0.5))):
+            v = diff(ref.Shape.common(z_), parts[n].common(z_))
             check(v < VOID, "%s is the shared side %s" % (n, what),
                   "%.3f mm3 different" % v)
+
+    print("\n[what the sides add never meets a leg]")
+    # The leg sits 5 mm either way of nominal on a 230..240 mm rack, and the
+    # side draws out CATCH_PULL past home before it stops: so every place the
+    # leg can be relative to the side, from 5 mm forward to 45 mm back.
+    for sx, n, lg in zip((-1, 1), dev.sides, ("leg_l", "leg_r")):
+        hit = [r for r in range(-5, int(P.CATCH_PULL) + 11)
+               if vol(added[n].common(parts[lg].translated(Vector(0, r, 0))))
+               > VOID]
+        check(not hit, "%s's seat and yoke clear %s from home to the stop "
+              "on any rack" % (n, lg),
+              "touches %d mm along" % hit[0] if hit else "clear at every mm")
 
     print("\n[the case]")
     case = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d, dev.z0, dev.z1)
@@ -204,9 +251,9 @@ def bare_device(doc, parts, dev):
         under = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d,
                     dev.z0 - 0.5, dev.z0)
         a = vol(parts[n].common(under)) / 0.5
-        want = 0.9 * (P.BODY_HW - P.LEDGE_X0) * dev.d
-        check(a >= want, "%s's ledge carries it the whole depth" % n,
-              "%.0f mm2 under it" % a)
+        want = 0.95 * (P.BODY_HW - P.SEAT_X0) * dev.d
+        check(a >= want, "%s's seat carries it the whole depth, %.1f mm deep"
+              % (n, P.BODY_HW - P.SEAT_X0), "%.0f mm2 under it" % a)
     for what, vec, free in (("forward", Vector(0, -1, 0), P.BARE_Y0),
                             ("back", Vector(0, 1, 0), dev.clr_d)):
         ok = vol(asm.common(case.translated(vec * (free - 0.1)))) < VOID
@@ -972,4 +1019,15 @@ def one_device(parts, bodies, dev):
               "opening %.1f vs device %.1f" % (2 * P.EAR_X0, dev.w))
 
 
-main()
+# freecadcmd reports a script that raised as having succeeded, so a check
+# that crashed would read as a pass. Say so, and fail.
+try:
+    main()
+except SystemExit:
+    raise
+except Exception:
+    import traceback
+    traceback.print_exc()
+    print("\nverify CRASHED -- not a pass")
+    sys.stdout.flush()
+    os._exit(1)

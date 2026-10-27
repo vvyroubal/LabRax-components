@@ -8,7 +8,7 @@ Lab Rax 1U bracket for Intel NUC6i7KYK (Skull Canyon), A1 mini
 
 ## Summary
 
-A 1U bracket that carries an Intel NUC6i7KYK (Skull Canyon) in a Lab Rax 10 inch rack, bolted to the front and rear posts. The NUC stands on the bracket's own ledges, face forward, with nothing under it to block its air. Three plates, all on an A1 mini.
+A 1U bracket that carries an Intel NUC6i7KYK (Skull Canyon) in a Lab Rax 10 inch rack, bolted to the front and rear posts. The NUC stands on the bracket's own seats, face forward, with nothing under it to block its air. Three plates, all on an A1 mini.
 
 ## Tags
 
@@ -39,13 +39,13 @@ https://makerworld.com/en/collections/5813742-lab-rax
 
 Intel NUC6i7KYK, "Skull Canyon", 233 x 143 x 40 mm measured whole (Intel quote 211 x 116 x 28 for the case alone).
 
-That is wider than the space between the bracket's side rails and too tall for a tray in one rack unit, so the NUC goes in bare: it stands on the two sides' ledges, 3 mm up, between the rack's posts, with about half a millimetre to spare at each end. Its face is half a millimetre behind the front ears, which overlap its ends and stop it coming forward; the runners at the back stop it going back. Its whole front face shows between the ears. It draws its cooling air through its underside, and there is nothing under it but the rack unit below.
+That is wider than the space between the bracket's side rails and too tall for a tray in one rack unit, so the NUC goes in bare: it stands on a 19.2 mm wide, 3.5 mm thick seat on each side, between the rack's posts, with about half a millimetre to spare at each end. Its face is half a millimetre behind the front ears, which overlap its ends and stop it coming forward; the runners at the back stop it going back. Its whole front face shows between the ears. It draws its cooling air through its underside, and there is nothing under it but the rack unit below.
 
 **What is in the file**
 
 Three plates, already arranged for a Bambu Lab A1 mini (180 x 180 mm bed):
 
-- Plate 1: left side, the NUC's own, cut down to the ledge where the NUC stands
+- Plate 1: left side, the NUC's own: a seat where the NUC stands, joined into the ear at the front and into a yoke round the leg at the back
 - Plate 2: right side, the same
 - Plate 3: both rear legs
 
@@ -57,8 +57,8 @@ The rear legs are the same as for every other device in this series, so if you a
   poor choice.
 - Profile: 0.20 mm Standard for the A1 mini, as carried in the file. 2 walls,
   15% infill.
-- Filament: about 80 g for all three plates.
-- Time: about 4 h 28 min for all three plates.
+- Filament: about 109 g for all three plates.
+- Time: about 5 h 28 min for all three plates.
 
 Each rear leg has a small sprung catch at its foot, printed flat on the bed
 with a thin slit above it. When the legs come off the plate, check that slit
@@ -77,7 +77,7 @@ screws go through slots, and a bare screw head will sink into the plastic.
 1. Bolt each rear leg to its rear post from behind, three screws with
    washers. Leave them finger-tight. The grooves face forward.
 2. On the bench, stand the two sides facing each other and set the NUC on
-   their ledges, its front face against the backs of the ears.
+   their seats, its front face against the backs of the ears.
 3. Slide the sides and the NUC into the rack from the front together. Each
    side runs into the groove of its leg. About 35 mm from home the two
    catches click. The ears overlap the NUC's ends, so it cannot go in after

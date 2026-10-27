@@ -125,7 +125,7 @@ class Device(object):
         A bare case has no tray: it stands on the sides' ledges.
         """
         if self.bare:
-            return P.LAP_T
+            return P.SEAT_T
         return P.TRAY_T + self.plinth
 
     @property

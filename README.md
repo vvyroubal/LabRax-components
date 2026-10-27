@@ -96,7 +96,7 @@ its own pair of sides and the shared rear legs, and no tray or faceplate.
 | `faceplate_usw` | 213.6 × 20 × 44.5 | 1 | Flex Mini |
 | `tray_sg108e_l` / `tray_sg108e_r` | 136.5 × 128.4 × 17.7 | 1 each | TL-SG108E |
 | `faceplate_sg108e` | 213.6 × 20 × 44.5 | 1 | TL-SG108E |
-| `side_nuc_l` / `side_nuc_r` | 33 × 212.5 × 44.5 | 1 each | NUC6i7KYK, in place of `side_l` / `side_r` |
+| `side_nuc_l` / `side_nuc_r` | 36 × 212.5 × 44.5 | 1 each | NUC6i7KYK, in place of `side_l` / `side_r` |
 
 **Four of the seven are a chassis that takes no notice of what is in it.**
 The sides and the rear legs are sized by the rack alone; only the tray pair
@@ -273,15 +273,15 @@ finger.
 
 | | UCG-Fiber | Flex Mini 2.5G | TL-SG108E | NUC6i7KYK |
 |---|---|---|---|---|
-| lifted by a plinth | no | 5.625 mm | 3.725 mm | no tray: on the sides' ledges |
-| sits at (z) | 6.0 – 36.0 | 11.625 – 32.825 | 9.725 – 34.725 | 3.0 – 43.0 |
+| lifted by a plinth | no | 5.625 mm | 3.725 mm | no tray: on its sides' 19.2 mm seats |
+| sits at (z) | 6.0 – 36.0 | 11.625 – 32.825 | 9.725 – 34.725 | 3.5 – 43.5 |
 | held sideways by | the rails, 0.6 mm a side | walls on its tray | walls on its tray | the rack's posts, about 0.5 mm a side |
-| held down by | the faceplate's flange, 0.8 mm over the case | the same | the same | its weight, 1.45 mm under the next U |
+| held down by | the faceplate's flange, 0.8 mm over the case | the same | the same | its weight, 0.95 mm under the next U |
 | held back by | its tray's rear lip | the same | the same | the runners' tongues, 0.5 mm behind it |
 | held forward by | the faceplate | the same | the same | the ears, 0.5 mm in front of it |
 | opening (mm) | 22.5 × 11.0 window | 109.1 × 18.5 frame | 150 × 17 frame | its whole face between the ears, 188 wide |
 | round-over on the opening | 6 mm | 6 mm | 6 mm | — |
-| tray | solid | solid | solid | none; 93% of its underside is open |
+| tray | solid | solid | solid | none; 87% of its underside is open |
 
 `z` is height above the bottom of the U, which is 44.45 mm tall.
 
@@ -303,13 +303,25 @@ opening.
 **The NUC** is 233 × 143 × 40 measured whole, where Intel quote
 211 × 116 × 28. That is wider than the bay and too tall for a tray and a
 flange in one U, so it goes in **bare**. Its own sides, `side_nuc_l` and
-`side_nuc_r`, have the rail and the rear stop cut down to the 3 mm ledge for
-the whole depth of the case, and the ledge run forward to the ear. It stands
-on the two ledges, between the rack's posts, with its face 0.5 mm behind the
+`side_nuc_r`, have the rail and the rear stop cut down for the whole depth of
+the case, and stand it on a **seat** 3.5 mm thick and 19.2 mm wide, joined
+across its whole width into a chin on the ear at the front and into a
+**yoke** round the leg at the back: a full-height bulkhead inboard of the
+leg, a flange over its top, and the rail raised to meet the flange. The seat
+is as wide as a side can be and still go on the bed. The NUC stands on the
+two seats, between the rack's posts, with its face 0.5 mm behind the
 ears and its back 0.5 mm short of the runners' tongues: the ears overlap its
 ends by 22.5 mm and stop it coming forward, the tongues stop it going back.
-Behind the tongue's front face, and at the ear, its sides are the shared
-sides exactly, so they ride the same rear legs. It draws its air through its
+Where the leg runs on them, and at the ear, its sides are the shared
+sides exactly, so they ride the same rear legs; the yoke clears the leg at
+every point of its travel, on any rack from 230 to 240 mm.
+
+The seat is the one thing under the case, and the U leaves it 3.5 mm. Run
+through CalculiX in FreeCAD's FEM workbench, one side with its ear clamped
+and its tongue held, the NUC's own weight on it peaks at about 2 MPa with
+0.25 mm of sag, against the 35–50 MPa printed PETG takes: some 17 times
+over. Fifty newtons pressed on one seat -- someone leaning on the NUC -- is
+about 31 MPa, at the joint of seat and rail just behind the case. It draws its air through its
 underside, and with no tray there is nothing under it but the U below.
 
 Because nothing ties the two sides together at the front, put the NUC on the
@@ -414,7 +426,7 @@ Then add its three plates to `KITS` in `common/tools/plate.py` and run `make`.
 
 `make verify` measures the **built solids**, not the parameters, so a feature
 that silently does nothing is caught rather than assumed away: 195 checks for
-the gateway, 194 each for the Flex Mini and the TL-SG108E, and 33 for the
+the gateway, 194 each for the Flex Mini and the TL-SG108E, and 35 for the
 NUC, which has no tray or faceplate to check and whose sides are checked
 against the shared ones.
 Among them:

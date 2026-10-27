@@ -246,13 +246,51 @@ def side(doc, sx, name, dev=None):
     sk.pocket(doc, bd, s, y_hi - y_lo, reversed_=False)
 
     if dev.bare:
-        # With no faceplate in front of it, a bare case starts just behind
-        # the ear, so the ledge it stands on has to start there too.
-        s = sk.sketch(doc, bd, name + "_Sk_ledge_front",
-                      sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
-        sk.rect(s, sx * P.LEDGE_X0, 0.0, sx * P.BODY_HW, P.LAP_T)
-        sk.pad(doc, bd, s, P.LEDGE_Y0, reversed_=True)
+        _seat(doc, bd, name, sx)
     return bd
+
+
+def _seat(doc, bd, name, sx):
+    """What a bare case stands on, and what holds the side together round it.
+
+    With the rail cut down for the case, all that joins the ear to the back of
+    the side is a plate under the case. It is made as wide as the bed allows,
+    and it is joined in across its whole width at both ends: into a chin on
+    the ear at the front, and into a yoke round the leg at the back.
+    """
+    x0, x1 = sx * P.SEAT_X0, sx * P.BODY_HW
+    # The seat: from the back of the ear to the front of the tongue.
+    s = sk.sketch(doc, bd, name + "_Sk_seat",
+                  sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
+    sk.rect(s, x0, 0.0, x1, P.SEAT_T)
+    sk.pad(doc, bd, s, P.RUN_Y0, reversed_=True)
+
+    # The ear's chin, under the seat's inboard half, so the seat meets the
+    # ear across its whole width rather than only where the ear already is.
+    s = sk.sketch(doc, bd, name + "_Sk_chin",
+                  sk.plane(Vector(0, -P.EAR_T, 0), sk.X, sk.Z))
+    sk.rect(s, x0, 0.0, sx * (P.EAR_X0 + 0.5), P.SEAT_T)
+    sk.pad(doc, bd, s, P.EAR_T, reversed_=True)
+
+    # The yoke. A bulkhead the full height of the U, inboard of the leg...
+    s = sk.sketch(doc, bd, name + "_Sk_bulkhead",
+                  sk.plane(Vector(0, P.RUN_Y0, 0), sk.X, sk.Z))
+    sk.rect(s, x0, 0.0, sx * P.BULK_X1, P.RACK_U)
+    sk.pad(doc, bd, s, P.BULK_Y1 - P.RUN_Y0, reversed_=True)
+
+    # ...the rail raised to the top of the U...
+    s = sk.sketch(doc, bd, name + "_Sk_rail_top",
+                  sk.plane(Vector(0, P.RUN_Y0, 0), sk.X, sk.Z))
+    sk.rect(s, sx * P.POCKET_HW, P.RAIL_TOP - 0.5, x1, P.RACK_U)
+    sk.pad(doc, bd, s, P.YOKE_Y1 - P.RUN_Y0, reversed_=True)
+
+    # ...and a flange over the top of the leg joining the two. It prints as a
+    # bridge between the bulkhead and the rail.
+    s = sk.sketch(doc, bd, name + "_Sk_flange",
+                  sk.plane(Vector(0, P.RUN_Y0, 0), sk.X, sk.Z))
+    sk.rect(s, x0, P.RAIL_TOP + P.YOKE_GAP, sx * (P.POCKET_HW + 0.5),
+            P.RACK_U)
+    return sk.pad(doc, bd, s, P.YOKE_Y1 - P.RUN_Y0, reversed_=True)
 
 
 def leg(doc, sx, name):

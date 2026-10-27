@@ -147,14 +147,17 @@ KITS = [
 def chassis_plates(kit):
     """The chassis plates for a kit, with its own sides in if it has them.
 
-    A device wider than the bay prints its own pair, laid out exactly as the
-    shared pair is: they are the same parts with less rail.
+    A device wider than the bay prints its own pair, turned as the shared
+    pair is. They are wider than the shared ones at the seat, so they go in
+    the middle of the bed rather than nudged off it the way the shared ones
+    are: that leaves about 4 mm all round.
     """
     sides = dict(zip(devices.CHASSIS[:2], devices.BY_KEY[kit["key"]].sides))
+    own = dict((n, o) for n, o in sides.items() if o != n)
     return [(title.replace("Chassis", "Chassis (%s)" % kit["key"].upper())
-             if any(n in sides and sides[n] != n for n, _, _, _ in parts)
-             else title,
-             [(sides.get(n, n), at, rot, opt) for n, at, rot, opt in parts])
+             if any(n in own for n, _, _, _ in parts) else title,
+             [(own[n], (90.0, 90.0), rot, opt) if n in own
+              else (n, at, rot, opt) for n, at, rot, opt in parts])
             for title, parts in CHASSIS_PLATES]
 
 
