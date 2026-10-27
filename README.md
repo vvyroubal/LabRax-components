@@ -402,8 +402,8 @@ Then add its three plates to `KITS` in `common/tools/plate.py` and run `make`.
 ### What is checked
 
 `make verify` measures the **built solids**, not the parameters, so a feature
-that silently does nothing is caught rather than assumed away: 204 checks for
-the NUC, 194 for the gateway, 193 each for the Flex Mini and the TL-SG108E.
+that silently does nothing is caught rather than assumed away: 199 checks for
+the NUC, 195 for the gateway, 194 each for the Flex Mini and the TL-SG108E.
 Among them:
 
 - each body is one valid solid, built from sketches, and fits the bed;

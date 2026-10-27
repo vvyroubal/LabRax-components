@@ -132,6 +132,10 @@ def main():
               % (dev.name, dev.w, dev.d, dev.h, dev.mass_g))
         print("=" * 62)
         print("\n[parts]")
+        want = set(dev.chassis + dev.parts)
+        check(set(parts) == want, "it is built of its own seven parts and no others",
+              "extra %s, missing %s" % (sorted(set(parts) - want),
+                                        sorted(want - set(parts))))
         for n in sorted(parts):
             sh = parts[n]
             check(sh.isValid() and len(sh.Solids) == 1,

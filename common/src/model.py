@@ -553,12 +553,14 @@ def build(doc, only=None):
     every device is a lot of solid to fuse and intersect, and doing it twice
     over in one process is what made the checks fall over.
     """
-    out = {
-        "side_l": side(doc, -1, "side_l"),
-        "side_r": side(doc, +1, "side_r"),
-        "leg_l": leg(doc, -1, "leg_l"),
-        "leg_r": leg(doc, +1, "leg_r"),
-    }
+    out = {}
+    # The shared sides, unless the one device asked for brings its own: a
+    # document with both pairs in it has two sides in the same place.
+    if only is None or not only.own_sides:
+        out["side_l"] = side(doc, -1, "side_l")
+        out["side_r"] = side(doc, +1, "side_r")
+    out["leg_l"] = leg(doc, -1, "leg_l")
+    out["leg_r"] = leg(doc, +1, "leg_r")
     for dev in (devices.ALL if only is None else (only,)):
         if dev.own_sides:
             nl, nr = dev.sides
