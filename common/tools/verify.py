@@ -133,7 +133,7 @@ def main():
         print("=" * 62)
         print("\n[parts]")
         want = set(dev.chassis + dev.parts)
-        check(set(parts) == want, "it is built of its own seven parts and no others",
+        check(set(parts) == want, "it is built of its own parts and no others",
               "extra %s, missing %s" % (sorted(set(parts) - want),
                                         sorted(want - set(parts))))
         for n in sorted(parts):
@@ -149,7 +149,93 @@ def main():
             check(len(sk_) > 0 and len(so) > 0,
                   "%-14s is sketches driving solids" % n,
                   "%d sketches, %d pads/pockets" % (len(sk_), len(so)))
-        one_device(parts, bodies, dev)
+        if dev.bare:
+            bare_device(doc, parts, dev)
+        else:
+            one_device(parts, bodies, dev)
+    report()
+
+
+def bare_device(doc, parts, dev):
+    """A case on its own sides' ledges, with no tray and no faceplate.
+
+    Its sides are checked against the shared ones rather than all over again:
+    wherever they meet a leg or a post they have to be the shared side to the
+    last cubic millimetre, which is what lets them ride legs already printed.
+    """
+    names = list(dev.chassis)
+    asm = parts[names[0]]
+    for n in names[1:]:
+        asm = asm.fuse(parts[n])
+    asm = asm.removeSplitter()
+
+    print("\n[no part overlaps another]")
+    for i, a in enumerate(names):
+        for b_ in names[i + 1:]:
+            v = vol(parts[a].common(parts[b_]))
+            check(v < VOID, "%-10s vs %-10s" % (a, b_), "%.3f mm3" % v)
+
+    print("\n[rack envelope]")
+    bb = asm.BoundBox
+    check(abs(bb.XMin + P.FACE_HW) < 1e-6 and abs(bb.XMax - P.FACE_HW) < 1e-6,
+          "spans the full 10 inch width", "%.2f .. %.2f" % (bb.XMin, bb.XMax))
+    check(bb.ZMin >= -1e-6 and bb.ZMax <= P.RACK_U + 1e-6,
+          "stays inside 1U", "Z %.2f .. %.2f" % (bb.ZMin, bb.ZMax))
+
+    print("\n[the sides are the shared sides wherever they meet the rack]")
+    for sx, n in zip((-1, 1), dev.sides):
+        ref = model.side(doc, sx, "ref_" + n)
+        doc.recompute()
+        for what, zone in (("at the ear", box(-200, 200, -20, 0.0, -5, 60)),
+                           ("behind the tongue's front face",
+                            box(-200, 200, P.RUN_Y0, 300, -5, 60))):
+            a, b_ = ref.Shape.common(zone), parts[n].common(zone)
+            v = vol(a.cut(b_)) + vol(b_.cut(a))
+            check(v < VOID, "%s is the shared side %s" % (n, what),
+                  "%.3f mm3 different" % v)
+
+    print("\n[the case]")
+    case = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d, dev.z0, dev.z1)
+    check(dev.z1 <= P.RACK_U, "it is inside the U",
+          "Z %.2f .. %.2f of %.2f" % (dev.z0, dev.z1, P.RACK_U))
+    check(vol(asm.common(case)) < VOID, "it sits without interference",
+          "%.3f mm3" % vol(asm.common(case)))
+    for sx, n in zip((-1, 1), dev.sides):
+        under = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d,
+                    dev.z0 - 0.5, dev.z0)
+        a = vol(parts[n].common(under)) / 0.5
+        want = 0.9 * (P.BODY_HW - P.LEDGE_X0) * dev.d
+        check(a >= want, "%s's ledge carries it the whole depth" % n,
+              "%.0f mm2 under it" % a)
+    for what, vec, free in (("forward", Vector(0, -1, 0), P.BARE_Y0),
+                            ("back", Vector(0, 1, 0), dev.clr_d)):
+        ok = vol(asm.common(case.translated(vec * (free - 0.1)))) < VOID
+        hit = vol(asm.common(case.translated(vec * (free + 0.5))))
+        check(ok and hit > VOID, "it cannot slide %s" % what,
+              "free for %.1f mm, %.0f mm3 in the way %.1f mm further"
+              % (free, hit, 0.5))
+    check(2 * P.EAR_X0 < dev.w,
+          "the ears overlap its ends, which is what stops it coming forward",
+          "opening %.1f vs case %.1f" % (2 * P.EAR_X0, dev.w))
+    open_ = 1.0 - vol(asm.common(box(-dev.w / 2, dev.w / 2, dev.y0,
+                                     dev.y0 + dev.d, -1.0, dev.z0))) / (
+        dev.w * dev.d * (dev.z0 + 1.0))
+    check(open_ > 0.8, "its underside is open to the air",
+          "%.0f%% of the space under it is clear" % (100 * open_))
+    # The rack's model puts the posts 222.25 apart; the case goes between a
+    # printed rack's posts with about 1 mm to spare. So this is reported, not
+    # checked: set it by the rack you have.
+    print("  note  %.2f mm between the posts by the rack's model, "
+          "%.2f mm case" % (P.POST_CLEAR_W, dev.w))
+
+
+def report():
+    print("\n%d checks, %d failed" % (_checks, len(_fails)))
+    for f in _fails:
+        print("  FAIL %s" % f)
+    sys.stdout.flush()
+    if _fails:
+        sys.exit(1)
 
 
 def one_device(parts, bodies, dev):
@@ -884,13 +970,6 @@ def one_device(parts, bodies, dev):
         check(2 * P.EAR_X0 < dev.w,
               "the ears overlap the device's ends, so it cannot slide out",
               "opening %.1f vs device %.1f" % (2 * P.EAR_X0, dev.w))
-
-    print("\n%d checks, %d failed" % (_checks, len(_fails)))
-    for f in _fails:
-        print("  FAIL %s" % f)
-    sys.stdout.flush()
-    if _fails:
-        sys.exit(1)
 
 
 main()

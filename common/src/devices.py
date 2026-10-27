@@ -92,8 +92,9 @@ class Frame(object):
 
 
 class Device(object):
-    def __init__(self, key, name, doc, w, d, h, mass_g, front, keys_y,
-                 plinth=0.0, vent=False, clr_w=None, clr_h=None, clr_d=None):
+    def __init__(self, key, name, doc, w, d, h, mass_g, front=None, keys_y=(),
+                 plinth=0.0, vent=False, clr_w=None, clr_h=None, clr_d=None,
+                 bare=False):
         self.key = key
         self.name = name
         self.doc = doc
@@ -110,11 +111,21 @@ class Device(object):
         self.clr_w = P.CLR_W if clr_w is None else clr_w
         self.clr_h = P.CLR_H if clr_h is None else clr_h
         self.clr_d = P.CLR_D if clr_d is None else clr_d
+        # True for a case too tall for a tray and a flange in one U. It sits
+        # straight on its own sides' ledges, face just behind the ears, with
+        # no tray and no faceplate: the ears stop it coming forward and the
+        # runner's tongue stops it going back.
+        self.bare = bare
 
     # --- where the case sits ------------------------------------------------
     @property
     def z0(self):
-        """Underside of the case: the tray's top face, plus any plinth."""
+        """Underside of the case: the tray's top face, plus any plinth.
+
+        A bare case has no tray: it stands on the sides' ledges.
+        """
+        if self.bare:
+            return P.LAP_T
         return P.TRAY_T + self.plinth
 
     @property
@@ -123,7 +134,10 @@ class Device(object):
 
     @property
     def y0(self):
-        """Front face, against the back of the faceplate."""
+        """Front face, against the back of the faceplate -- or, with no
+        faceplate, just behind the ears."""
+        if self.bare:
+            return P.BARE_Y0
         return P.DEV_Y0
 
     @property
@@ -174,7 +188,9 @@ class Device(object):
     # `dir` is the device's own folder, set when its device.py is loaded.
     @property
     def parts(self):
-        """The three prints drawn around this device."""
+        """The three prints drawn around this device -- none, if it is bare."""
+        if self.bare:
+            return ()
         return tuple(self.part(b) for b in ("tray_l", "tray_r", "faceplate"))
 
     @property

@@ -307,6 +307,9 @@ VENT_MARGIN = 6.0   # [design] solid border kept round the vented panel
 # everything from the rear stop back, where the runner is.
 RELIEF_CLR_Z = 0.5    # [design] between the cut-down rail and the case
 RELIEF_CLR_Y = 0.5    # [design] in front of the case, and past its rear lip
+# A bare case -- no tray, no faceplate, see Device.bare -- stands on the
+# ledges with its face this far behind the back of the ears.
+BARE_Y0 = 0.5         # [design]
 
 REAR_LIP_X = STOP_X0 - LAP_FIT  # [design] it stops just short of where the
                       # sides' rear stops start, so the two together span the

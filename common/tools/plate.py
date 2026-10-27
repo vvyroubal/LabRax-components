@@ -17,6 +17,7 @@ plates are well formed and printable.
 """
 
 import json
+import math
 import os
 import re
 import struct
@@ -136,17 +137,12 @@ KITS = [
         "key": "nuc",
         "out": "NUC6i7KYK_LabRax-A1mini.3mf",
         "title": "Intel NUC6i7KYK in a Lab Rax 10 inch rack",
-        "plates": [
-            ("NUC6i7KYK 1 of 3 - left tray",
-             [("tray_nuc_l", (90.0, 90.0), [], TRAY)]),
-            ("NUC6i7KYK 2 of 3 - right tray",
-             [("tray_nuc_r", (90.0, 90.0), [], TRAY)]),
-            ("NUC6i7KYK 3 of 3 - faceplate",
-             [("faceplate_nuc", (90.0, 90.0), [("x", 180), ("z", 45)],
-               NO_BRIM)]),
-        ],
+        # Bare: it stands on its own sides, with no tray and no faceplate, so
+        # the chassis plates are the whole kit.
+        "plates": [],
     },
 ]
+
 
 def chassis_plates(kit):
     """The chassis plates for a kit, with its own sides in if it has them.
@@ -198,14 +194,21 @@ def rotate(V, ops):
     return V
 
 
-PLATES_PER_ROW = 3     # see plate_origin(); 2 puts row 2 off the grid
+def plates_per_row(n):
+    """How many plates Bambu Studio puts in a row: the square root, rounded up.
+
+    Three for the six-plate files, so the old fixed 3 was right for those and
+    only those: a three-plate file is two to a row, and laid out three to a
+    row its third plate came back empty.
+    """
+    return int(math.ceil(math.sqrt(n)))
 
 
-def plate_origin(index):
+def plate_origin(index, n):
     """Bottom-left of plate `index` (1-based) in Bambu Studio's global layout.
 
-    Plates sit on a grid THREE to a row, stepping 216 mm across a row and
-    216 mm down to the next. Found by trying candidates against the real
+    Plates sit on a grid plates_per_row(n) to a row, stepping 216 mm across a
+    row and 216 mm down to the next. Found by trying candidates against the real
     slicer, which is the only way to know: with two to a row every plate from
     the second row on came back empty, and 250 mm failed on the second plate.
 
@@ -221,8 +224,9 @@ def plate_origin(index):
     plate as its own single-plate project before slicing, so it only ever
     exercised plate 1's origin. It slices the real exported files as well now.
     """
-    col = (index - 1) % PLATES_PER_ROW
-    row = (index - 1) // PLATES_PER_ROW
+    per = plates_per_row(n)
+    col = (index - 1) % per
+    row = (index - 1) // per
     return col * PLATE_STRIDE, -row * PLATE_STRIDE
 
 
@@ -286,7 +290,7 @@ def build():
             problems += check_name("part name", name)
 
     for pindex, (pname, parts) in enumerate(PLATES, start=1):
-        ox, oy = plate_origin(pindex)
+        ox, oy = plate_origin(pindex, len(PLATES))
         instances = []
         placed = []   # (name, x0, x1, y0, y1) already put on this plate
         for name, (cx, cy), ops, opts in parts:

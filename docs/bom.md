@@ -14,7 +14,7 @@ well, so whichever you open is a complete build: print all six plates.
 | `ucg-fiber/UCG_Fiber_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 UCG-Fiber | 261.0 g, 11 h 23 |
 | `usw-flex-mini/USW_Flex_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 USW-Flex | 248.7 g, 11 h 09 |
 | `tl-sg108e/TL_SG108E_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 TL-SG108E | 254.7 g, 11 h 22 |
-| `nuc6i7kyk/NUC6i7KYK_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 NUC6i7KYK | 245.8 g, 11 h 21 |
+| `nuc6i7kyk/NUC6i7KYK_LabRax-A1mini.3mf` | 1–2 its own sides, 3 the rear legs; nothing else | 80.2 g, 4 h 28 |
 
 Every plate carries its own label in Bambu Studio — `Chassis 2 of 3 - right
 side`, `UCG-Fiber 3 of 3 - faceplate` — so the tab tells you which kit a plate
@@ -26,10 +26,10 @@ belongs to.
 | UCG-Fiber | `tray_ucg_l`, `tray_ucg_r`, `faceplate_ucg` | 149.0 g | 5 h 37 |
 | USW-Flex-2.5G-5 | `tray_usw_l`, `tray_usw_r`, `faceplate_usw` | 136.7 g | 5 h 22 |
 | TL-SG108E | `tray_sg108e_l`, `tray_sg108e_r`, `faceplate_sg108e` | 142.7 g | 5 h 35 |
-| NUC6i7KYK | `tray_nuc_l`, `tray_nuc_r`, `faceplate_nuc` | 133.7 g | 5 h 34 |
+| NUC6i7KYK | `side_nuc_l`, `side_nuc_r` in place of `side_l`, `side_r`; no tray, no faceplate | 40.2 g | 2 h 33 |
 
-**Each bracket needs a chassis of its own.** Plates 1–3 are identical in all
-four files, so for a second device print them again from whichever file is
+**Each bracket needs a chassis of its own.** Plate 3, the rear legs, is
+identical in all four files, and so are plates 1–2 in all but the NUC's, so for a second device print them again from whichever file is
 open, then that device's plates 4–6.
 
 Plate by plate:
@@ -48,9 +48,8 @@ Plate by plate:
 | 4† | `tray_sg108e_l` | 136.5 × 128.4 × 17.7 | 47.3 g | 1 h 45 | yes |
 | 5† | `tray_sg108e_r` | 136.5 × 128.4 × 17.7 | 59.2 g | 2 h 12 | yes |
 | 6† | `faceplate_sg108e` | 213.6 × 20 × 44.5 | 36.2 g | 1 h 38 | no |
-| 4‡ | `tray_nuc_l` | 136.5 × 128.4 × 11.2 | 44.4 g | 1 h 45 | yes |
-| 5‡ | `tray_nuc_r` | 136.5 × 128.4 × 11.2 | 55.4 g | 2 h 12 | yes |
-| 6‡ | `faceplate_nuc` | 213.6 × 20 × 44.5 | 33.9 g | 1 h 37 | no |
+| 1‡ | `side_nuc_l` | 33 × 212.5 × 44.5 | 20.0 g | 1 h 16 | yes |
+| 2‡ | `side_nuc_r` | 33 × 212.5 × 44.5 | 20.2 g | 1 h 16 | yes |
 
 \* in `USW_Flex_LabRax-A1mini.3mf`, † in `TL_SG108E_LabRax-A1mini.3mf`,
 ‡ in `NUC6i7KYK_LabRax-A1mini.3mf`; the rows with no mark are in

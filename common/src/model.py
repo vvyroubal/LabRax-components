@@ -231,14 +231,27 @@ def side(doc, sx, name, dev=None):
 
     if dev is None:
         return bd
-    # A case wider than the bay stands where the rail is. Take the rail away
-    # above the case's underside for its whole depth, so the case passes over
-    # what is left. The ledge is under the tray and is not touched.
+    # A case wider than the bay stands where the rail is. Take away everything
+    # of the side above its underside for the whole depth of the case -- the
+    # rail, and for a bare case the rear stop too -- so it passes over what is
+    # left. The ledge is below that line and is not touched.
+    z_cut = dev.z0 if dev.bare else dev.z0 - P.RELIEF_CLR_Z
+    y_lo = dev.y0 - P.RELIEF_CLR_Y
+    y_hi = dev.y1 if dev.bare else dev.y1 + P.RELIEF_CLR_Y
     s = sk.sketch(doc, bd, name + "_Sk_relief",
-                  sk.plane(Vector(sx * P.POCKET_HW, 0, 0), sk.Y, sk.Z))
-    sk.rect(s, dev.y0 - P.RELIEF_CLR_Y, dev.z0 - P.RELIEF_CLR_Z,
-            dev.y1 + P.RELIEF_CLR_Y, P.RAIL_TOP + 1.0)
-    sk.pocket(doc, bd, s, P.RAIL_T)
+                  sk.plane(Vector(0, y_lo, 0), sk.X, sk.Z))
+    sk.rect(s, sx * (P.LEDGE_X0 - 1.0), z_cut,
+            sx * (P.BODY_HW + 1.0), P.RACK_U + 1.0)
+    # Rearward, and said so: see the note on directions in faceplate().
+    sk.pocket(doc, bd, s, y_hi - y_lo, reversed_=False)
+
+    if dev.bare:
+        # With no faceplate in front of it, a bare case starts just behind
+        # the ear, so the ledge it stands on has to start there too.
+        s = sk.sketch(doc, bd, name + "_Sk_ledge_front",
+                      sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
+        sk.rect(s, sx * P.LEDGE_X0, 0.0, sx * P.BODY_HW, P.LAP_T)
+        sk.pad(doc, bd, s, P.LEDGE_Y0, reversed_=True)
     return bd
 
 
@@ -566,6 +579,8 @@ def build(doc, only=None):
             nl, nr = dev.sides
             out[nl] = side(doc, -1, nl, dev)
             out[nr] = side(doc, +1, nr, dev)
+        if dev.bare:
+            continue
         out[dev.part("tray_l")] = tray(doc, dev, -1, dev.part("tray_l"))
         out[dev.part("tray_r")] = tray(doc, dev, +1, dev.part("tray_r"))
         out[dev.part("faceplate")] = faceplate(doc, dev,

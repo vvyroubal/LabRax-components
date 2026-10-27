@@ -8,7 +8,7 @@ Lab Rax 1U bracket for Intel NUC6i7KYK (Skull Canyon), A1 mini
 
 ## Summary
 
-A 1U bracket that carries an Intel NUC6i7KYK (Skull Canyon) in a Lab Rax 10 inch rack, bolted to the front and rear posts, on a slotted tray that lets it breathe. Every part fits an A1 mini.
+A 1U bracket that carries an Intel NUC6i7KYK (Skull Canyon) in a Lab Rax 10 inch rack, bolted to the front and rear posts. The NUC stands on the bracket's own ledges, face forward, with nothing under it to block its air. Three plates, all on an A1 mini.
 
 ## Tags
 
@@ -16,20 +16,10 @@ Lab Rax, 10 inch rack, 1U, Intel NUC, NUC6i7KYK, Skull Canyon, rack mount, homel
 
 ## Pictures
 
-Isometric views from FreeCAD, in `../images/`, 1200 x 1600 (3:4) on white:
-
-1. `makerworld-nuc-assembled.png` — cover picture: the bracket with the
-   device in place and all sixteen screws fitted.
-2. `makerworld-nuc-empty.png` — the bracket without the device, showing the
-   tray and the runners at the back.
-3. `makerworld-nuc-exploded.png` — the seven printed parts and the device,
-   drawn apart to show how they go together.
-
-The device is shown as a plain translucent block the size of its case.
-
-Photographs of four of these brackets fitted in a rack are in `../../images/`:
-`rack-front.jpg`, `rack-side.jpg` and `rack-rear.jpg`. They show the whole
-rack rather than this bracket alone.
+Rendered from the STLs, in `../images/`: `assembly-nuc-iso.png`,
+`assembly-nuc-front.png` and `assembly-nuc-top.png`. The 3:4 MakerWorld
+pictures (`makerworld-nuc-*.png`) still show the earlier bracket with a tray
+and faceplate and need rendering again.
 
 ## Description
 
@@ -47,28 +37,19 @@ https://makerworld.com/en/collections/5813742-lab-rax
 
 **The device**
 
-Intel NUC6i7KYK, "Skull Canyon", 223 x 116 x 28 mm measured across the bulges on its ends (Intel quote 211 wide).
+Intel NUC6i7KYK, "Skull Canyon", 233 x 143 x 40 mm measured whole (Intel quote 211 x 116 x 28 for the case alone).
 
-The NUC's front USB ports and audio jack face the front through an open frame in the faceplate, 179 x 18 mm, with a rounded front edge. Everything else is at the back.
-
-The NUC is wider than the space between the bracket's side rails, so this kit has its own pair of sides, with the rails cut down below the case. The NUC stands between the rack's posts themselves, with about half a millimetre to spare at each end. It draws its cooling air through its underside, so the tray under it is slotted from front to back.
+That is wider than the space between the bracket's side rails and too tall for a tray in one rack unit, so the NUC goes in bare: it stands on the two sides' ledges, 3 mm up, between the rack's posts, with about half a millimetre to spare at each end. Its face is half a millimetre behind the front ears, which overlap its ends and stop it coming forward; the runners at the back stop it going back. Its whole front face shows between the ears. It draws its cooling air through its underside, and there is nothing under it but the rack unit below.
 
 **What is in the file**
 
-Six plates, already arranged for a Bambu Lab A1 mini (180 x 180 mm bed):
+Three plates, already arranged for a Bambu Lab A1 mini (180 x 180 mm bed):
 
-- Plate 1: left side, the NUC's own, with the rail cut down below the case
+- Plate 1: left side, the NUC's own, cut down to the ledge where the NUC stands
 - Plate 2: right side, the same
 - Plate 3: both rear legs
-- Plate 4: left half of the tray
-- Plate 5: right half of the tray
-- Plate 6: faceplate
 
-Every part is already turned the way it prints, and supports and brims are
-set per part. Open the file and print all six plates.
-
-Plates 1 to 3 are a chassis that is the same for every device in this series.
-Plates 4 to 6 are made for this device.
+The rear legs are the same as for every other device in this series, so if you already have a pair, plates 1 and 2 are all you need.
 
 **Printing**
 
@@ -76,8 +57,8 @@ Plates 4 to 6 are made for this device.
   poor choice.
 - Profile: 0.20 mm Standard for the A1 mini, as carried in the file. 2 walls,
   15% infill.
-- Filament: about 246 g for all six plates.
-- Time: about 11 h 21 min for all six plates.
+- Filament: about 80 g for all three plates.
+- Time: about 4 h 28 min for all three plates.
 
 Each rear leg has a small sprung catch at its foot, printed flat on the bed
 with a thin slit above it. When the legs come off the plate, check that slit
@@ -85,49 +66,41 @@ is clear and pick out any support left in it, or the catch cannot move.
 
 **Hardware to buy**
 
-- 16 x M6 x 12 button head screws
-- 4 x M6 nuts
+- 12 x M6 x 12 button head screws
 - 12 x M6 washers (12.5 mm outside diameter)
 
-The rack's posts already hold the nuts for the twelve rack screws. The four
-loose nuts are for the faceplate. The washers are needed: the rack screws go
-through slots, and a bare screw head will sink into the plastic.
+The rack's posts already hold the nuts. The washers are needed: the rack
+screws go through slots, and a bare screw head will sink into the plastic.
 
 **Assembly**
 
 1. Bolt each rear leg to its rear post from behind, three screws with
    washers. Leave them finger-tight. The grooves face forward.
-2. Slide a nut into each of the four slots in the ends of the faceplate.
-3. On the bench, stand the two sides facing each other and lay the tray
-   across their ledges: the left half first, then the right half onto it.
-4. Set the device down onto the tray.
-5. Lower the faceplate from above, behind the ears and in front of the
-   device, and put four screws through the ears into its nuts. The faceplate
-   goes on after the device, not before.
-6. Slide the whole frame into the rack from the front. Each side runs into
-   the groove of its leg. About 35 mm from home the two catches click.
-7. Put six screws with washers through the front ears, then tighten the six
+2. On the bench, stand the two sides facing each other and set the NUC on
+   their ledges, its front face against the backs of the ears.
+3. Slide the sides and the NUC into the rack from the front together. Each
+   side runs into the groove of its leg. About 35 mm from home the two
+   catches click. The ears overlap the NUC's ends, so it cannot go in after
+   the sides.
+4. Put six screws with washers through the front ears, then tighten the six
    at the back.
 
-To take it out again, undo the six front screws and draw the frame forward.
-It stops after about 35 mm. To remove it completely, reach in from the back
-of the rack and push the two tabs at the foot of the legs towards the middle.
+To take it out again, undo the six front screws and draw it forward. It
+stops after about 35 mm. To remove it completely, reach in from the back of
+the rack and push the two tabs at the foot of the legs towards the middle.
 
 **Good to know**
 
 - The sides slide into the legs on a printed dovetail, and how freely that
   runs depends on the printer. Two small test pieces for it are on GitHub
-  (`common/stl/coupon_tongue.stl` and `coupon_groove.stl`). Print those first:
-  they are small, and they tell you whether the fit suits your printer before
-  you print a two-hour side.
+  (`common/stl/coupon_tongue.stl` and `coupon_groove.stl`).
 - The rack's depth sets itself. The joint between side and leg slides, and
   covers 229 to 257 mm over the outside of the posts.
-- The gap between the bracket and the rack's posts is under a millimetre a
-  side. Print one side first and offer it up to your rack.
-- The outer 12.8 mm at each end of the NUC's back panel sits behind the
-  bracket's rear stops. Keep plugs out of that last 12.8 mm.
-- Before printing the faceplate, check the front ports on your unit against
-  the 179 x 18 mm opening. Measure your NUC across its end bulges too: it has to pass between your rack's posts.
+- Measure your NUC and your rack before printing: the case has to pass
+  between the posts, and it is 233 mm wide.
+- The front rack screws go into the posts right beside the NUC's front
+  corners. Check that their tips do not stand out of the posts' inner faces
+  before you tighten them.
 
 **Source, other devices and full documentation**
 
