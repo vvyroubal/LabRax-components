@@ -8,3 +8,9 @@ graphify-out/
 # The FEM documents are 28 MB each and `make fem` rebuilds them in a few
 # minutes. Keeping them out of the history rather than out of reach.
 common/cad/fem_*.FCStd
+
+# The top cover's logo is third-party artwork for personal printing only:
+# its source, and everything made from it, stay out of the repository.
+top-cover/assets
+top-cover/stl/logo_*.stl
+top-cover/TopCover_Skynet_LabRax*

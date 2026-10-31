@@ -23,7 +23,7 @@ STLS  := $(addprefix common/stl/,$(addsuffix .stl,side_l side_r leg_l leg_r \
 DEVICE_CAD := $(foreach s,ucg-fiber/UCG_Fiber_LabRax usw-flex-mini/USW_Flex_LabRax \
                 tl-sg108e/TL_SG108E_LabRax nuc6i7kyk/NUC6i7KYK_LabRax,$(s).FCStd $(s).step)
 
-.PHONY: all model verify assembly images plate plates clean
+.PHONY: all model verify assembly images plate plates cover clean
 
 all: model verify assembly images plate
 
@@ -49,6 +49,13 @@ images: $(STLS)
 # Arranged onto A1 mini plates, ready to open in Bambu Studio.
 plate: $(STLS)
 	python3 $(TOOLS)/plate.py
+
+# The rack's top cover: two halves and the post joiner that holds them, built,
+# checked and plated in one go. With top-cover/assets/Skynet.3mf present it
+# also makes the logo's pieces and a three-colour 3MF; see top-cover/logo.py.
+cover:
+	$(FREECAD) top-cover/build.py
+	python3 top-cover/plate_cover.py
 
 # Put a real M6 x 12 and a real nut at all 20 positions and see if they fit.
 assembly: $(CAD)
