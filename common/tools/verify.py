@@ -224,21 +224,21 @@ def bare_device(doc, parts, dev):
                        y0, y1, -5, z1)
         for what, z_ in (("at the ear", zone(P.EAR_X0 + 0.5, -20, 0.0, 60)),
                          ("where the leg runs on it",
-                          zone(P.LEDGE_X0, P.RUN_Y0, 300, P.RAIL_TOP - 0.5))):
+                          zone(P.LEDGE_X0, P.WALL_Y1, 300, P.RAIL_TOP - 0.5))):
             v = diff(ref.Shape.common(z_), parts[n].common(z_))
             check(v < VOID, "%s is the shared side %s" % (n, what),
                   "%.3f mm3 different" % v)
 
     print("\n[what the sides add never meets a leg]")
-    # The leg sits 5 mm either way of nominal on a 230..240 mm rack, and the
-    # side draws out CATCH_PULL past home before it stops: so every place the
-    # leg can be relative to the side, from 5 mm forward to 45 mm back.
+    # The legs are already where the NUC's rack puts them, and the side draws
+    # out CATCH_PULL past home before it stops: so every place the leg can be
+    # relative to the side, from home to 10 mm past the stop.
     for sx, n, lg in zip((-1, 1), dev.sides, ("leg_l", "leg_r")):
-        hit = [r for r in range(-5, int(P.CATCH_PULL) + 11)
+        hit = [r for r in range(0, int(P.CATCH_PULL) + 11)
                if vol(added[n].common(parts[lg].translated(Vector(0, r, 0))))
                > VOID]
         check(not hit, "%s's seat and yoke clear %s from home to the stop "
-              "on any rack" % (n, lg),
+              "on a %.0f mm rack" % (n, lg, P.BARE_RACK_D),
               "touches %d mm along" % hit[0] if hit else "clear at every mm")
 
     print("\n[the case]")

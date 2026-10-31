@@ -316,12 +316,19 @@ BARE_Y0 = 0.5         # [design]
 SEAT_T = 3.5          # [design] the seat's thickness; the case's underside
 SEAT_X0 = 91.0        # [design] its inboard edge, 19.2 mm in from the body
 # Behind the case the side is joined up again by a yoke round the leg: a
-# bulkhead inboard of the leg, a flange over the top of it, and the rail
-# raised to meet the flange. Inboard of x = 97 and ahead of y = 150 the
-# leg never is, on any rack from 230 to 240 mm deep; the catch's tab, the
-# nearest part of it, starts at 97.55 and y = 151.
-BULK_X1 = 97.0        # [design] the bulkhead's outboard face
-BULK_Y1 = 150.0       # [design] and its back
+# wall across the whole seat behind the case, a web carrying on from it
+# inboard of the leg, a flange over the top of the leg, and the rail raised to
+# meet the flange.
+#
+# The wall is what the seat lands on, so it is as deep as the rack allows.
+# That depends on the rack: the legs are fixed to the rear posts, so a deeper
+# rack puts them further back. The NUC's rack measures 240 over the outside
+# of its posts, which puts the front of the legs at 155, 11 mm behind the
+# case. On a shallower rack the legs come forward into the wall -- these
+# sides are for a rack this deep or deeper.
+BARE_RACK_D = 240.0   # [rack] measured, outer face of front post to outer
+                      # face of rear post, on the rack the NUC goes in
+WALL_Y1 = LEG_Y0 + (BARE_RACK_D - RACK_D) - 1.0   # 154.0, 1 mm off the leg
 YOKE_GAP = 0.5        # [design] between the flange and the top of the leg
 YOKE_Y1 = 200.0       # [design] where the flange ends, short of the rail's end
 # Behind the bulkhead a web carries on under the flange as far as it goes, so

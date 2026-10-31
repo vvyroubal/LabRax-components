@@ -272,11 +272,13 @@ def _seat(doc, bd, name, sx):
     sk.rect(s, x0, 0.0, sx * (P.EAR_X0 + 0.5), P.SEAT_T)
     sk.pad(doc, bd, s, P.EAR_T, reversed_=True)
 
-    # The yoke. A bulkhead the full height of the U, inboard of the leg...
-    s = sk.sketch(doc, bd, name + "_Sk_bulkhead",
+    # The yoke. A wall the full height of the U and the full width of the
+    # seat, behind the case and in front of the leg, so the seat lands on it
+    # all the way across rather than at its two edges...
+    s = sk.sketch(doc, bd, name + "_Sk_wall",
                   sk.plane(Vector(0, P.RUN_Y0, 0), sk.X, sk.Z))
-    sk.rect(s, x0, 0.0, sx * P.BULK_X1, P.RACK_U)
-    sk.pad(doc, bd, s, P.BULK_Y1 - P.RUN_Y0, reversed_=True)
+    sk.rect(s, x0, 0.0, sx * (P.POCKET_HW + 0.5), P.RACK_U)
+    sk.pad(doc, bd, s, P.WALL_Y1 - P.RUN_Y0, reversed_=True)
 
     # ...the rail raised to the top of the U...
     s = sk.sketch(doc, bd, name + "_Sk_rail_top",
@@ -284,12 +286,12 @@ def _seat(doc, bd, name, sx):
     sk.rect(s, sx * P.POCKET_HW, P.RAIL_TOP - 0.5, x1, P.RACK_U)
     sk.pad(doc, bd, s, P.YOKE_Y1 - P.RUN_Y0, reversed_=True)
 
-    # ...a web from the bulkhead back under the flange, clear of the catch's
+    # ...a web from the wall back under the flange, clear of the catch's
     # tab below it...
     s = sk.sketch(doc, bd, name + "_Sk_web",
-                  sk.plane(Vector(0, P.BULK_Y1 - 0.5, 0), sk.X, sk.Z))
+                  sk.plane(Vector(0, P.WALL_Y1 - 0.5, 0), sk.X, sk.Z))
     sk.rect(s, x0, P.WEB_Z0, sx * P.WEB_X1, P.RACK_U)
-    sk.pad(doc, bd, s, P.YOKE_Y1 - P.BULK_Y1 + 0.5, reversed_=True)
+    sk.pad(doc, bd, s, P.YOKE_Y1 - P.WALL_Y1 + 0.5, reversed_=True)
 
     # ...and a flange over the top of the leg joining them to the rail. It
     # prints as a bridge between the web and the rail.
@@ -619,6 +621,14 @@ def build(doc, only=None):
         out["side_r"] = side(doc, +1, "side_r")
     out["leg_l"] = leg(doc, -1, "leg_l")
     out["leg_r"] = leg(doc, +1, "leg_r")
+    # The legs are fixed to the rear posts, so in a deeper rack they sit
+    # further back. A bare device's sides are drawn for its own rack, and its
+    # document shows the legs where that rack puts them. The legs themselves
+    # are unchanged: only where they are placed.
+    if only is not None and only.bare:
+        for n in ("leg_l", "leg_r"):
+            out[n].Placement = App.Placement(
+                Vector(0, P.BARE_RACK_D - P.RACK_D, 0), App.Rotation())
     for dev in (devices.ALL if only is None else (only,)):
         if dev.own_sides:
             nl, nr = dev.sides

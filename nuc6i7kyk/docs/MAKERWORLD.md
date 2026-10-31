@@ -16,10 +16,21 @@ Lab Rax, 10 inch rack, 1U, Intel NUC, NUC6i7KYK, Skull Canyon, rack mount, homel
 
 ## Pictures
 
-Rendered from the STLs, in `../images/`: `assembly-nuc-iso.png`,
-`assembly-nuc-front.png` and `assembly-nuc-top.png`. The 3:4 MakerWorld
-pictures (`makerworld-nuc-*.png`) still show the earlier bracket with a tray
-and faceplate and need rendering again.
+Isometric views from FreeCAD, in `../images/`, 1200 x 1600 (3:4) on white:
+
+1. `makerworld-nuc-assembled.png` — cover picture: the bracket with the
+   NUC in place and all twelve rack screws fitted.
+2. `makerworld-nuc-empty.png` — the bracket without the NUC, showing the
+   seats it stands on and the solid walls behind it, in front of the rear legs.
+3. `makerworld-nuc-exploded.png` — the four printed parts and the NUC,
+   drawn apart to show how they go together.
+
+The NUC is shown as a plain translucent block, 233 x 143 x 40. The NUC's
+own sides are orange; the rear legs, the same for every device, are grey.
+
+Photographs of four of these brackets fitted in a rack are in `../../images/`:
+`rack-front.jpg`, `rack-side.jpg` and `rack-rear.jpg`. They show the whole
+rack rather than this bracket alone.
 
 ## Description
 
@@ -57,8 +68,8 @@ The rear legs are the same as for every other device in this series, so if you a
   poor choice.
 - Profile: 0.20 mm Standard for the A1 mini, as carried in the file. 2 walls,
   15% infill.
-- Filament: about 112 g for all three plates.
-- Time: about 5 h 32 min for all three plates.
+- Filament: about 111 g for all three plates.
+- Time: about 5 h 22 min for all three plates.
 
 Each rear leg has a small sprung catch at its foot, printed flat on the bed
 with a thin slit above it. When the legs come off the plate, check that slit
@@ -98,6 +109,10 @@ the rack and push the two tabs at the foot of the legs towards the middle.
   covers 229 to 257 mm over the outside of the posts.
 - Measure your NUC and your rack before printing: the case has to pass
   between the posts, and it is 233 mm wide.
+- These sides are for a rack 240 mm deep, measured over the outside of the
+  front and rear posts. The rear legs sit further back in a deeper rack, and
+  the wall behind the NUC uses the room that leaves; in a shallower rack the
+  legs run into it.
 - The front rack screws go into the posts right beside the NUC's front
   corners. Check that their tips do not stand out of the posts' inner faces
   before you tighten them.

@@ -306,26 +306,34 @@ flange in one U, so it goes in **bare**. Its own sides, `side_nuc_l` and
 `side_nuc_r`, have the rail and the rear stop cut down for the whole depth of
 the case, and stand it on a **seat** 3.5 mm thick and 19.2 mm wide, joined
 across its whole width into a chin on the ear at the front and into a
-**yoke** round the leg at the back: a full-height bulkhead inboard of the
-leg, a web carrying on from it under a flange over the leg's top, and the
-rail raised to meet the flange -- a channel 44 mm deep over the leg. The web
-stops 15 mm off the floor so the catch's tab can still be reached. The seat
-is as wide as a side can be and still go on the bed. The NUC stands on the
-two seats, between the rack's posts, with its face 0.5 mm behind the
+**yoke** round the leg at the back: a solid wall the full height of the U
+across the whole seat, behind the case and in front of the leg; a web
+carrying on from it inboard of the leg under a flange over the leg's top;
+and the rail raised to meet the flange -- a channel 44 mm deep over the leg.
+The web stops 15 mm off the floor so the catch's tab can still be reached.
+The seat is as wide as a side can be and still go on the bed. The NUC stands
+on the two seats, between the rack's posts, with its face 0.5 mm behind the
 ears and its back 0.5 mm short of the runners' tongues: the ears overlap its
 ends by 22.5 mm and stop it coming forward, the tongues stop it going back.
 Where the leg runs on them, and at the ear, its sides are the shared
-sides exactly, so they ride the same rear legs; the yoke clears the leg at
-every point of its travel, on any rack from 230 to 240 mm.
+sides exactly, so they ride the same rear legs.
+
+**These sides are for a rack 240 mm deep** over the outside of its posts,
+the depth of the rack the NUC went into. The legs are fixed to the rear
+posts, so a deeper rack puts them further back; at 240 mm their front is at
+155, which leaves room for the wall behind the case. In a shallower rack the
+legs come forward into the wall. `BARE_RACK_D` in `common/src/params.py`
+sets it, and `verify` sweeps the leg against the side from home to the
+catch's stop at that depth.
 
 The seat is the one thing under the case, and the U leaves it 3.5 mm. Run
 through CalculiX in FreeCAD's FEM workbench, one side with its ear clamped
-and its tongue held, the NUC's own weight on it peaks at about 2 MPa with
-0.25 mm of sag, against the 35–50 MPa printed PETG takes: some 17 times
-over. Fifty newtons pressed on one seat -- someone leaning on the NUC -- is
-about 31 MPa, at the joint of seat and rail just behind the case, and
-20 N pushed sideways about 7 MPa at the same corner; the yoke itself sees
-under 2 MPa in either.
+and its tongue held where the leg holds it, the NUC's own weight peaks at
+about 1.6 MPa against the 35–50 MPa printed PETG takes, some 20 times over.
+Fifty newtons pressed on one seat -- someone leaning on the NUC -- is about
+23 MPa, and 20 N pushed sideways about 4 MPa. The highest stress is now
+where the seat meets the ear, not behind the case: the wall took the
+seat-to-rail corner from the worst place on the part to an ordinary one.
 
 The NUC draws its air through its underside, and with no tray there is nothing under it but the U below.
 

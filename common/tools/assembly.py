@@ -138,13 +138,15 @@ class Fastener:
 
 def fasteners(dev):
     out = []
+    # A bare device's document puts the legs where its own rack does.
+    rack_d = P.BARE_RACK_D if dev.bare else P.RACK_D
     for sx in (-1, 1):
         for z in P.EIA_Z:
             out.append(Fastener("rack front x%+.0f z%.2f" % (sx * P.SCREW_X, z),
                                 (sx * P.SCREW_X, -P.EAR_T, z), (0, 1, 0),
                                 washer=True))
             out.append(Fastener("rack rear  x%+.0f z%.2f" % (sx * P.SCREW_X, z),
-                                (sx * P.SCREW_X, P.RACK_D + P.EAR_T, z),
+                                (sx * P.SCREW_X, rack_d + P.EAR_T, z),
                                 (0, -1, 0), washer=True))
     # A bare device has no faceplate, so nothing goes into those holes.
     for sx in (() if dev.bare else (-1, 1)):

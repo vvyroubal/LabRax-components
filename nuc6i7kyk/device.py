@@ -20,9 +20,10 @@ from devices import Device
 #
 # At 233 mm it is wider than the bay, so its sides are its own (side_nuc_l,
 # side_nuc_r): rail and rear stop cut away over the case, a 19.2 mm seat under
-# it joined into the ear in front and into a yoke round the leg behind. Where
+# it joined into the ear in front and into a yoke round the leg behind, whose
+# wall across the seat needs the 240 mm rack it goes in (BARE_RACK_D). Where
 # the leg runs on them they are the shared side's, so they ride the same legs.
-# See SEAT_* and BULK_* in params.
+# See SEAT_*, WALL_Y1 and BARE_RACK_D in params.
 #
 # It takes its air in through its underside. Standing on two seats at its
 # ends, it has nothing else under it but the U below.
