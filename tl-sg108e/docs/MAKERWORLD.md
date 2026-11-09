@@ -49,9 +49,9 @@ https://makerworld.com/en/collections/5813742-lab-rax
 
 TP-Link TL-SG108E Easy Smart switch, 158 x 101 x 25 mm.
 
-The switch's eight ports face the front through an open frame in the faceplate, 150 x 17 mm, with a rounded front edge. Its power jack is at the back.
+The switch's whole front face shows: it stands in a 159 x 26 mm opening in the faceplate, flush with its front, with nothing over its ports or LEDs. Its power jack is at the back.
 
-The switch is narrower than the rack, so its tray carries walls that hold it straight and a plinth that lifts it until it is centred in the U. The frame leaves a 4 mm border all round, so the switch cannot come out through the front.
+The switch is narrower than the rack, so its tray carries walls that hold it straight and a plinth that lifts it until it is centred in the U. A sprung leaf in each wall grips its sides, so it stays put, and it slides in and out through the front with the bracket in the rack. The leaves print standing on the bed, with no support.
 
 **What is in the file**
 
@@ -100,7 +100,8 @@ through slots, and a bare screw head will sink into the plastic.
 2. Slide a nut into each of the four slots in the ends of the faceplate.
 3. On the bench, stand the two sides facing each other and lay the tray
    across their ledges: the left half first, then the right half onto it.
-4. Set the device down onto the tray.
+4. Set the device down onto the tray -- or leave it out and slide it in
+   through the faceplate's opening at the end.
 5. Lower the faceplate from above, behind the ears and in front of the
    device, and put four screws through the ears into its nuts. The faceplate
    goes on after the device, not before.

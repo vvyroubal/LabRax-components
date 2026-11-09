@@ -292,6 +292,31 @@ REAR_LIP_T = 3.0      # [design] thickness, fore and aft
 TRAY_WALL_T = 4.0     # [design] wall thickness
 TRAY_WALL_H = 8.0     # [design] how far it rises above the case's underside
 
+# A device whose faceplate opening is bigger than its face (devices.Opening)
+# goes in through the front, and nothing stands in front of it to stop it
+# coming back out. What holds it instead is a sprung leaf in each of its
+# tray's walls, with a ramped bump that stands into the case's path: the case
+# rides over the ramp going in and is then gripped by both leaves.
+#
+# Each leaf is a strip of its wall cut free on three sides, attached at its
+# rear end. It runs right down to the underside of the tray through a slot, so
+# it stands on the bed when the tray is printed flat: a vertical plate with
+# nothing printed in the air, flexing sideways in the plane of the bed.
+#
+# 2.5 x 30 mm of PETG deflected 0.8 mm at the bump pushes back with about
+# 6 N and strains it about 0.3 %. Two of them on a 250 g case is friction
+# enough that pulling a plug, latch pressed, does not bring the switch with
+# it. The rear lip still stops it going back.
+GRIP_T = 2.5          # [design] the leaf's thickness, across the bay
+GRIP_L = 30.0         # [design] its length, free tip to root
+GRIP_Y0 = 40.0        # [design] where its free tip is, from the case's face
+GRIP_GAP = 0.5        # [design] the slit round it
+GRIP_IN = 0.8         # [design] how far the bump stands into the case
+GRIP_TOP = 16.0       # [design] the leaf's top, above the case's underside:
+                      # past the middle of a 25 mm case, where it is widest
+GRIP_RAMP = 4.0       # [design] the bump's ramps, front and back
+GRIP_FLAT = 4.0       # [design] and its flat between them
+
 # A tray under a device that breathes through its underside has to be opened
 # up, or the tray is a lid on the intake. Slots run fore-and-aft through the
 # full-thickness part of each half; the centre lap is left solid, because
