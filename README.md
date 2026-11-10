@@ -41,7 +41,7 @@ two small test pieces tell you whether the sliding joint fits on your printer.
 |---|---|---|---|---|
 | **UniFi Cloud Gateway Fiber** | `UCG-Fiber` | 212.8 × 127.6 × 30, 734 g | its 0.96" display, through an oval window | `ucg-fiber/UCG_Fiber_LabRax-A1mini.3mf` |
 | **UniFi Flex Mini 2.5G** | `USW-Flex-2.5G-5` | 117.1 × 90 × 21.2, 206 g | its 5 × 2.5 GbE ports, through an open frame | `usw-flex-mini/USW_Flex_LabRax-A1mini.3mf` |
-| **TP-Link Easy Smart switch** | `TL-SG108E` | 158 × 101 × 25 | its whole face, 8 × GbE ports and LEDs, flush in a full-size opening | `tl-sg108e/TL_SG108E_LabRax-A1mini.3mf` |
+| **TP-Link Easy Smart switch** | `TL-SG108E` | 158 × 101 × 25 | its 8 × GbE ports, through an open frame | `tl-sg108e/TL_SG108E_LabRax-A1mini.3mf` |
 | **Intel NUC, Skull Canyon** | `NUC6i7KYK` | 233 × 143 × 40 measured whole (Intel say 211 × 116 × 28), 45 W | its whole front face, just behind the ears | `nuc6i7kyk/NUC6i7KYK_LabRax-A1mini.3mf` |
 
 ![the gateway](ucg-fiber/images/assembly-ucg-front.png)
@@ -74,8 +74,7 @@ for a tray and a flange -- the NUC again, at 40 mm -- goes in **bare**: no
 tray and no faceplate, standing on its sides' ledges with its face just
 behind the ears. A device shorter than the U gets a
 plinth under it to centre it in the opening. The faceplate is either a
-**window** onto a display, a **frame** onto ports, or a full-size
-**opening** the case's whole face stands in.
+**window** onto a display or a **frame** onto ports.
 
 What it cannot do: anything over 1U, anything deeper than the rear stops
 allow, or anything needing full access to both long faces at once. The
@@ -95,7 +94,7 @@ its own pair of sides and the shared rear legs, and no tray or faceplate.
 | `faceplate_ucg` | 213.6 × 20 × 44.5 | 1 | UCG-Fiber |
 | `tray_usw_l` / `tray_usw_r` | 136.5 × 128.4 × 19.6 | 1 each | Flex Mini |
 | `faceplate_usw` | 213.6 × 20 × 44.5 | 1 | Flex Mini |
-| `tray_sg108e_l` / `tray_sg108e_r` | 136.5 × 128.4 × 25.7 | 1 each | TL-SG108E |
+| `tray_sg108e_l` / `tray_sg108e_r` | 136.5 × 128.4 × 17.7 | 1 each | TL-SG108E |
 | `faceplate_sg108e` | 213.6 × 20 × 44.5 | 1 | TL-SG108E |
 | `side_nuc_l` / `side_nuc_r` | 36 × 212.5 × 44.5 | 1 each | NUC6i7KYK, in place of `side_l` / `side_r` |
 
@@ -117,8 +116,7 @@ orientation — lapping 60 mm across the centreline, the left half passing
 underneath. Four ⌀5 pegs key them, and they take no screw.
 
 The **faceplate** is the front, in one piece. What is cut in it depends on the
-device: a window to see a display through, a frame opening onto ports, or
-an opening the whole case passes through. A
+device: a window to see a display through, or a frame opening onto ports. A
 flange along its top reaches back over the device so it cannot lift. Its four
 nuts slide into slots in its two **ends**, where they stay put.
 
@@ -226,8 +224,7 @@ No screw has to be reached from inside the rack.
    onto it, its pegs going down into the left half's sockets. The left half
    cannot be fitted under the right one. The tray spaces the sides.
 4. **Device.** Set it straight down onto the tray, its back inside the tray's
-   rear lip. (The TL-SG108E can instead go in last, through its faceplate's
-   opening, once the bracket is in the rack.)
+   rear lip.
 5. **Faceplate.** Lower it from above, behind the ears and in front of the
    device, until its flange sits over the device, and put four M6 through the
    ears into its nuts. It goes on **after** the device: the flange covers the
@@ -281,9 +278,9 @@ finger.
 | held sideways by | the rails, 0.6 mm a side | walls on its tray | walls on its tray | the rack's posts, about 0.5 mm a side |
 | held down by | the faceplate's flange, 0.8 mm over the case | the same | the same | its weight, 0.95 mm under the next U |
 | held back by | its tray's rear lip | the same | the same | the runners' tongues, 0.5 mm behind it |
-| held forward by | the faceplate | the same | a sprung leaf in each tray wall, gripping its sides | the ears, 0.5 mm in front of it |
-| opening (mm) | 22.5 × 11.0 window | 109.1 × 18.5 frame | 159 × 26 opening, face flush | its whole face between the ears, 188 wide |
-| round-over on the opening | 6 mm | 6 mm | 1 mm | — |
+| held forward by | the faceplate | the same | the same | the ears, 0.5 mm in front of it |
+| opening (mm) | 22.5 × 11.0 window | 109.1 × 18.5 frame | 150 × 17 frame | its whole face between the ears, 188 wide |
+| round-over on the opening | 6 mm | 6 mm | 6 mm | — |
 | tray | solid | solid | solid | none; 87% of its underside is open |
 
 `z` is height above the bottom of the U, which is 44.45 mm tall.
@@ -300,17 +297,8 @@ straight. Its frame leaves a 4 mm border each side, 1.85 mm below and 0.85
 above. The opening is not centred on the case: centred, an RJ45 plug with its
 latch would not go in, so the extra millimetre comes off the top border.
 
-**The TL-SG108E** shows its whole face. It used to sit 8 mm behind a frame
-with a 4 mm border all round -- a 150 × 17 window onto a 158 × 25 face --
-and that was no good in print. Now, after a rack panel made for this switch,
-the faceplate has a **159 × 26 opening**, the case plus 0.5 mm all round, and
-the case stands in it with its face flush with the front of the plate. The
-plinth and the 4 mm walls are as before. With nothing in front of it, what
-keeps it in is a **sprung leaf in each tray wall**: a 2.5 × 30 mm strip cut
-free on three sides, with a ramped bump that presses 0.8 mm into the case's
-side, about 6 N each. The leaves stand on the bed when the tray prints, so
-they need no support. The switch slides in and out **through the front**, with
-the bracket in the rack: push it home until it meets the tray's rear lip.
+**The TL-SG108E** is held the same way, with a 4 mm border all round its
+opening.
 
 **The NUC** is 233 × 143 × 40 measured whole, where Intel quote
 211 × 116 × 28. That is wider than the bay and too tall for a tray and a
@@ -356,9 +344,7 @@ screws' tips reach 1.2 mm past where a 233 mm case's front corners are; in a
 rack the NUC passes, they are inside the post, but look before you tighten.
 
 A frame's border is what keeps the case in, and it does so absolutely rather
-than by friction: the case is wider and taller than the hole. An opening
-trades that for the whole face: the case is held by friction, by the leaves
-in its tray's walls.
+than by friction: the case is wider and taller than the hole.
 
 ![the Flex Mini, assembled](usw-flex-mini/images/assembly-usw-iso.png)
 
@@ -443,9 +429,8 @@ Add a folder with a `device.py` in it and name that folder in `DIRS` in
 - the case's width, depth and height, and its mass;
 - `doc`, what its FreeCAD document and STEP are called;
 - `plinth`, how far to lift it above the tray;
-- `front`, a `Window`, a `Frame` or an `Opening`, with an optional `fillet`
-  to round over the opening's front edge. An `Opening` needs a device narrow
-  enough for tray walls, which carry the leaves that hold it;
+- `front`, a `Window` or a `Frame`, with an optional `fillet` to round over
+  the opening's front edge;
 - `vent=True` if it breathes through its underside and wants a slotted tray.
 
 Then add its three plates to `KITS` in `common/tools/plate.py` and run `make`.

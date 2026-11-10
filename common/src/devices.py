@@ -91,38 +91,6 @@ class Frame(object):
         return dev.z0 + self.border_z + self.h(dev) / 2.0
 
 
-class Opening(object):
-    """The whole face, through a hole the case itself passes.
-
-    A Frame keeps a border over the edge of the case so it cannot come out.
-    On a case only 25 mm tall that border is what is in the way: of the
-    ports' LEDs, of a plug's latch, of a finger reaching for it. An Opening
-    has no border at all. It is the case's face plus `clr` all round, and the
-    case stands in it with its face flush with the front of the plate, as it
-    would in a rack-mount panel made for it.
-
-    Nothing in front of the case, then, so nothing stops it coming forward:
-    its tray's walls grip it instead (see GRIP_* in params). The upside is
-    that it goes in and comes out through the front, with the bracket in the
-    rack.
-    """
-
-    kind = "opening"
-
-    def __init__(self, clr=0.5, fillet=0.0):
-        self.clr = clr
-        self.fillet = fillet
-
-    def w(self, dev):
-        return dev.w + 2 * self.clr
-
-    def h(self, dev):
-        return dev.h + 2 * self.clr
-
-    def z(self, dev):
-        return dev.z0 + dev.h / 2.0
-
-
 class Device(object):
     def __init__(self, key, name, doc, w, d, h, mass_g, front=None, keys_y=(),
                  plinth=0.0, vent=False, clr_w=None, clr_h=None, clr_d=None,
@@ -167,35 +135,10 @@ class Device(object):
     @property
     def y0(self):
         """Front face, against the back of the faceplate -- or, with no
-        faceplate, just behind the ears. A case that passes through its
-        faceplate stands in it, face flush with the plate's front."""
+        faceplate, just behind the ears."""
         if self.bare:
             return P.BARE_Y0
-        if self.through:
-            return P.DEV_Y0 - P.BAR_T
         return P.DEV_Y0
-
-    @property
-    def through(self):
-        """True when the case passes through its faceplate (an Opening)."""
-        return self.front is not None and self.front.kind == "opening"
-
-    @property
-    def tray_y0(self):
-        """Front of the tray: always the back of the faceplate, even when
-        the case runs on forward into the plate's opening."""
-        return P.DEV_Y0
-
-    @property
-    def grip(self):
-        """True when the tray's walls have to hold the case by friction,
-        because nothing stands in front of it. Needs walls to put them in."""
-        return self.through and self.walls
-
-    @property
-    def grip_in(self):
-        """How far into the case's own outline the tray's leaves reach."""
-        return P.GRIP_IN if self.grip else 0.0
 
     @property
     def y1(self):

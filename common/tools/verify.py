@@ -56,12 +56,6 @@ def box(x0, x1, y0, y1, z0, z1):
     return Part.makeBox(x1 - x0, y1 - y0, z1 - z0, Vector(x0, y0, z0))
 
 
-def case_hw(dev):
-    """Half-width of the case as the bracket should leave it room: all of it,
-    less what a gripping tray's leaves deliberately press into its sides."""
-    return dev.w / 2.0 - (dev.grip_in + 0.05 if dev.grip_in else 0.0)
-
-
 def vol(s):
     return 0.0 if s is None or not s.Solids else s.Volume
 
@@ -248,13 +242,13 @@ def bare_device(doc, parts, dev):
               "touches %d mm along" % hit[0] if hit else "clear at every mm")
 
     print("\n[the case]")
-    case = box(-case_hw(dev), case_hw(dev), dev.y0, dev.y0 + dev.d, dev.z0, dev.z1)
+    case = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d, dev.z0, dev.z1)
     check(dev.z1 <= P.RACK_U, "it is inside the U",
           "Z %.2f .. %.2f of %.2f" % (dev.z0, dev.z1, P.RACK_U))
     check(vol(asm.common(case)) < VOID, "it sits without interference",
           "%.3f mm3" % vol(asm.common(case)))
     for sx, n in zip((-1, 1), dev.sides):
-        under = box(-case_hw(dev), case_hw(dev), dev.y0, dev.y0 + dev.d,
+        under = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d,
                     dev.z0 - 0.5, dev.z0)
         a = vol(parts[n].common(under)) / 0.5
         want = 0.95 * (P.BODY_HW - P.SEAT_X0) * dev.d
@@ -270,7 +264,7 @@ def bare_device(doc, parts, dev):
     check(2 * P.EAR_X0 < dev.w,
           "the ears overlap its ends, which is what stops it coming forward",
           "opening %.1f vs case %.1f" % (2 * P.EAR_X0, dev.w))
-    open_ = 1.0 - vol(asm.common(box(-case_hw(dev), case_hw(dev), dev.y0,
+    open_ = 1.0 - vol(asm.common(box(-dev.w / 2, dev.w / 2, dev.y0,
                                      dev.y0 + dev.d, -1.0, dev.z0))) / (
         dev.w * dev.d * (dev.z0 + 1.0))
     check(open_ > 0.8, "its underside is open to the air",
@@ -445,13 +439,9 @@ def one_device(parts, bodies, dev):
           "its flange is %.1f mm in front of the posts on a 240 mm rack; a "
           "neighbour stands %.1f proud" % (-back_of_plate, P.NEIGHBOUR_PROUD - 1.0))
     fp_ = parts[dev.part("faceplate")]
-    case_ = box(-case_hw(dev), case_hw(dev), dev.y0, dev.y0 + dev.d, dev.z0, dev.z1)
-    # A case that passes through its faceplate goes in after it, through
-    # the front -- checked under [device] -- so the plate comes down onto an
-    # empty tray.
+    case_ = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d, dev.z0, dev.z1)
     below = [parts[n] for n in dev.sides + (dev.part("tray_l"),
-                                            dev.part("tray_r"))] + (
-        [] if dev.through else [case_])
+                                            dev.part("tray_r"))] + [case_]
     hit = [h for h in (2.0, 6.0, 12.0, 20.0, 30.0, 45.0, 60.0)
            if sum(vol(fp_.translated(Vector(0, 0, h)).common(o))
                   for o in below) > VOID]
@@ -596,37 +586,6 @@ def one_device(parts, bodies, dev):
               "%.1f mm radius in a %.1f mm plate, %.1f mm left"
               % (r, P.BAR_T, P.BAR_T - r))
 
-    elif front.kind == "opening":
-        # No border: the case passes through its own opening and stands in
-        # it, face flush with the front of the plate. What holds it is checked
-        # under [device].
-        w, h, z = front.w(dev), front.h(dev), front.z(dev)
-        check(w > dev.w and h > dev.h,
-              "the case passes through its own opening",
-              "case %.1f x %.1f, opening %.1f x %.1f" % (dev.w, dev.h, w, h))
-        check(abs(z - (dev.z0 + dev.z1) / 2.0) < 0.05,
-              "the opening is centred on the case",
-              "opening z=%.3f, case z=%.3f" % (z, (dev.z0 + dev.z1) / 2.0))
-        check(abs(dev.y0) < 1e-9, "the case's face is flush with the plate's",
-              "face at y=%.2f" % dev.y0)
-        face = box(-dev.w / 2, dev.w / 2, -1.0, P.BAR_T + 0.5,
-                   dev.z0, dev.z1)
-        check(vol(fp.common(face)) < VOID,
-              "nothing of the plate stands over any of its face",
-              "%.3f mm3 over a %.0f x %.0f face" % (vol(fp.common(face)),
-                                                    dev.w, dev.h))
-        check(abs((dev.z0 + dev.z1) / 2.0 - P.RACK_U / 2.0) < 0.05,
-              "the case is centred in the U, which is what you look at",
-              "case centre z=%.3f, U centre %.3f"
-              % ((dev.z0 + dev.z1) / 2.0, P.RACK_U / 2.0))
-        slot_x = (P.BAR_SCREW_X - P.M6_HEX_AF / 3 ** 0.5 - P.NUT_SLOT_FIT)
-        r = front.fillet
-        check(w / 2 + r < slot_x and z - h / 2 - r > 0.0
-              and z + h / 2 + r < P.RACK_U,
-              "the opening and its round stay inside the plate, clear of the "
-              "nut slots", "x to %.2f (slots from %.2f), z %.2f..%.2f"
-              % (w / 2 + r, slot_x, z - h / 2 - r, z + h / 2 + r))
-
     else:
         # A frame, not a window: the opening is onto the ports, and its job is
         # to let a plug in while not letting the case out.
@@ -729,101 +688,50 @@ def one_device(parts, bodies, dev):
                   % (x, z), "%.3f mm3" % vol(asm.common(through)))
 
     print("\n[device]")
-    case = box(-case_hw(dev), case_hw(dev), dev.y0, dev.y0 + dev.d,
+    case = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d,
                dev.z0, dev.z1)
     check(vol(asm.common(case)) < VOID, "device sits without interference",
           "%.3f mm3" % vol(asm.common(case)))
     cradle = parts[dev.sides[0]].fuse(parts[dev.sides[1]]).fuse(
         parts[dev.part("tray_l")]).fuse(parts[dev.part("tray_r")])
-    drop = box(-case_hw(dev), case_hw(dev), dev.y0, dev.y0 + dev.d,
+    drop = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d,
                dev.z0, 400)
     check(vol(cradle.common(drop)) < VOID, "drops in from above between the sides",
           "%.3f mm3" % vol(cradle.common(drop)))
-    shelf = box(-case_hw(dev), case_hw(dev), dev.y0, dev.y0 + dev.d,
+    shelf = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d,
                 dev.z0 - 2.0, dev.z0)
     check(vol(cradle.common(shelf)) > 20000.0, "the tray carries it",
           "%.0f mm3 under it" % vol(cradle.common(shelf)))
-    if not dev.through:
-        fwd = box(-case_hw(dev), case_hw(dev), dev.y0 - P.BAR_T, dev.y0,
-                  dev.z0, dev.z1)
-        check(vol(asm.common(fwd)) > 100.0, "stopped at the front",
-              "%.0f mm3" % vol(asm.common(fwd)))
+    fwd = box(-dev.w / 2, dev.w / 2, dev.y0 - P.BAR_T, dev.y0,
+              dev.z0, dev.z1)
+    check(vol(asm.common(fwd)) > 100.0, "stopped at the front",
+          "%.0f mm3" % vol(asm.common(fwd)))
     back = box(-dev.w / 2, dev.w / 2, dev.y1, dev.y1 + P.STOP_T,
                dev.z0, dev.z1)
     check(vol(asm.common(back)) > 100.0, "stopped at the rear",
           "%.0f mm3" % vol(asm.common(back)))
-    if dev.through:
-        # Nothing stands in front of it: it goes in and out through the
-        # faceplate. So the way in has to be clear from well in front of the
-        # rack to home -- leaves apart, which it rides over -- and the leaves
-        # have to be there to ride over.
-        path = box(-case_hw(dev), case_hw(dev), dev.y0 - 150.0,
-                   dev.y0 + dev.d, dev.z0, dev.z1)
-        v = vol(asm.common(path))
-        check(v < VOID, "it slides in through the opening from the front",
-              "%.3f mm3 in its way over 150 mm" % v)
-        for sx, nm in ((-1, dev.part("tray_l")), (1, dev.part("tray_r"))):
-            a, b_ = sx * case_hw(dev), sx * dev.w / 2.0
-            strip = box(min(a, b_), max(a, b_), dev.y0, dev.y0 + dev.d,
-                        dev.z0, dev.z1)
-            v = vol(parts[nm].common(strip))
-            check(v > 20.0, "%s's leaf grips the case's side" % nm,
-                  "%.0f mm3 of bump in its outline, %.1f mm deep"
-                  % (v, P.GRIP_IN))
-            ly0 = dev.y0 + P.GRIP_Y0
-            ly1 = ly0 + P.GRIP_L
-            a, b_ = sx * dev.hw, sx * (dev.hw + P.GRIP_T)
-            foot = box(min(a, b_), max(a, b_), ly0, ly1 - 1.0, -1.0, 0.5)
-            v = vol(parts[nm].common(foot))
-            check(v > 0.9 * P.GRIP_T * (P.GRIP_L - 1.0) * 0.5,
-                  "%s's leaf stands on the bed, not in the air" % nm,
-                  "%.0f mm3 of it in the first half-millimetre" % v)
-            # Free to flex: open behind it for the full height, and open in
-            # front of its tip, so only its root holds it.
-            a, b_ = (sx * (dev.hw + P.GRIP_T + 0.05),
-                     sx * (dev.hw + P.TRAY_WALL_T))
-            back_ = box(min(a, b_), max(a, b_), ly0, ly1 - 0.05,
-                        0.0, dev.z0 + P.GRIP_TOP)
-            a, b_ = sx * dev.hw, sx * (dev.hw + P.GRIP_T)
-            tip = box(min(a, b_), max(a, b_), ly0 - P.GRIP_GAP + 0.05,
-                      ly0 - 0.05, 0.0, dev.z0 + P.GRIP_TOP)
-            v1, v2 = vol(asm.common(back_)), vol(asm.common(tip))
-            check(v1 < VOID and v2 < VOID,
-                  "%s's leaf is cut free, so it can flex" % nm,
-                  "%.3f mm3 behind it, %.3f at its tip" % (v1, v2))
-        # The stiffness that makes the grip: a cantilever, 3EI/L^3, in PETG.
-        e = 2000.0
-        hgt = dev.z0 + P.GRIP_TOP
-        k = 3 * e * (hgt * P.GRIP_T ** 3 / 12.0) / P.GRIP_L ** 3
-        strain = 1.5 * P.GRIP_T * P.GRIP_IN / P.GRIP_L ** 2
-        check(2.0 <= k * P.GRIP_IN <= 20.0 and strain < 0.01,
-              "each leaf presses on it firmly, well inside the plastic's range",
-              "%.1f N at %.1f mm, %.2f%% strain" % (k * P.GRIP_IN, P.GRIP_IN,
-                                                    100 * strain))
-        check(dev.walls, "a gripped case has walls to grip it with", "")
-    else:
-        # And it must not be able to leave through the front once the bar is on.
-        # The top bar's end blocks reach down to BAR_END_Z0 and stand directly in
-        # front of the device's face at each end; nothing else does.
-        for push in (1.5, 5.0, 20.0):
-            moved = box(-case_hw(dev), case_hw(dev), dev.y0 - push,
-                        dev.y0 + dev.d - push, dev.z0, dev.z1)
-            v = vol(asm.common(moved))
-            check(v > 50.0, "cannot be pushed %.1f mm out of the front" % push,
-                  "%.0f mm3 of interference" % v)
-        face = box(-case_hw(dev), case_hw(dev), dev.y0 - P.BAR_T, dev.y0,
-                   dev.z0, dev.z1)
-        half = box(-dev.w / 2, 0.0, dev.y0 - P.BAR_T, dev.y0,
-                   dev.z0, dev.z1)
-        per = vol(fp.common(half))
-        # A window covers the face and shows a sliver of it; a frame deliberately
-        # opens most of it and keeps only a border. Ask for the border, not for a
-        # fixed volume that only a covered face can reach.
-        want = 3000.0 if dev.front.kind == "window" else 500.0
-        check(per > want, "the faceplate stands across the device's face",
-              "%.0f mm3 of it on each half, wanted %.0f" % (per, want))
+    # And it must not be able to leave through the front once the bar is on.
+    # The top bar's end blocks reach down to BAR_END_Z0 and stand directly in
+    # front of the device's face at each end; nothing else does.
+    for push in (1.5, 5.0, 20.0):
+        moved = box(-dev.w / 2, dev.w / 2, dev.y0 - push,
+                    dev.y0 + dev.d - push, dev.z0, dev.z1)
+        v = vol(asm.common(moved))
+        check(v > 50.0, "cannot be pushed %.1f mm out of the front" % push,
+              "%.0f mm3 of interference" % v)
+    face = box(-dev.w / 2, dev.w / 2, dev.y0 - P.BAR_T, dev.y0,
+               dev.z0, dev.z1)
+    half = box(-dev.w / 2, 0.0, dev.y0 - P.BAR_T, dev.y0,
+               dev.z0, dev.z1)
+    per = vol(fp.common(half))
+    # A window covers the face and shows a sliver of it; a frame deliberately
+    # opens most of it and keeps only a border. Ask for the border, not for a
+    # fixed volume that only a covered face can reach.
+    want = 3000.0 if dev.front.kind == "window" else 500.0
+    check(per > want, "the faceplate stands across the device's face",
+          "%.0f mm3 of it on each half, wanted %.0f" % (per, want))
 
-    over = box(-case_hw(dev), case_hw(dev), dev.y0, dev.y0 + dev.d,
+    over = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d,
                dev.z1, P.RACK_U)
     check(vol(fp.common(over)) > 100.0, "the faceplate's flange caps it",
           "%.0f mm3 over it" % vol(fp.common(over)))
@@ -896,7 +804,7 @@ def one_device(parts, bodies, dev):
         # Measured as open area seen from below, not as "the pocket ran": a
         # slot that stops inside the plinth removes material and still leaves
         # the intake covered.
-        under = box(-case_hw(dev), case_hw(dev), dev.y0, dev.y0 + dev.d,
+        under = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d,
                     -1.0, dev.z0 + 0.5)
         solid = vol(trays.common(under))
         full = dev.w * dev.d * (dev.z0 + 1.5)
@@ -928,7 +836,7 @@ def one_device(parts, bodies, dev):
     # Before this existed the only thing behind the gateway was the two rear
     # stops on the sides, reaching in to x = +/-99: 7.4 mm of overlap at each
     # end of a 212.8 mm rear face. The lip covers what is between them.
-    lip = box(-case_hw(dev), case_hw(dev), dev.y0 + dev.d,
+    lip = box(-dev.w / 2, dev.w / 2, dev.y0 + dev.d,
               dev.y0 + dev.d + 25.0, dev.z0, dev.z0 + P.REAR_LIP_H)
     v = vol(trays.common(lip))
     check(v > 1000.0, "the tray has a lip behind the gateway",
@@ -962,7 +870,7 @@ def one_device(parts, bodies, dev):
     # It has to be behind the gateway, not under it: the case sits on the
     # tray, so a lip that started too far forward would hold it off the floor.
     for nm in (dev.part("tray_l"), dev.part("tray_r")):
-        under = box(-case_hw(dev), case_hw(dev), dev.y0,
+        under = box(-dev.w / 2, dev.w / 2, dev.y0,
                     dev.y0 + dev.d, dev.z0 + 0.05, dev.z1)
         v = vol(parts[nm].common(under))
         check(v < VOID, "%s stays below the gateway it carries" % nm,
@@ -1014,7 +922,7 @@ def one_device(parts, bodies, dev):
           "ends at y %.2f, stops at %.1f" % (strip.YMax, P.STOP_Y))
 
     # Held fore and aft by the bottom bar and the rear stop, so it cannot walk.
-    ahead = box(-P.TRAY_X1, P.TRAY_X1, dev.tray_y0 - 1.0, dev.tray_y0,
+    ahead = box(-P.TRAY_X1, P.TRAY_X1, dev.y0 - 1.0, dev.y0,
                 0.0, P.TRAY_T)
     check(vol(fp.common(ahead)) > 100.0,
           "the faceplate stops the tray sliding forward",

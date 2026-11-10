@@ -433,61 +433,6 @@ def faceplate(doc, dev, name):
     return bd
 
 
-def _grip(doc, bd, name, dev, sx):
-    """A sprung leaf in the tray's wall, with a bump that grips the case.
-
-    The wall is cut away for the leaf's length, right through the tray to its
-    underside, and the leaf stands up in the slot: attached at its rear end,
-    free along its other three sides. So it stands on the bed when the tray
-    is printed and is never printed in the air. The bump on its inner face is
-    ramped both ways -- the case rides over it going in and coming out -- and
-    reaches GRIP_IN into the case, which is the leaf's preload.
-
-    The bump runs the leaf's full height, down to the bed, and the slot is
-    cut back past it: started above the plinth it would be an overhang, and
-    the support a slicer put under it would weld the leaf to the plinth.
-    """
-    hw, t, g = dev.hw, P.TRAY_WALL_T, P.GRIP_GAP
-    reach = hw - (dev.w / 2.0 - P.GRIP_IN)
-    y0 = dev.y0 + P.GRIP_Y0
-    y1 = y0 + P.GRIP_L
-    top = dev.z0 + P.GRIP_TOP
-
-    def xs(a, b):
-        a, b = sx * a, sx * b
-        return min(a, b), max(a, b)
-
-    # The slot: the wall's full thickness, past the bump and a slit's width
-    # into the plinth beside it, and a slit in front of the leaf's tip.
-    x0, x1 = xs(hw - reach - g, hw + t + 0.5)
-    s = sk.sketch(doc, bd, name + "_Sk_gripslot",
-                  sk.plane(Vector(0, 0, 0), sk.X, sk.Y))
-    sk.rect(s, x0, y0 - g, x1, y1)
-    sk.pocket(doc, bd, s, top + 1.0)
-
-    # The leaf, from the underside up, running 1 mm on into the solid wall
-    # behind the slot so that it is one with it there.
-    x0, x1 = xs(hw, hw + P.GRIP_T)
-    s = sk.sketch(doc, bd, name + "_Sk_grip",
-                  sk.plane(Vector(0, 0, 0), sk.X, sk.Y))
-    sk.rect(s, x0, y0, x1, y1 + 1.0)
-    # Upward: on an XY sketch plane, reversed_ is -Z.
-    sk.pad(doc, bd, s, top)
-
-    # The bump, near the free tip where the leaf gives most.
-    a = y0 + 1.0
-    pts = [(hw + 0.5, a), (hw - reach, a + P.GRIP_RAMP),
-           (hw - reach, a + P.GRIP_RAMP + P.GRIP_FLAT),
-           (hw + 0.5, a + 2 * P.GRIP_RAMP + P.GRIP_FLAT)]
-    pts = [(sx * x, y) for x, y in pts]
-    if sx < 0:
-        pts.reverse()
-    s = sk.sketch(doc, bd, name + "_Sk_grippad",
-                  sk.plane(Vector(0, 0, 0), sk.X, sk.Y))
-    sk.polygon(s, pts)
-    sk.pad(doc, bd, s, top)
-
-
 def tray(doc, dev, sx, name):
     """Half of the tray that carries one device.
 
@@ -522,9 +467,9 @@ def tray(doc, dev, sx, name):
                (step, 0.0), (step, P.LAP_T),
                (P.TRAY_X1, P.LAP_T), (P.TRAY_X1, P.TRAY_T), (lap_r, P.TRAY_T)]
     s = sk.sketch(doc, bd, name + "_Sk_plate",
-                  sk.plane(Vector(0, dev.tray_y0, 0), sk.X, sk.Z))
+                  sk.plane(Vector(0, dev.y0, 0), sk.X, sk.Z))
     sk.polygon(s, pts)
-    sk.pad(doc, bd, s, rear - dev.tray_y0, reversed_=True)
+    sk.pad(doc, bd, s, rear - dev.y0, reversed_=True)
 
     # --- the strip that reaches the rear stop -----------------------------
     # The tray is located fore and aft by the faceplate in front and the
@@ -569,7 +514,7 @@ def tray(doc, dev, sx, name):
         x0, x1 = ((-out, -lap) if sx < 0 else (lap_r, out))
         s = sk.sketch(doc, bd, name + "_Sk_plinth",
                       sk.plane(Vector(0, 0, P.TRAY_T), sk.X, sk.Y))
-        sk.rect(s, x0, dev.tray_y0, x1, rear)
+        sk.rect(s, x0, dev.y0, x1, rear)
         # Upward: on an XY sketch plane, reversed_ is -Z (the pegs use that).
         sk.pad(doc, bd, s, dev.plinth)
 
@@ -581,12 +526,8 @@ def tray(doc, dev, sx, name):
         x0, x1 = ((-dev.hw - t, -dev.hw) if sx < 0 else (dev.hw, dev.hw + t))
         s = sk.sketch(doc, bd, name + "_Sk_wall",
                       sk.plane(Vector(0, 0, P.TRAY_T), sk.X, sk.Y))
-        sk.rect(s, x0, dev.tray_y0, x1, rear)
+        sk.rect(s, x0, dev.y0, x1, rear)
         sk.pad(doc, bd, s, dev.plinth + P.TRAY_WALL_H)
-
-    # --- the leaves that grip a case with nothing in front of it ----------
-    if dev.grip:
-        _grip(doc, bd, name, dev, sx)
 
     # --- ventilation, for a device that breathes through its underside ----
     # Slots run fore and aft through the full-thickness part of this half --
@@ -595,7 +536,7 @@ def tray(doc, dev, sx, name):
     # and the lap is the joint that holds the tray together.
     if dev.vent:
         lo, hi = lap + P.VENT_MARGIN, P.LEDGE_X0 - P.VENT_MARGIN
-        y0, y1 = dev.tray_y0 + P.VENT_MARGIN, rear - P.VENT_MARGIN
+        y0, y1 = dev.y0 + P.VENT_MARGIN, rear - P.VENT_MARGIN
         pitch = P.VENT_W + P.VENT_RIB
         n = int((hi - lo + P.VENT_RIB) // pitch)
         if n > 0:
