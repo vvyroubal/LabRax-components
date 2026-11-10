@@ -26,7 +26,9 @@ You do not need FreeCAD, Python or anything else in this repository to print
 a bracket. The 3MF files are complete.
 
 1. **Print.** Open the 3MF in your device's folder in Bambu Studio and print
-   all six plates, in PETG. See [Printing](#printing).
+   all six plates, in PETG. See [Printing](#printing). The TL-SG108E's
+   file has one plate: it goes in a panel of its own, see
+   [The TL-SG108E's panel](#the-tl-sg108es-panel).
 2. **Buy.** 16 × M6 × 12 button-head screws, 4 × M6 nuts, 12 × M6 washers.
    See [Fasteners](#fasteners).
 3. **Assemble.** Legs onto the rear posts; sides, tray, device and faceplate
@@ -41,7 +43,7 @@ two small test pieces tell you whether the sliding joint fits on your printer.
 |---|---|---|---|---|
 | **UniFi Cloud Gateway Fiber** | `UCG-Fiber` | 212.8 × 127.6 × 30, 734 g | its 0.96" display, through an oval window | `ucg-fiber/UCG_Fiber_LabRax-A1mini.3mf` |
 | **UniFi Flex Mini 2.5G** | `USW-Flex-2.5G-5` | 117.1 × 90 × 21.2, 206 g | its 5 × 2.5 GbE ports, through an open frame | `usw-flex-mini/USW_Flex_LabRax-A1mini.3mf` |
-| **TP-Link Easy Smart switch** | `TL-SG108E` | 158 × 101 × 25 | its 8 × GbE ports, through an open frame | `tl-sg108e/TL_SG108E_LabRax-A1mini.3mf` |
+| **TP-Link Easy Smart switch** | `TL-SG108E` | 158 × 101 × 25 | its whole face, flush in a rack panel of its own | `tl-sg108e/TL_SG108E_LabRax-A1mini.3mf` |
 | **Intel NUC, Skull Canyon** | `NUC6i7KYK` | 233 × 143 × 40 measured whole (Intel say 211 × 116 × 28), 45 W | its whole front face, just behind the ears | `nuc6i7kyk/NUC6i7KYK_LabRax-A1mini.3mf` |
 
 ![the gateway](ucg-fiber/images/assembly-ucg-front.png)
@@ -94,8 +96,8 @@ its own pair of sides and the shared rear legs, and no tray or faceplate.
 | `faceplate_ucg` | 213.6 × 20 × 44.5 | 1 | UCG-Fiber |
 | `tray_usw_l` / `tray_usw_r` | 136.5 × 128.4 × 19.6 | 1 each | Flex Mini |
 | `faceplate_usw` | 213.6 × 20 × 44.5 | 1 | Flex Mini |
-| `tray_sg108e_l` / `tray_sg108e_r` | 136.5 × 128.4 × 17.7 | 1 each | TL-SG108E |
-| `faceplate_sg108e` | 213.6 × 20 × 44.5 | 1 | TL-SG108E |
+| `panel_sg108e_l` / `panel_sg108e_r` | 127 × 106.5 × 44.5 | 1 each | TL-SG108E, no chassis |
+| `splice_top_sg108e` / `splice_bottom_sg108e` | 48 × 6 × 8.2 | 1 each | TL-SG108E |
 | `side_nuc_l` / `side_nuc_r` | 36 × 212.5 × 44.5 | 1 each | NUC6i7KYK, in place of `side_l` / `side_r` |
 
 **Four of the seven are a chassis that takes no notice of what is in it.**
@@ -140,7 +142,7 @@ every file — print them once per bracket — except in the NUC's, whose plates
 | 1–3 | chassis (in every file) | 112.1 g | 5 h 46 |
 | 4–6 | UCG-Fiber | 149.0 g | 5 h 37 |
 | 4–6 | Flex Mini 2.5G | 136.7 g | 5 h 22 |
-| 4–6 | TL-SG108E | 142.7 g | 5 h 35 |
+| 1 | TL-SG108E panel, the whole bracket | 86.0 g | 3 h 58 |
 
 A chassis and one kit is about 261 g for the gateway and 249 g for the Flex
 Mini. Print in **PETG**: a gateway running IDS/IPS gets warm enough that PLA
@@ -271,17 +273,19 @@ finger.
 
 ## How each device is held
 
-| | UCG-Fiber | Flex Mini 2.5G | TL-SG108E | NUC6i7KYK |
-|---|---|---|---|---|
-| lifted by a plinth | no | 5.625 mm | 3.725 mm | no tray: on its sides' 19.2 mm seats |
-| sits at (z) | 6.0 – 36.0 | 11.625 – 32.825 | 9.725 – 34.725 | 3.5 – 43.5 |
-| held sideways by | the rails, 0.6 mm a side | walls on its tray | walls on its tray | the rack's posts, about 0.5 mm a side |
-| held down by | the faceplate's flange, 0.8 mm over the case | the same | the same | its weight, 0.95 mm under the next U |
-| held back by | its tray's rear lip | the same | the same | the runners' tongues, 0.5 mm behind it |
-| held forward by | the faceplate | the same | the same | the ears, 0.5 mm in front of it |
-| opening (mm) | 22.5 × 11.0 window | 109.1 × 18.5 frame | 150 × 17 frame | its whole face between the ears, 188 wide |
-| round-over on the opening | 6 mm | 6 mm | 6 mm | — |
-| tray | solid | solid | solid | none; 87% of its underside is open |
+The TL-SG108E is not in this table: it has a panel of its own, below.
+
+| | UCG-Fiber | Flex Mini 2.5G | NUC6i7KYK |
+|---|---|---|---|
+| lifted by a plinth | no | 5.625 mm | no tray: on its sides' 19.2 mm seats |
+| sits at (z) | 6.0 – 36.0 | 11.625 – 32.825 | 3.5 – 43.5 |
+| held sideways by | the rails, 0.6 mm a side | walls on its tray | the rack's posts, about 0.5 mm a side |
+| held down by | the faceplate's flange, 0.8 mm over the case | the same | its weight, 0.95 mm under the next U |
+| held back by | its tray's rear lip | the same | the runners' tongues, 0.5 mm behind it |
+| held forward by | the faceplate | the same | the ears, 0.5 mm in front of it |
+| opening (mm) | 22.5 × 11.0 window | 109.1 × 18.5 frame | its whole face between the ears, 188 wide |
+| round-over on the opening | 6 mm | 6 mm | — |
+| tray | solid | solid | none; 87% of its underside is open |
 
 `z` is height above the bottom of the U, which is 44.45 mm tall.
 
@@ -297,8 +301,44 @@ straight. Its frame leaves a 4 mm border each side, 1.85 mm below and 0.85
 above. The opening is not centred on the case: centred, an RJ45 plug with its
 latch would not go in, so the extra millimetre comes off the top border.
 
-**The TL-SG108E** is held the same way, with a 4 mm border all round its
-opening.
+### The TL-SG108E's panel
+
+The TL-SG108E does not use the chassis at all. Two tray-and-faceplate kits
+were printed for it and neither was any good. It now goes in a **rack panel of
+its own**, drawn after a panel made for this switch, and bolted to the
+**front posts only**. At about 250 g it needs nothing at the back.
+
+- **The panel** is the full 254 × 44.45, 6.5 mm thick like an ear, so the
+  rack's own M6 × 12 and washers go through three slots each side. The
+  opening is **159 × 26**, the case plus 0.5 mm all round, and the case
+  stands in it with its face flush with the front. Nothing covers its ports
+  or LEDs.
+- **An arm along each side** runs 106 mm back. It is a channel: a 7 mm wall
+  0.5 mm off the case's side, and lips reaching 8 mm over its top and bottom
+  edges. A gusset braces each arm to the panel. A 45° stop at the end of each
+  channel catches the case's back edge 1 mm behind home, so pushing a plug in
+  cannot push the switch back.
+- **A finger on each half** lies over the case's top, with a ramped bump that
+  presses 1 mm into it (about 3.5 N). That, with the channels, is what keeps
+  the switch in. It slides in and out **through the front**, with the panel
+  in the rack.
+- **It is two halves.** 254 mm will not go on a 180 mm bed any way round, so
+  the panel splits down the middle. Each half prints **face down**, as the
+  original does, 127 × 44.5 on the bed and 106.5 tall. Nothing is overhung
+  past 45°, and the only bridges are the nut slots' 6 mm roofs, so no support
+  is needed. The halves are joined behind the opening's top and bottom bars
+  by two **splice plates** and **4 × M3 × 16 with 4 × M3 nuts**. The nuts
+  slide into slots in the joint faces before the halves are put together.
+  Once the panel is in the rack each half is held by its own three M6, so
+  the splice only matters while you handle it.
+
+Both halves and both splices go on **one plate**: 86 g and about 4 hours.
+
+**Assembly:** drop an M3 nut into each of the four slots in the halves'
+joint faces. Butt the halves together, lay a splice across the back of each
+bar, and put an M3 × 16 through each hole into its nut. Bolt the panel to
+the front posts with six M6 × 12 and washers, then slide the switch in
+through the front until it stops.
 
 **The NUC** is 233 × 143 × 40 measured whole, where Intel quote
 211 × 116 × 28. That is wider than the bay and too tall for a tray and a
@@ -353,7 +393,7 @@ than by friction: the case is wider and taller than the hole.
 The gateway's ports and DC input are on one long face and its display on the
 other, so its faceplate commits you to **display at the front, cables at the
 back**. The two switches are the opposite: **ports at the front**, through the
-frame, power at the back. The NUC shows its whole front face between the
+frame or the panel, power at the back. The NUC shows its whole front face between the
 ears; everything else is at the back.
 
 Each side rail carries three windows, and the rear of the bracket is open.
@@ -439,9 +479,11 @@ Then add its three plates to `KITS` in `common/tools/plate.py` and run `make`.
 
 `make verify` measures the **built solids**, not the parameters, so a feature
 that silently does nothing is caught rather than assumed away: 195 checks for
-the gateway, 194 each for the Flex Mini and the TL-SG108E, and 35 for the
-NUC, which has no tray or faceplate to check and whose sides are checked
-against the shared ones.
+the gateway, 194 for the Flex Mini, 35 for the NUC, which has no tray or
+faceplate to check and whose sides are checked against the shared ones, and
+70 for the TL-SG108E's panel: its fit in the rack, the case's way in, the
+channels, stops and fingers, the splice's screws and nuts, and that each
+half prints face down with nothing overhung.
 Among them:
 
 - each body is one valid solid, built from sketches, and fits the bed;

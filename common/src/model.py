@@ -601,6 +601,166 @@ def coupons(doc):
     return {"coupon_tongue": a, "coupon_groove": b}
 
 
+def _pnl(dev):
+    """The numbers a panel half and its splices share."""
+    class N(object):
+        pass
+    n = N()
+    n.hw = dev.w / 2.0 + P.PNL_CLR             # the opening's half-width
+    n.z_lo = dev.z0 - P.PNL_CLR                # and its bottom and top
+    n.z_hi = dev.z1 + P.PNL_CLR
+    n.lip_x = dev.w / 2.0 - P.PNL_LIP          # inner edge of the arm's lips
+    n.arm_z0 = n.z_lo - P.PNL_LIP_T
+    n.arm_z1 = n.z_hi + P.PNL_LIP_T
+    n.back = dev.y0 + dev.d                    # the case's back face
+    n.arm_y1 = n.back + P.PNL_STOP_CLR + P.PNL_STOP_IN + 0.5
+    n.bar_z0 = P.PNL_SLEEVE_Z0                 # the frame's bars
+    n.bar_z1 = P.RACK_U - P.PNL_SLEEVE_Z0
+    n.zb = (n.bar_z0 + n.z_lo) / 2.0           # the splice screws' heights
+    n.zt = (n.z_hi + n.bar_z1) / 2.0
+    n.splice_y0 = P.PNL_SLEEVE_D
+    n.splice_y1 = P.PNL_SLEEVE_D + P.PNL_SPLICE_T
+    # An M3 x 16 from the back of the splice ends here; its nut sits just in
+    # front of the tip, so the whole nut is threaded.
+    n.tip_y = n.splice_y1 - P.M3_SCREW_LEN
+    n.nut_y0 = n.tip_y + 1.5
+    return n
+
+
+def panel(doc, dev, sx, name):
+    """Half of a rack panel the device slides into from the front.
+
+    After a panel made for the TL-SG108E: a plate across the rack with an
+    opening the case passes through, its face flush with the front; a frame
+    round the opening behind the plate; and an arm along each side of the
+    case, a channel whose lips reach over its top and bottom edges. A finger
+    off the frame's top bar presses on the case so it stays put. Bolted to the
+    front posts only: it carries a light device and nothing else.
+
+    It is one half, x = 0 outwards on the `sx` side, because the whole panel
+    is 254 wide and the bed 180. Printed face down, as the original is: the
+    arms stand up, and every face is upright, flat on the bed or at 45 degrees.
+    """
+    bd = sk.body(doc, name)
+    n = _pnl(dev)
+    c = P.EAR_CHAMFER
+
+    def r(s, x0, z0, x1, z1):
+        sk.rect(s, sx * x0, z0, sx * x1, z1)
+
+    # The plate: the ear and everything between the ears, half of it.
+    s = sk.sketch(doc, bd, name + "_Sk_plate",
+                  sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
+    sk.polygon(s, [(0.0, 0.0), (sx * (P.FACE_HW - c), 0.0),
+                   (sx * P.FACE_HW, c), (sx * P.FACE_HW, P.RACK_U - c),
+                   (sx * (P.FACE_HW - c), P.RACK_U), (0.0, P.RACK_U)])
+    # Forward, in front of the posts: on an X-Z plane a pad grows along -Y.
+    sk.pad(doc, bd, s, P.PNL_T)
+
+    # The frame behind it, as a block; the opening is cut through it below.
+    s = sk.sketch(doc, bd, name + "_Sk_frame",
+                  sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
+    r(s, 0.0, n.bar_z0, P.PNL_WALL_X1, n.bar_z1)
+    sk.pad(doc, bd, s, P.PNL_SLEEVE_D, reversed_=True)
+
+    # The arm: a back wall outside the case's side and lips over its top and
+    # bottom edges, the whole depth of the case and the stop behind it.
+    s = sk.sketch(doc, bd, name + "_Sk_arm",
+                  sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
+    r(s, n.lip_x, n.arm_z0, P.PNL_WALL_X1, n.arm_z1)
+    sk.pad(doc, bd, s, n.arm_y1, reversed_=True)
+
+    # A gusset outside the arm, from the plate back along it. Its outer face
+    # leans in as it goes back, so printed face down it is never overhung.
+    w = P.PNL_WALL_X1 - 0.5
+    s = sk.sketch(doc, bd, name + "_Sk_gusset",
+                  sk.plane(Vector(0, 0, n.arm_z0), sk.X, sk.Y))
+    sk.polygon(s, [(sx * w, 0.0), (sx * P.PNL_GUSSET_X1, 0.0),
+                   (sx * w, P.PNL_GUSSET_Y1)])
+    # Upward: on an XY sketch plane, reversed_ is -Z.
+    sk.pad(doc, bd, s, n.arm_z1 - n.arm_z0)
+
+    # The opening, through the plate, the frame and on down the channel.
+    s = sk.sketch(doc, bd, name + "_Sk_opening",
+                  sk.plane(Vector(0, -P.PNL_T, 0), sk.X, sk.Z))
+    r(s, 0.0, n.z_lo, n.hw, n.z_hi)
+    sk.pocket(doc, bd, s, P.PNL_T + n.arm_y1 + 1.0)
+
+    # The rear stop at the end of the channel. Its face is at 45 degrees:
+    # it meets the case's back edge 1 mm behind it, and printed face down it
+    # grows out of the wall rather than hanging off it.
+    y_a = n.back + P.PNL_STOP_CLR - (n.hw - dev.w / 2.0) - 0.5
+    s = sk.sketch(doc, bd, name + "_Sk_stop",
+                  sk.plane(Vector(0, 0, n.z_lo - 0.5), sk.X, sk.Y))
+    xi = dev.w / 2.0 - P.PNL_STOP_IN
+    sk.polygon(s, [(sx * (n.hw + 0.5), y_a),
+                   (sx * xi, y_a + (n.hw + 0.5 - xi)),
+                   (sx * xi, n.arm_y1), (sx * (n.hw + 0.5), n.arm_y1)])
+    sk.pad(doc, bd, s, n.z_hi - n.z_lo + 1.0)
+
+    # The finger, off the back of the frame's top bar, lying over the case.
+    f0, f1 = P.PNL_FING_X - P.PNL_FING_W / 2, P.PNL_FING_X + P.PNL_FING_W / 2
+    fy1 = P.PNL_SLEEVE_D + P.PNL_FING_L
+    s = sk.sketch(doc, bd, name + "_Sk_finger",
+                  sk.plane(Vector(0, 0, n.z_hi), sk.X, sk.Y))
+    sk.rect(s, sx * f0, P.PNL_SLEEVE_D - 1.0, sx * f1, fy1)
+    sk.pad(doc, bd, s, P.PNL_FING_T)
+
+    # Its bump, near the tip: ramped both ways, pressing PNL_GRIP into the
+    # case's top. Drawn on a Y-Z plane, which pads along +X.
+    yb1 = fy1 - 1.0
+    yb0 = yb1 - 2 * P.PNL_BUMP_RAMP - P.PNL_BUMP_FLAT
+    zb = dev.z1 - P.PNL_GRIP
+    s = sk.sketch(doc, bd, name + "_Sk_bump",
+                  sk.plane(Vector(min(sx * f0, sx * f1), 0, 0), sk.Y, sk.Z))
+    sk.polygon(s, [(yb0, n.z_hi + 0.5), (yb0 + P.PNL_BUMP_RAMP, zb),
+                   (yb1 - P.PNL_BUMP_RAMP, zb), (yb1, n.z_hi + 0.5)])
+    sk.pad(doc, bd, s, P.PNL_FING_W)
+
+    # Three slots in the ear, for M6 into the post's own nuts.
+    s = sk.sketch(doc, bd, name + "_Sk_slots",
+                  sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
+    for z in P.EIA_Z:
+        sk.slot(s, sx * P.SCREW_X, z, P.SLOT_W, P.SLOT_H)
+    sk.pocket(doc, bd, s, P.PNL_T)
+
+    # The splice: a clearance hole in each bar from the back...
+    s = sk.sketch(doc, bd, name + "_Sk_m3",
+                  sk.plane(Vector(0, P.PNL_SLEEVE_D, 0), sk.X, sk.Z))
+    for z in (n.zb, n.zt):
+        sk.circle(s, sx * P.PNL_M3_X, z, P.M3_CLEAR)
+    sk.pocket(doc, bd, s, P.PNL_SLEEVE_D - n.tip_y + 1.0)
+
+    # ...and a slot from the joint face for its nut, flats top and bottom so
+    # it cannot turn. Its roof is a 6 mm bridge printed face down.
+    hh = (P.M3_NUT_AF + P.PNL_NUT_FIT) / 2.0
+    s = sk.sketch(doc, bd, name + "_Sk_m3nut",
+                  sk.plane(Vector(0, 0, 0), sk.Y, sk.Z))
+    for z in (n.zb, n.zt):
+        sk.rect(s, n.nut_y0 - P.PNL_NUT_FIT / 2.0, z - hh,
+                n.nut_y0 + P.M3_NUT_T + P.PNL_NUT_FIT / 2.0, z + hh)
+    sk.pocket(doc, bd, s, P.PNL_M3_X + P.M3_NUT_AF / 3 ** 0.5
+              + P.PNL_NUT_FIT)
+    return bd
+
+
+def splice(doc, dev, top, name):
+    """A plate across the joint at the back of one of the frame's bars."""
+    bd = sk.body(doc, name)
+    n = _pnl(dev)
+    z0, z1 = ((n.z_hi, n.bar_z1) if top else (n.bar_z0, n.z_lo))
+    s = sk.sketch(doc, bd, name + "_Sk_plate",
+                  sk.plane(Vector(0, n.splice_y0, 0), sk.X, sk.Z))
+    sk.rect(s, -P.PNL_SPLICE_HW, z0, P.PNL_SPLICE_HW, z1)
+    sk.pad(doc, bd, s, P.PNL_SPLICE_T, reversed_=True)
+    s = sk.sketch(doc, bd, name + "_Sk_m3",
+                  sk.plane(Vector(0, n.splice_y0, 0), sk.X, sk.Z))
+    for sx in (-1, 1):
+        sk.circle(s, sx * P.PNL_M3_X, n.zt if top else n.zb, P.M3_CLEAR)
+    sk.pocket(doc, bd, s, P.PNL_SPLICE_T)
+    return bd
+
+
 def build(doc, only=None):
     """Every part, as its own Body. Returns {name: body}.
 
@@ -614,6 +774,14 @@ def build(doc, only=None):
     over in one process is what made the checks fall over.
     """
     out = {}
+    # A device in a panel of its own has no chassis at all.
+    if only is not None and only.panel:
+        nl, nr, nt, nb = only.parts
+        out[nl] = panel(doc, only, -1, nl)
+        out[nr] = panel(doc, only, +1, nr)
+        out[nt] = splice(doc, only, True, nt)
+        out[nb] = splice(doc, only, False, nb)
+        return out
     # The shared sides, unless the one device asked for brings its own: a
     # document with both pairs in it has two sides in the same place.
     if only is None or not only.own_sides:
@@ -635,6 +803,13 @@ def build(doc, only=None):
             out[nl] = side(doc, -1, nl, dev)
             out[nr] = side(doc, +1, nr, dev)
         if dev.bare:
+            continue
+        if dev.panel:
+            nl, nr, nt, nb = dev.parts
+            out[nl] = panel(doc, dev, -1, nl)
+            out[nr] = panel(doc, dev, +1, nr)
+            out[nt] = splice(doc, dev, True, nt)
+            out[nb] = splice(doc, dev, False, nb)
             continue
         out[dev.part("tray_l")] = tray(doc, dev, -1, dev.part("tray_l"))
         out[dev.part("tray_r")] = tray(doc, dev, +1, dev.part("tray_r"))

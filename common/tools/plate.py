@@ -122,15 +122,20 @@ KITS = [
     {
         "key": "sg108e",
         "out": "TL_SG108E_LabRax-A1mini.3mf",
-        "title": "TL-SG108E in a Lab Rax 10 inch rack",
+        "title": "TL-SG108E rack panel for a Lab Rax 10 inch rack",
+        # A panel of its own, front posts only: no chassis, and everything on
+        # one plate. The halves lie face down, as the panel they are drawn
+        # after does, with the arms standing 106.5 up; the splices lie flat,
+        # one in front of them and one behind. Nothing on it needs support.
         "plates": [
-            ("TL-SG108E 1 of 3 - left tray",
-             [("tray_sg108e_l", (90.0, 90.0), [], TRAY)]),
-            ("TL-SG108E 2 of 3 - right tray",
-             [("tray_sg108e_r", (90.0, 90.0), [], TRAY)]),
-            ("TL-SG108E 3 of 3 - faceplate",
-             [("faceplate_sg108e", (90.0, 90.0), [("x", 180), ("z", 45)],
-               NO_BRIM)]),
+            ("TL-SG108E 1 of 1 - panel halves and splices", [
+                ("panel_sg108e_l", (90.0, 58.0), [("x", 90)], NO_BRIM),
+                ("panel_sg108e_r", (90.0, 120.0), [("x", 90)], NO_BRIM),
+                ("splice_top_sg108e", (90.0, 17.5), [("x", 90)],
+                 NO_BRIM),
+                ("splice_bottom_sg108e", (90.0, 162.5),
+                 [("x", 90)], NO_BRIM),
+            ]),
         ],
     },
     {
@@ -152,6 +157,8 @@ def chassis_plates(kit):
     the middle of the bed rather than nudged off it the way the shared ones
     are: that leaves about 4 mm all round.
     """
+    if devices.BY_KEY[kit["key"]].panel:
+        return []
     sides = dict(zip(devices.CHASSIS[:2], devices.BY_KEY[kit["key"]].sides))
     own = dict((n, o) for n, o in sides.items() if o != n)
     return [(title.replace("Chassis", "Chassis (%s)" % kit["key"].upper())

@@ -94,7 +94,7 @@ class Frame(object):
 class Device(object):
     def __init__(self, key, name, doc, w, d, h, mass_g, front=None, keys_y=(),
                  plinth=0.0, vent=False, clr_w=None, clr_h=None, clr_d=None,
-                 bare=False):
+                 bare=False, panel=False):
         self.key = key
         self.name = name
         self.doc = doc
@@ -116,6 +116,11 @@ class Device(object):
         # no tray and no faceplate: the ears stop it coming forward and the
         # runner's tongue stops it going back.
         self.bare = bare
+        # True for a device light enough to go in a rack panel of its own,
+        # bolted to the front posts only: no sides, no legs, no tray. It
+        # slides in through the panel's opening and runs in a channel along
+        # each side. See PNL_* in params.
+        self.panel = panel
 
     # --- where the case sits ------------------------------------------------
     @property
@@ -126,6 +131,8 @@ class Device(object):
         """
         if self.bare:
             return P.SEAT_T
+        if self.panel:
+            return (P.RACK_U - self.h) / 2.0
         return P.TRAY_T + self.plinth
 
     @property
@@ -138,6 +145,8 @@ class Device(object):
         faceplate, just behind the ears."""
         if self.bare:
             return P.BARE_Y0
+        if self.panel:
+            return -P.PNL_T
         return P.DEV_Y0
 
     @property
@@ -191,6 +200,9 @@ class Device(object):
         """The three prints drawn around this device -- none, if it is bare."""
         if self.bare:
             return ()
+        if self.panel:
+            return (self.part("panel_l"), self.part("panel_r"),
+                    self.part("splice_top"), self.part("splice_bottom"))
         return tuple(self.part(b) for b in ("tray_l", "tray_r", "faceplate"))
 
     @property
@@ -202,6 +214,8 @@ class Device(object):
 
     @property
     def chassis(self):
+        if self.panel:
+            return ()
         return self.sides + CHASSIS[2:]
 
     @property

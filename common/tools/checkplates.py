@@ -150,7 +150,7 @@ def slice_whole_files():
                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                timeout=1800)
             log = r.stdout.decode("utf-8", "replace")
-            want = len(plate.CHASSIS_PLATES) + len(kit["plates"])
+            want = len(plate.chassis_plates(kit)) + len(kit["plates"])
             got = len([n for n in os.listdir(out) if n.endswith(".gcode")])
             trouble = [l.split("]")[-1].strip()
                        for l in log.splitlines()

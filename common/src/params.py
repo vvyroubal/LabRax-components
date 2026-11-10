@@ -450,3 +450,59 @@ EAR_CHAMFER = 4.0     # [design]
 M6_CLEAR = 6.4      # [rack]
 M6_HEX_AF = 10.09   # [rack] 11.65 across corners
 M6_HEX_D = 5.0      # [rack] nut thickness
+
+
+# ------------------------------------------------- a panel, front only ----
+# A light device can do without the chassis altogether: a rack panel of its
+# own, bolted to the front posts only, that it slides into from the front and
+# that holds it in a channel along each side. This is the TL-SG108E's. It is
+# drawn after a rack panel made for that switch, one piece 254 wide and 104.5
+# deep -- which no orientation puts on a 180 mm bed. So it is split down the
+# middle into two mirrored halves, each 127 wide, printed face down with the
+# arms standing up as the original is, and joined behind the opening's top
+# and bottom bars by two small splice plates and four M3.
+#
+# Once it is in the rack each half is held by its own three M6, so the splice
+# carries nothing but handling. The switch itself, sitting in both channels,
+# ties the halves together as well.
+#
+# Y here is as everywhere: 0 at the front face of the front posts. The panel
+# is the ear, in front of them.
+PNL_T = EAR_T          # [design] 6.5: what an M6 x 12 wants, see EAR_T
+PNL_CLR = 0.5          # [design] the opening is the case plus this all round
+PNL_SLEEVE_D = 14.0    # [design] the frame behind the panel, round the case
+PNL_SLEEVE_Z0 = 1.0    # [design] its bars stop this far inside the U
+PNL_WALL_X1 = 86.5     # [design] outer face of the arm's back wall; the
+                       # case's side is at 79, so the wall is 7 thick
+PNL_LIP = 8.0          # [design] how far the arm's lips reach over the case
+PNL_LIP_T = 4.2        # [design] and how thick they are
+PNL_STOP_IN = 4.0      # [design] the rear stop at the end of each channel
+                       # reaches this far in over the case's back,
+PNL_STOP_CLR = 1.0     # [design] this far behind it. Its face is at 45
+                       # degrees, so it is not an overhang printed face down
+PNL_GUSSET_X1 = 108.0  # [design] the gusset outside each arm: out to here on
+PNL_GUSSET_Y1 = 40.0   # [design] the panel, back to here along the arm. 3 mm
+                       # inside the posts' 111.125
+# The finger on top. With nothing in front of the case, this is what keeps it
+# in: a strip off the back of the frame's top bar, lying over the case, with
+# a ramped bump that presses down on it. Printed face down it stands upright,
+# so it is a plain wall. 3 x 12 x 36 of PETG pressed 1 mm pushes back with
+# about 3.5 N and strains about 0.35 %.
+PNL_FING_X = 55.0      # [design] its centre, either side of the middle
+PNL_FING_W = 12.0      # [design]
+PNL_FING_T = 3.0       # [design]
+PNL_FING_L = 36.0      # [design] from the back of the frame
+PNL_GRIP = 1.0         # [design] how far the bump presses into the case
+PNL_BUMP_RAMP = 5.0    # [design] its ramps; the front one is what the case
+PNL_BUMP_FLAT = 3.0    # [design] rides up going in
+# The splice. Each plate lies against the back of a bar, across the joint,
+# with an M3 each side into a nut slid into the bar from the joint face.
+PNL_SPLICE_HW = 24.0   # [design] half its length
+PNL_SPLICE_T = 6.0     # [design] its thickness, fore and aft
+PNL_SPLICE_CLR = 0.5   # [design] it stops this far short of the case
+PNL_M3_X = 12.0        # [design] the screws, either side of the joint
+M3_CLEAR = 3.4         # [design]
+M3_NUT_AF = 5.5        # [design] DIN 934
+M3_NUT_T = 2.4         # [design]
+M3_SCREW_LEN = 16.0    # [design] M3 x 16 from the back of the splice
+PNL_NUT_FIT = 0.3      # [design] room for the nut in its slot

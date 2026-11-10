@@ -145,11 +145,15 @@ def fasteners(dev):
             out.append(Fastener("rack front x%+.0f z%.2f" % (sx * P.SCREW_X, z),
                                 (sx * P.SCREW_X, -P.EAR_T, z), (0, 1, 0),
                                 washer=True))
+            # A panel is bolted to the front posts only, and its splice takes
+            # M3, which verify checks: nothing else here applies to it.
+            if dev.panel:
+                continue
             out.append(Fastener("rack rear  x%+.0f z%.2f" % (sx * P.SCREW_X, z),
                                 (sx * P.SCREW_X, rack_d + P.EAR_T, z),
                                 (0, -1, 0), washer=True))
     # A bare device has no faceplate, so nothing goes into those holes.
-    for sx in (() if dev.bare else (-1, 1)):
+    for sx in (() if dev.bare or dev.panel else (-1, 1)):
         for z, tag in ((P.BAR_SCREW_Z, "faceplate hi"),
                        (P.BOT_SCREW_Z, "faceplate lo")):
             out.append(Fastener(
@@ -215,7 +219,10 @@ def one_device(parts, dev):
           % (len(fs), nuts, sum(1 for f in fs if f.washer)))
 
     print("\n[the device]")
-    case = Part.makeBox(dev.w, dev.d, dev.h,
+    # A panel's fingers press into the case's top on purpose; verify checks
+    # that they do. Here the case only has to clear everything else.
+    h = dev.h - (P.PNL_GRIP + 0.05 if dev.panel else 0.0)
+    case = Part.makeBox(dev.w, dev.d, h,
                         Vector(-dev.w / 2, dev.y0, dev.z0))
     check(vol(asm.common(case)) < VOID, "sits in the bracket without fouling it",
           "%.3f mm3" % vol(asm.common(case)))
