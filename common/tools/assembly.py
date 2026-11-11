@@ -151,16 +151,15 @@ def fasteners(dev):
             out.append(Fastener("rack rear  x%+.0f z%.2f" % (sx * P.SCREW_X, z),
                                 (sx * P.SCREW_X, rack_d + P.EAR_T, z),
                                 (0, -1, 0), washer=True))
-    # A panel's ears are bolted to its middle sideways, through the ear's
-    # flange into a nut in the middle's tab.
+    # A panel's ears are bolted to its middle from the front, through the
+    # ends of the middle's plate into nuts in the ears' tongues.
     if dev.panel:
         for sx in (-1, 1):
             for z in (P.BAR_SCREW_Z, P.BOT_SCREW_Z):
-                seat = sx * (P.PNL_TAB_X1 + P.PNL_FLANGE_T)
                 out.append(Fastener(
-                    "panel joint x%+.0f z%.2f" % (seat, z),
-                    (seat, P.PNL_JOIN_Y, z), (-sx, 0, 0),
-                    nut_at=P.PNL_FLANGE_T + P.PNL_NUT_IN, phase=30.0))
+                    "panel joint x%+.1f z%.2f" % (sx * P.PNL_JOIN_X, z),
+                    (sx * P.PNL_JOIN_X, -P.PNL_T, z), (0, 1, 0),
+                    nut_at=P.PNL_T + P.BAR_NUT_Y0))
     # A bare device has no faceplate, so nothing goes into those holes.
     for sx in (() if dev.bare or dev.panel else (-1, 1)):
         for z, tag in ((P.BAR_SCREW_Z, "faceplate hi"),

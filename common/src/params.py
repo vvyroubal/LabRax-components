@@ -485,8 +485,6 @@ PNL_STOP_IN = 4.0      # [design] the rear stop at the end of each channel
                        # reaches this far in over the case's back,
 PNL_STOP_CLR = 1.0     # [design] this far behind it. Its face is at 45
                        # degrees, so it is not an overhang printed face down
-PNL_GUSSET_Y1 = 40.0   # [design] the gusset outside each arm runs out to
-                       # the tab's end on the plate and back to here
 # The finger on top. With nothing in front of the case, this is what keeps it
 # in: a strip off the back of the frame's top bar, lying over the case, with
 # a ramped bump that presses down on it. Printed face down it stands upright,
@@ -501,20 +499,23 @@ PNL_BUMP_RAMP = 5.0    # [design] its ramps; the front one is what the case
 PNL_BUMP_FLAT = 3.0    # [design] rides up going in
 # The ears, and how they join the middle. The middle's plate runs out to
 # PNL_TAB_X1 and the ear's from there to the edge, flush with it. Behind the
-# joint the middle has a solid tab, merging with the arm, and the ear a flange
-# that lies against the tab's end. Two M6 x 12 go through the flange into the
-# tab, sideways, into nuts dropped into slots from the tab's top and bottom
-# edges. Both parts print face down with every wall upright: a lap in front
-# of the plate would leave one of them hanging 6.5 mm off the bed.
-PNL_TAB_X0 = 86.0      # [design] the tab's inner face, in the arm's wall
-PNL_TAB_X1 = 98.0      # [design] its end, where the ear starts. The middle
-                       # is twice this wide: 196, which is 170 diagonally
-                       # with 44.45 and goes on the bed with 5 mm to spare
-PNL_TAB_D = 30.0       # [design] how far back the tab and the flange run
-PNL_FLANGE_T = 6.0     # [design] the ear's flange. A 12 mm screw through it
-                       # ends 6 mm into the tab: a 5 mm nut 0.5 in from the
-                       # end face is threaded right through. Its head stands
-                       # 7.3 inside the posts' 111.125
-PNL_JOIN_Y = 15.0      # [design] the joint's screws, halfway back the tab,
-                       # at BAR_SCREW_Z and BOT_SCREW_Z like the faceplates'
-PNL_NUT_IN = 0.5       # [design] the nut's near face, in from the tab's end
+# middle's plate, at each end, is room for a tongue on the ear: it reaches in
+# behind the joint, and two M6 x 12 go through the middle's plate from the
+# front into nuts slid into slots in the tongue. The arm's wall closes the
+# slots once the ear is on.
+#
+# Everything is flush on the outside. An ear bolted on from the side, with
+# its screw heads standing out behind it, would catch on the posts as the
+# panel goes into the rack. Behind the ears nothing reaches past
+# PNL_TONGUE_X1, well inside the chassis' own BODY_HW.
+PNL_TAB_X1 = 98.0      # [design] where the middle's plate ends and the ear's
+                       # starts. The middle is twice this wide: 196, which
+                       # is 170 diagonally with 44.45 and goes on the bed
+                       # with 5 mm to spare
+PNL_TONGUE_X1 = 106.0  # [design] the tongue's outer face, behind the ear
+PNL_TONGUE_T = BAR_T   # [design] 8.0, fore and aft: the nut sits 1.5..6.5
+PNL_JOIN_X = 92.5      # [design] the joint's screws, at BAR_SCREW_Z and
+                       # BOT_SCREW_Z like the faceplates'. A button head here
+                       # stays on the middle's plate, short of the seam
+PNL_EAR_FIT = 0.2      # [design] between the ear and the middle, at the
+                       # seam and at the end of the tongue

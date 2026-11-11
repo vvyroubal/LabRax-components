@@ -57,19 +57,18 @@ Two plates, already arranged for a Bambu Lab A1 mini (180 x 180 mm bed):
 
 - Plate 1: the middle of the panel, face down and turned 45 degrees: the
   plate round the opening, both arms, the fingers and the stops
-- Plate 2: the two ears
+- Plate 2: the two ears, standing on their bottom edges
 
 A 254 mm panel will not fit a 180 mm bed any way round, so the ears are
-separate. Every part prints face down with its walls standing up. Nothing is
-overhung past 45 degrees, so no support is needed.
+separate. Nothing is overhung past 45 degrees, so no support is needed.
 
 **Printing**
 
 - Material: PETG. PLA will work in a cool room.
 - Profile: 0.20 mm Standard for the A1 mini, as carried in the file. 2 walls,
   15% infill.
-- Filament: about 92 g for both plates.
-- Time: about 4 h 30 min for both plates.
+- Filament: about 83 g for both plates.
+- Time: about 4 h 15 min for both plates.
 
 **Hardware to buy**
 
@@ -85,12 +84,11 @@ into the plastic.
 
 **Assembly**
 
-1. Drop an M6 nut into each of the four slots in the tabs at the ends of the
-   middle piece: the upper ones from the top edge, the lower ones from the
-   bottom edge, flats against the sides of the slot.
-2. Hold each ear's flange against the end of its tab and put two M6 x 12
-   through the flange into the nuts. Do this on the bench: in the rack there
-   is no room beside the posts for a driver.
+1. Slide an M6 nut into each of the two slots in each ear's tongue, from the
+   tongue's inner end, flats top and bottom.
+2. Put each ear's tongue in behind the end of the middle's plate, up against
+   the arm, and drive two M6 x 12 from the front through the plate into the
+   nuts.
 3. Bolt the panel to the front posts with six M6 x 12 and washers.
 4. Slide the switch in through the opening until it stops.
 
@@ -98,9 +96,9 @@ To take the switch out, pull it forward by its sides.
 
 **Good to know**
 
-- The ears join the middle beside the opening, where the panel is full
-  height. There is no room for an M6 nut in the thin bars above and below
-  the opening.
+- Every joint screw goes in from the front. Nothing stands out at the sides
+  behind the ears, so the panel goes into the rack without catching on the
+  posts.
 - If the switch is loose, the fingers' grip is `PNL_GRIP` in the source, 1 mm.
   If it is tight in the channels, raise `PNL_CLR` from 0.5.
 - Case dimensions are TP-Link's published figures. Measure your unit before

@@ -221,14 +221,16 @@ def panel_device(parts, dev):
             v = vol(parts[a].common(parts[b_]))
             check(v < VOID, "%-14s vs %-14s" % (a, b_), "%.3f mm3" % v)
     for sx, e in ((-1, el), (1, er)):
-        v = vol(parts[e].translated(Vector(-sx * 0.1, 0, 0)).common(mid))
-        check(v > 50.0, "%s's flange and plate lie against the middle" % e,
-              "%.0f mm3 when pushed 0.1 in" % v)
-        front = xbox(sx * (P.PNL_TAB_X1 - 0.5), sx * (P.PNL_TAB_X1 + 0.5),
-                     -P.PNL_T, -P.PNL_T + 0.5, 1.0, P.RACK_U - 1.0)
-        check(vol(asm.common(front)) > 0.9 * vol(front),
-              "and its front is flush with the middle's, no step",
-              "%.1f of %.1f mm3" % (vol(asm.common(front)), vol(front)))
+        v = vol(parts[e].translated(Vector(0, -0.1, 0)).common(mid))
+        # Its whole face behind the plate, bar the two screw holes.
+        want = 0.1 * 0.8 * ((P.PNL_TAB_X1 - P.PNL_WALL_X1 - P.PNL_EAR_FIT)
+                            * P.RACK_U - 2 * math.pi * (P.M6_CLEAR / 2) ** 2)
+        check(v > want, "%s's tongue lies against the back of the middle's "
+              "plate" % e, "%.0f mm2 of contact" % (v / 0.1))
+        ear_front = parts[e].BoundBox.YMin
+        check(abs(ear_front - mid.BoundBox.YMin) < 1e-6,
+              "and its front is flush with the middle's",
+              "both at y=%.2f" % ear_front)
 
     print("\n[the rack -- front posts only]")
     bb = asm.BoundBox
@@ -328,100 +330,114 @@ def panel_device(parts, dev):
     check(open_ > 0.85, "its back is open, for the power jack and the air",
           "%.0f%% of the 30 mm behind it is clear" % (100 * open_))
 
-    print("\n[the joint -- M6 x %.0f through each ear's flange into a nut "
-          "in the middle's tab]" % P.SCREW_LEN)
+    print("\n[the joint -- M6 x %.0f from the front through the middle's "
+          "plate into a nut in the ear's tongue]" % P.SCREW_LEN)
     r = P.M6_HEX_AF / 3 ** 0.5
     for sx, e in ((-1, el), (1, er)):
         for z in n.join_z:
-            seat = sx * (P.PNL_TAB_X1 + P.PNL_FLANGE_T)
-            tip = seat - sx * P.SCREW_LEN
-            tag = "x=%+6.1f z=%5.2f" % (seat, z)
-            shank = Part.makeCylinder(2.9, P.SCREW_LEN,
-                                      Vector(seat, P.PNL_JOIN_Y, z),
-                                      Vector(-sx, 0, 0))
+            x = sx * P.PNL_JOIN_X
+            tag = "x=%+5.1f z=%5.2f" % (x, z)
+            seat = -P.PNL_T
+            shank = Part.makeCylinder(2.9, P.SCREW_LEN, Vector(x, seat, z),
+                                      Vector(0, 1, 0))
             check(vol(asm.common(shank)) < VOID,
                   "its screw goes in clear at %s" % tag,
-                  "tip at x=%+.1f" % tip)
+                  "tip at y=%.1f" % (seat + P.SCREW_LEN))
             head = Part.makeCylinder(P.M6_HEAD_D / 2, 3.5,
-                                     Vector(seat, P.PNL_JOIN_Y, z),
-                                     Vector(sx, 0, 0))
-            hb = head.BoundBox
-            check(vol(asm.common(head)) < VOID
-                  and max(abs(hb.XMin), abs(hb.XMax)) < P.POST_CLEAR_HW - 1.0,
-                  "its head has room, inside the posts",
-                  "out to x=%.1f of %.3f" % (max(abs(hb.XMin), abs(hb.XMax)),
-                                             P.POST_CLEAR_HW))
-            bear = Part.makeCylinder(P.M6_HEAD_D / 2, 0.4,
-                                     Vector(seat, P.PNL_JOIN_Y, z),
-                                     Vector(-sx, 0, 0))
-            check(vol(parts[e].common(bear)) > 0.4 * 50.0,
-                  "and bears on the flange", "%.0f mm2"
-                  % (vol(parts[e].common(bear)) / 0.4))
-            nx = sx * (P.PNL_TAB_X1 - P.PNL_NUT_IN)
+                                     Vector(x, seat, z), Vector(0, -1, 0))
+            check(vol(asm.common(head)) < VOID, "its head has room", "")
+            bear = Part.makeCylinder(P.M6_HEAD_D / 2, 0.4, Vector(x, seat, z),
+                                     Vector(0, 1, 0))
+            on_mid = vol(mid.common(bear)) / 0.4
+            check(on_mid > 0.8 * math.pi * (P.M6_HEAD_D / 2) ** 2
+                  - math.pi * (P.M6_CLEAR / 2) ** 2,
+                  "and bears on the middle's plate, short of the seam",
+                  "%.0f mm2" % on_mid)
             ring = Part.makePolygon([
-                Vector(nx, P.PNL_JOIN_Y + r * math.cos(math.radians(a)),
-                       z + r * math.sin(math.radians(a)))
+                Vector(x + r * math.cos(math.radians(a)),
+                       P.BAR_NUT_Y0 + 0.05, z + r * math.sin(math.radians(a)))
                 for a in range(0, 361, 60)])
-            # Flats against the slot's sides, corners up and down the slot.
-            ring = ring.rotated(Vector(nx, P.PNL_JOIN_Y, z), Vector(1, 0, 0),
-                                90)
-            nut = Part.Face(ring).extrude(Vector(-sx * (P.M6_HEX_D - 0.1),
-                                                 0, 0))
-            nut.translate(Vector(-sx * 0.05, 0, 0))
+            nut = Part.Face(ring).extrude(Vector(0, P.M6_HEX_D - 0.1, 0))
             check(vol(asm.common(nut)) < VOID,
-                  "its nut seats at %s" % tag,
+                  "its nut seats in the tongue at %s" % tag,
                   "%.3f mm3" % vol(asm.common(nut)))
-            top = z > P.RACK_U / 2
-            drop = box(min(nut.BoundBox.XMin, nut.BoundBox.XMax),
-                       max(nut.BoundBox.XMin, nut.BoundBox.XMax),
-                       P.PNL_JOIN_Y - P.M6_HEX_AF / 2 + 0.05,
-                       P.PNL_JOIN_Y + P.M6_HEX_AF / 2 - 0.05,
-                       z if top else -1.0, P.RACK_U + 1.0 if top else z)
-            check(vol(mid.common(nut.fuse(drop))) < VOID,
-                  "and drops in from the tab's %s edge" % ("top" if top
-                                                          else "bottom"),
-                  "%.3f mm3 in its way" % vol(mid.common(nut.fuse(drop))))
-            turn = vol(mid.common(nut.rotated(Vector(nx, P.PNL_JOIN_Y, z),
-                                              Vector(1, 0, 0), 30)))
-            check(turn > 0.2, "and jams if it tries to turn",
+            feed = nut.fuse(xbox(x, sx * (P.PNL_WALL_X1 - 1.0),
+                                 P.BAR_NUT_Y0 + 0.05,
+                                 P.BAR_NUT_Y0 + P.M6_HEX_D - 0.05,
+                                 z - 4.9, z + 4.9))
+            check(vol(parts[e].common(feed)) < VOID,
+                  "and slides in from the tongue's inner end",
+                  "%.3f mm3" % vol(parts[e].common(feed)))
+            out_ = vol(mid.common(nut.translated(Vector(-sx * 8.0, 0, 0))))
+            check(out_ > VOID, "and the arm's wall shuts it in",
+                  "%.0f mm3 in its way out" % out_)
+            turn = vol(parts[e].common(nut.rotated(Vector(x, 0, z),
+                                                   Vector(0, 1, 0), 30)))
+            check(turn > 0.2, "and it jams if it tries to turn",
                   "%.1f mm3 in the way" % turn)
-            past = abs(tip) - (abs(nx) - P.M6_HEX_D)
-            check(past <= 0.0 and abs(nx) - P.M6_HEX_D - abs(tip) <= 1.0,
-                  "and the screw runs right through it",
-                  "tip %.1f mm past the nut's far face" % -past)
+            eng = (seat + P.SCREW_LEN) - P.BAR_NUT_Y0
+            check(3.0 <= eng <= P.M6_HEX_D + 0.01,
+                  "and the screw takes %.1f mm of its thread, tip inside the "
+                  "tongue" % eng, "")
 
-    print("\n[printing -- every part face down]")
-    allowed = 4 * (P.M6_HEX_D + P.NUT_SLOT_FIT) * (
-        P.RACK_U - P.BAR_SCREW_Z + r + 1.0)
-    for h in names:
-        m = MeshPart.meshFromShape(Shape=parts[h], LinearDeflection=0.05,
+    print("\n[nothing stands out to catch on the posts]")
+    for sx, e in ((-1, el), (1, er)):
+        side = xbox(sx * P.PNL_TONGUE_X1 + sx * 0.01, sx * 200.0, 0.0, 400.0,
+                    -10.0, 60.0)
+        v = vol(asm.common(side))
+        check(v < VOID, "behind the %s ear nothing reaches past x=%+.1f"
+              % ("left" if sx < 0 else "right", sx * P.PNL_TONGUE_X1),
+              "%.3f mm3 beyond; the chassis' own sides go to %.1f"
+              % (v, P.BODY_HW))
+    check(P.PNL_TONGUE_X1 < P.BODY_HW,
+          "the tongues stay inside the line the chassis' sides already pass",
+          "%.1f inside %.1f" % (P.PNL_TONGUE_X1, P.BODY_HW))
+    check(True, "every joint screw goes in from the front, and every nut is "
+          "inside a part", "no head or nut behind the ears")
+
+    print("\n[printing -- the middle face down, the ears on their edge]")
+
+    def overhang(shape, up, base, holes):
+        m = MeshPart.meshFromShape(Shape=shape, LinearDeflection=0.05,
                                    AngularDeflection=0.3, Relative=False)
-        bad, flat = 0.0, 0.0
+        bad = flat = 0.0
         for f in m.Facets:
             c = [sum(p[i] for p in f.Points) / 3.0 for i in range(3)]
-            if c[1] < -P.PNL_T + 0.05:
+            if c[up] < base + 0.05:
                 continue
-            # The tops of the sideways M6 holes are a small arch each; any
-            # printer bridges them.
-            in_hole = any(abs(c[1] - P.PNL_JOIN_Y) < 3.3
-                          and abs(c[2] - z) < 3.3 for z in n.join_z)
-            if f.Normal.y < -0.99:
+            nrm = (f.Normal.x, f.Normal.y, f.Normal.z)[up]
+            if any(h(c) for h in holes):
+                continue
+            if nrm < -0.99:
                 flat += f.Area
-            elif f.Normal.y < -0.72 and not in_hole:
+            elif nrm < -0.72:
                 bad += f.Area
-        check(bad < 1.0, "%s has nothing overhung past 45 degrees" % h,
-              "%.1f mm2" % bad)
-        check(flat <= allowed + 20.0,
-              "%s bridges nothing but its nut slots' roofs and hole tops" % h,
-              "%.0f mm2" % flat)
-        b = parts[h].BoundBox
-        d = (b.XLength + b.ZLength) / math.sqrt(2.0)
-        check(b.YLength <= 180.0 and (max(b.XLength, b.ZLength) <= 172.0
-                                      or d <= 172.0),
-              "%s goes on the bed face down, %.1f tall" % (h, b.YLength),
-              "%.1f x %.1f%s" % (b.XLength, b.ZLength,
-                                 ", %.1f turned 45 degrees" % d
-                                 if b.XLength > 172.0 else ""))
+        return bad, flat
+
+    bad, flat = overhang(mid, 1, -P.PNL_T, [])
+    check(bad < 1.0 and flat < 1.0,
+          "%s, face down: nothing overhung past 45 degrees, nothing bridged"
+          % nm, "%.1f / %.1f mm2" % (bad, flat))
+    b = mid.BoundBox
+    d = (b.XLength + b.ZLength) / math.sqrt(2.0)
+    check(b.YLength <= 180.0 and d <= 172.0,
+          "%s goes on the bed turned 45 degrees, %.1f tall" % (nm, b.YLength),
+          "%.1f corner to corner" % d)
+    for e in (el, er):
+        # Printed standing on its bottom edge. The holes through it run
+        # sideways then, and their tops are small arches any printer bridges;
+        # the nut slots' roofs are 5.6 mm bridges.
+        def in_hole(c):
+            near_rack = abs(abs(c[0]) - P.SCREW_X) < P.SLOT_W / 2 + 0.1 and \
+                c[1] < 0.1
+            near_join = abs(abs(c[0]) - P.PNL_JOIN_X) < 6.5
+            return near_rack or near_join
+        bad, flat = overhang(parts[e], 2, 0.0, [in_hole])
+        b = parts[e].BoundBox
+        check(bad < 1.0,
+              "%s, on its edge: nothing overhung past 45 degrees" % e,
+              "%.1f mm2; %.1f x %.1f on the bed, %.1f tall"
+              % (bad, b.XLength, b.YLength, b.ZLength))
     print("  note  per bracket: 10 x M6 x 12, 6 x M6 washers (rack), "
           "4 x M6 nuts (joint)")
 

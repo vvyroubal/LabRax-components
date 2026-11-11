@@ -19,10 +19,11 @@ from devices import Device
 #
 # The panel is 254 wide and the bed 180, so it is three pieces: a middle
 # carrying the case, face down and turned 45 degrees on one plate, and two
-# ears on another. Each ear's flange is bolted sideways to a tab on the end of
-# the middle with two M6 x 12 into M6 nuts: every screw in it is an M6. The
-# joint is beside the opening because the bars above and below it are too
-# thin for an M6 nut.
+# ears on another. Each ear has a tongue behind it that reaches in behind the
+# end of the middle's plate; two M6 x 12 go in from the front through the
+# plate into M6 nuts in the tongue. Every screw in it is an M6, and nothing
+# stands out behind the ears to catch on the posts. The joint is beside the
+# opening because the bars above and below it are too thin for an M6 nut.
 #
 # Its power jack is on the BACK; the panel is open behind the case.
 DEVICE = Device(

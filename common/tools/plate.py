@@ -126,15 +126,17 @@ KITS = [
         # A panel of its own, front posts only: no chassis. The middle lies
         # face down, as the panel it is drawn after does, with the arms
         # standing 106.5 up; at 196 wide it goes on turned 45 degrees. The
-        # ears lie face down on a plate of their own. Nothing needs support.
+        # ears stand on their bottom edges, as modelled, on a plate of their
+        # own: lying down, the tongue would hang off the back of the plate.
+        # Nothing needs support.
         "plates": [
             ("TL-SG108E 1 of 2 - panel", [
                 ("panel_sg108e", (90.0, 90.0), [("x", 90), ("z", 45)],
                  NO_BRIM),
             ]),
             ("TL-SG108E 2 of 2 - ears", [
-                ("ear_sg108e_l", (55.0, 90.0), [("x", 90)], NO_BRIM),
-                ("ear_sg108e_r", (125.0, 90.0), [("x", 90)], NO_BRIM),
+                ("ear_sg108e_l", (90.0, 70.0), [], NO_BRIM),
+                ("ear_sg108e_r", (90.0, 110.0), [], NO_BRIM),
             ]),
         ],
     },

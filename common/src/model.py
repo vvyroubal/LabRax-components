@@ -627,12 +627,11 @@ def panel(doc, dev, name):
     passes through, its face flush with the front; a frame round the opening
     behind the plate; and an arm along each side of the case, a channel whose
     lips reach over its top and bottom edges. A finger off the frame's top bar
-    presses on the case so it stays put. Its ears are separate plates
-    (pnl_ear), bolted to the tabs on its ends with M6.
+    presses on the case so it stays put. Its ears are separate (pnl_ear),
+    bolted to it with M6 through the ends of its plate from the front.
 
     Printed face down, as the original is: the arms stand up, and every face
-    is upright, flat on the bed or at 45 degrees, apart from the nut slots'
-    roofs, 5.6 mm bridges, and the tops of the sideways M6 holes.
+    is upright, flat on the bed or at 45 degrees.
     """
     bd = sk.body(doc, name)
     n = _pnl(dev)
@@ -654,29 +653,12 @@ def panel(doc, dev, name):
     sk.rect(s, -P.PNL_WALL_X1, n.bar_z0, P.PNL_WALL_X1, n.bar_z1)
     sk.pad(doc, bd, s, P.PNL_SLEEVE_D, reversed_=True)
 
-    # A solid tab behind each end of the plate, which the ear's flange is
-    # bolted to. It stands on the plate, so printed face down it is a wall.
-    s = sk.sketch(doc, bd, name + "_Sk_tabs", xz())
-    for sx in (-1, 1):
-        sk.rect(s, sx * P.PNL_TAB_X0, 0.0, sx * P.PNL_TAB_X1, P.RACK_U)
-    sk.pad(doc, bd, s, P.PNL_TAB_D, reversed_=True)
-
     # The arms: a back wall outside each side of the case and lips over its
     # top and bottom edges, the whole depth of the case and the stop behind.
     s = sk.sketch(doc, bd, name + "_Sk_arms", xz())
     for sx in (-1, 1):
         sk.rect(s, sx * n.lip_x, n.arm_z0, sx * P.PNL_WALL_X1, n.arm_z1)
     sk.pad(doc, bd, s, n.arm_y1, reversed_=True)
-
-    # A gusset outside each arm, from the tab back along it. Its outer face
-    # leans in as it goes back, so printed face down it is never overhung.
-    w = P.PNL_WALL_X1 - 0.5
-    s = sk.sketch(doc, bd, name + "_Sk_gussets", xy(n.arm_z0))
-    for sx in (-1, 1):
-        sk.polygon(s, [(sx * w, 0.0), (sx * P.PNL_TAB_X1, 0.0),
-                       (sx * w, P.PNL_GUSSET_Y1)])
-    # Upward: on an XY sketch plane, reversed_ is -Z.
-    sk.pad(doc, bd, s, n.arm_z1 - n.arm_z0)
 
     # The opening, through the plate, the frame and on down the channels.
     s = sk.sketch(doc, bd, name + "_Sk_opening", xz(-P.PNL_T))
@@ -716,55 +698,42 @@ def panel(doc, dev, name):
                        (yb1 - P.PNL_BUMP_RAMP, zb), (yb1, n.z_hi + 0.5)])
         sk.pad(doc, bd, s, P.PNL_FING_W - 1.0)
 
-    # The joint: a clearance hole into the end of each tab for an M6,
-    # sideways, deep enough for a 12 mm screw through the ear's flange...
-    depth = P.SCREW_LEN - P.PNL_FLANGE_T + 1.0
+    # The joint: a clearance hole through each end of the plate, from the
+    # front, for the M6 into the nut in the ear's tongue behind it.
+    s = sk.sketch(doc, bd, name + "_Sk_m6", xz(-P.PNL_T))
     for sx in (-1, 1):
-        s = sk.sketch(doc, bd, name + "_Sk_m6%s" % ("l" if sx < 0 else "r"),
-                      sk.plane(Vector(sx * P.PNL_TAB_X1, 0, 0), sk.Y, sk.Z))
         for z in n.join_z:
-            sk.circle(s, P.PNL_JOIN_Y, z, P.M6_CLEAR)
-        sk.pocket(doc, bd, s, depth)
-
-    # ...and a slot for its nut, dropped in from the tab's top edge for the
-    # upper screw and from its bottom edge for the lower. As wide as the nut
-    # across its flats, so it cannot turn; the screw holds it once it is in.
-    hw_ = (P.M6_HEX_AF + P.NUT_SLOT_FIT) / 2.0
-    r = P.M6_HEX_AF / 3 ** 0.5
-    x0 = P.PNL_TAB_X1 - P.PNL_NUT_IN - P.M6_HEX_D - P.NUT_SLOT_FIT / 2.0
-    x1 = P.PNL_TAB_X1 - P.PNL_NUT_IN + P.NUT_SLOT_FIT / 2.0
-    for tag, z, top in (("hi", n.join_z[0], True), ("lo", n.join_z[1], False)):
-        s = sk.sketch(doc, bd, name + "_Sk_nut" + tag,
-                      xy(P.RACK_U if top else 0.0))
-        for sx in (-1, 1):
-            sk.rect(s, sx * x0, P.PNL_JOIN_Y - hw_, sx * x1,
-                    P.PNL_JOIN_Y + hw_)
-        reach = (P.RACK_U - (z - r - P.NUT_SLOT_FIT)) if top \
-            else (z + r + P.NUT_SLOT_FIT)
-        sk.pocket(doc, bd, s, reach)
+            sk.circle(s, sx * P.PNL_JOIN_X, z, P.M6_CLEAR)
+    # Rearward, through the plate: on an X-Z plane an unreversed pocket
+    # cuts +Y.
+    sk.pocket(doc, bd, s, P.PNL_T, reversed_=False)
     return bd
 
 
 def pnl_ear(doc, dev, sx, name):
-    """One ear of a panel: the rack slots, and a flange that bolts it to the
-    end of the middle with two M6 x 12, sideways."""
+    """One ear of a panel: the rack slots, and a tongue behind it that
+    reaches in behind the end of the middle's plate and takes the nuts for
+    the two M6 that join them. Flush on the outside: nothing on it stands
+    out where it would catch on the posts."""
     bd = sk.body(doc, name)
     n = _pnl(dev)
     c = P.EAR_CHAMFER
+    x0 = P.PNL_TAB_X1 + P.PNL_EAR_FIT
     s = sk.sketch(doc, bd, name + "_Sk_plate",
                   sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
-    pts = [(sx * P.PNL_TAB_X1, 0.0), (sx * (P.FACE_HW - c), 0.0),
+    pts = [(sx * x0, 0.0), (sx * (P.FACE_HW - c), 0.0),
            (sx * P.FACE_HW, c), (sx * P.FACE_HW, P.RACK_U - c),
-           (sx * (P.FACE_HW - c), P.RACK_U), (sx * P.PNL_TAB_X1, P.RACK_U)]
+           (sx * (P.FACE_HW - c), P.RACK_U), (sx * x0, P.RACK_U)]
     sk.polygon(s, pts if sx > 0 else pts[::-1])
     sk.pad(doc, bd, s, P.PNL_T)
 
-    # The flange, behind the plate, against the tab's end.
-    s = sk.sketch(doc, bd, name + "_Sk_flange",
+    # The tongue: behind the ear and on in behind the middle's plate, up to
+    # the arm's wall.
+    t0 = P.PNL_WALL_X1 + P.PNL_EAR_FIT
+    s = sk.sketch(doc, bd, name + "_Sk_tongue",
                   sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
-    sk.rect(s, sx * P.PNL_TAB_X1, 0.0, sx * (P.PNL_TAB_X1 + P.PNL_FLANGE_T),
-            P.RACK_U)
-    sk.pad(doc, bd, s, P.PNL_TAB_D, reversed_=True)
+    sk.rect(s, sx * t0, 0.0, sx * P.PNL_TONGUE_X1, P.RACK_U)
+    sk.pad(doc, bd, s, P.PNL_TONGUE_T, reversed_=True)
 
     # Three slots for M6 into the post's own nuts...
     s = sk.sketch(doc, bd, name + "_Sk_slots",
@@ -773,12 +742,24 @@ def pnl_ear(doc, dev, sx, name):
         sk.slot(s, sx * P.SCREW_X, z, P.SLOT_W, P.SLOT_H)
     sk.pocket(doc, bd, s, P.PNL_T)
 
-    # ...and two through the flange for the joint.
+    # ...a clearance hole in the tongue for each joint screw...
     s = sk.sketch(doc, bd, name + "_Sk_m6",
-                  sk.plane(Vector(sx * P.PNL_TAB_X1, 0, 0), sk.Y, sk.Z))
+                  sk.plane(Vector(0, 0, 0), sk.X, sk.Z))
     for z in n.join_z:
-        sk.circle(s, P.PNL_JOIN_Y, z, P.M6_CLEAR)
-    sk.pocket(doc, bd, s, P.PNL_FLANGE_T)
+        sk.circle(s, sx * P.PNL_JOIN_X, z, P.M6_CLEAR)
+    sk.pocket(doc, bd, s, P.PNL_TONGUE_T, reversed_=False)
+
+    # ...and a slot for its nut, cut in from the tongue's inner end: as tall
+    # as the nut across its flats, so it cannot turn, closed in front and
+    # behind by the tongue and at its mouth by the arm's wall.
+    hh = (P.M6_HEX_AF + P.NUT_SLOT_FIT) / 2.0
+    reach = P.PNL_JOIN_X + P.M6_HEX_AF / 3 ** 0.5 + P.NUT_SLOT_FIT - t0
+    s = sk.sketch(doc, bd, name + "_Sk_nuts",
+                  sk.plane(Vector(sx * t0, 0, 0), sk.Y, sk.Z))
+    for z in n.join_z:
+        sk.rect(s, P.BAR_NUT_Y0 - P.NUT_SLOT_FIT / 2.0, z - hh,
+                P.BAR_NUT_Y0 + P.M6_HEX_D + P.NUT_SLOT_FIT / 2.0, z + hh)
+    sk.pocket(doc, bd, s, reach)
     return bd
 
 

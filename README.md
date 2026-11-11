@@ -97,7 +97,7 @@ its own pair of sides and the shared rear legs, and no tray or faceplate.
 | `tray_usw_l` / `tray_usw_r` | 136.5 × 128.4 × 19.6 | 1 each | Flex Mini |
 | `faceplate_usw` | 213.6 × 20 × 44.5 | 1 | Flex Mini |
 | `panel_sg108e` | 196 × 106.5 × 44.5 | 1 | TL-SG108E, no chassis |
-| `ear_sg108e_l` / `ear_sg108e_r` | 29 × 36.5 × 44.5 | 1 each | TL-SG108E |
+| `ear_sg108e_l` / `ear_sg108e_r` | 40.3 × 14.5 × 44.5 | 1 each | TL-SG108E |
 | `side_nuc_l` / `side_nuc_r` | 36 × 212.5 × 44.5 | 1 each | NUC6i7KYK, in place of `side_l` / `side_r` |
 
 **Four of the seven are a chassis that takes no notice of what is in it.**
@@ -142,7 +142,7 @@ every file — print them once per bracket — except in the NUC's, whose plates
 | 1–3 | chassis (in every file) | 112.1 g | 5 h 46 |
 | 4–6 | UCG-Fiber | 149.0 g | 5 h 37 |
 | 4–6 | Flex Mini 2.5G | 136.7 g | 5 h 22 |
-| 1–2 | TL-SG108E panel and ears, the whole bracket | 92.4 g | 4 h 27 |
+| 1–2 | TL-SG108E panel and ears, the whole bracket | 82.7 g | 4 h 14 |
 
 A chassis and one kit is about 261 g for the gateway and 249 g for the Flex
 Mini. Print in **PETG**: a gateway running IDS/IPS gets warm enough that PLA
@@ -330,28 +330,34 @@ its own**, drawn after a panel made for this switch, and bolted to the
   the panel cannot take an M6: the bars above and below the opening are
   8.2 mm tall and an M6 nut is 10.1 across its flats. So the joint is where
   the panel is full height, beside the opening.
-- **The joint.** Behind each end of the middle's plate stands a solid tab,
-  12 × 30 mm and the full height of the U, merged with the arm. Each ear has
-  a 6 mm flange behind it that lies against the tab's end face. **Two
-  M6 × 12 per side** go sideways through the flange into **M6 nuts** dropped
-  into slots in the tab, the upper one from the tab's top edge and the lower
-  one from its bottom edge. The slots are as wide as a nut across its flats,
-  so it cannot turn, and the screw runs right through it. The heads stand
-  7 mm inside the posts.
+- **The joint.** Each ear has an 8 mm **tongue** behind it that reaches in
+  behind the end of the middle's plate, up to the arm's wall. **Two M6 × 12
+  per side** go in **from the front**, through the end of the middle's plate,
+  into **M6 nuts** slid into slots in the tongue from its inner end. The
+  slots are as tall as a nut across its flats, so it cannot turn, and once
+  the ear is on, the arm's wall closes their mouths. The heads sit on the
+  front of the panel beside the opening, as the faceplates' do on the
+  chassis brackets.
+- **Nothing stands out behind the ears.** No screw head or nut is outside a
+  part, and behind the ears nothing reaches past x = ±106, inside the line
+  the chassis' own sides already pass the posts at. An ear bolted on from
+  the side, with heads standing out behind it, would catch on the posts as
+  the panel goes in.
 
-Every part prints **face down** with every wall upright. The only bridges
-are the nut slots' 5.6 mm roofs and the tops of the four sideways holes, so
-nothing needs support. Two plates: the middle (74.8 g, 3 h 24) and both ears
-(17.7 g, 1 h 03).
+The middle prints **face down** with nothing overhung and nothing bridged.
+The ears print **standing on their bottom edge**, every wall upright; their
+holes run sideways then and their tops are small arches. Nothing needs
+support. Two plates: the middle (67.4 g, 3 h 11) and both ears
+(15.3 g, 1 h 03).
 
 **Hardware:** 10 × M6 × 12 button head, 6 × M6 washers, 4 × M6 nuts.
 
-**Assembly:** drop an M6 nut into each of the four slots in the middle's
-tabs, flats against the slot's sides. Hold each ear's flange against its
-tab and put two M6 × 12 through the flange into the nuts. This is done on
-the bench: in the rack there is no room beside the posts for a driver. Bolt
-the panel to the front posts with six M6 × 12 and washers, then slide the
-switch in through the front until it stops.
+**Assembly:** slide an M6 nut into each of the two slots in each ear's
+tongue, from its inner end, flats top and bottom. Put the ear's tongue in
+behind the end of the middle's plate, against the arm's wall, and drive two
+M6 × 12 from the front through the plate into the nuts. Bolt the panel to
+the front posts with six M6 × 12 and washers, then slide the switch in
+through the front until it stops.
 
 ## Orientation and cooling
 
@@ -446,9 +452,10 @@ Then add its three plates to `KITS` in `common/tools/plate.py` and run `make`.
 that silently does nothing is caught rather than assumed away: 195 checks for
 the gateway, 194 for the Flex Mini, 35 for the NUC, which has no tray or
 faceplate to check and whose sides are checked against the shared ones, and
-79 for the TL-SG108E's panel: its fit in the rack, the case's way in, the
+82 for the TL-SG108E's panel: its fit in the rack, the case's way in, the
 channels, stops and fingers, the M6 joint between the middle and the ears,
-and that every part prints face down with nothing overhung.
+that nothing stands out behind the ears to catch on the posts, and that
+every part prints with nothing overhung.
 Among them:
 
 - each body is one valid solid, built from sketches, and fits the bed;
