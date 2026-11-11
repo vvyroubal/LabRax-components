@@ -123,18 +123,18 @@ KITS = [
         "key": "sg108e",
         "out": "TL_SG108E_LabRax-A1mini.3mf",
         "title": "TL-SG108E rack panel for a Lab Rax 10 inch rack",
-        # A panel of its own, front posts only: no chassis, and everything on
-        # one plate. The halves lie face down, as the panel they are drawn
-        # after does, with the arms standing 106.5 up; the splices lie flat,
-        # one in front of them and one behind. Nothing on it needs support.
+        # A panel of its own, front posts only: no chassis. The middle lies
+        # face down, as the panel it is drawn after does, with the arms
+        # standing 106.5 up; at 196 wide it goes on turned 45 degrees. The
+        # ears lie face down on a plate of their own. Nothing needs support.
         "plates": [
-            ("TL-SG108E 1 of 1 - panel halves and splices", [
-                ("panel_sg108e_l", (90.0, 58.0), [("x", 90)], NO_BRIM),
-                ("panel_sg108e_r", (90.0, 120.0), [("x", 90)], NO_BRIM),
-                ("splice_top_sg108e", (90.0, 17.5), [("x", 90)],
+            ("TL-SG108E 1 of 2 - panel", [
+                ("panel_sg108e", (90.0, 90.0), [("x", 90), ("z", 45)],
                  NO_BRIM),
-                ("splice_bottom_sg108e", (90.0, 162.5),
-                 [("x", 90)], NO_BRIM),
+            ]),
+            ("TL-SG108E 2 of 2 - ears", [
+                ("ear_sg108e_l", (55.0, 90.0), [("x", 90)], NO_BRIM),
+                ("ear_sg108e_r", (125.0, 90.0), [("x", 90)], NO_BRIM),
             ]),
         ],
     },

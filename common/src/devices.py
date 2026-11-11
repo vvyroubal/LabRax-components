@@ -201,8 +201,8 @@ class Device(object):
         if self.bare:
             return ()
         if self.panel:
-            return (self.part("panel_l"), self.part("panel_r"),
-                    self.part("splice_top"), self.part("splice_bottom"))
+            return (self.part("panel"), self.part("ear_l"),
+                    self.part("ear_r"))
         return tuple(self.part(b) for b in ("tray_l", "tray_r", "faceplate"))
 
     @property

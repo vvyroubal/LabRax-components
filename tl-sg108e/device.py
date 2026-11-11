@@ -17,9 +17,12 @@ from devices import Device
 # and-faceplate kits came before it and both were no good in print: the case
 # sat 8 mm behind a 4 mm border, then in a full opening on a tray.
 #
-# The panel is 254 wide and the bed 180, so it is two halves joined behind
-# the opening's bars by two splice plates and four M3 x 16 with nuts. All
-# four parts go on one A1 mini plate, the halves face down.
+# The panel is 254 wide and the bed 180, so it is three pieces: a middle
+# carrying the case, face down and turned 45 degrees on one plate, and two
+# ears on another. Each ear's flange is bolted sideways to a tab on the end of
+# the middle with two M6 x 12 into M6 nuts: every screw in it is an M6. The
+# joint is beside the opening because the bars above and below it are too
+# thin for an M6 nut.
 #
 # Its power jack is on the BACK; the panel is open behind the case.
 DEVICE = Device(

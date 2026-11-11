@@ -8,7 +8,7 @@ Lab Rax 1U rack panel for TP-Link TL-SG108E, A1 mini
 
 ## Summary
 
-A 1U rack panel for a TP-Link TL-SG108E 8-port switch in a Lab Rax 10 inch rack. The switch's whole face shows, flush with the front. Front posts only, one A1 mini plate, no support.
+A 1U rack panel for a TP-Link TL-SG108E 8-port switch in a Lab Rax 10 inch rack. The switch's whole face shows, flush with the front. Front posts only, M6 throughout, two A1 mini plates, no support.
 
 ## Tags
 
@@ -21,8 +21,8 @@ Isometric views from FreeCAD, in `../images/`, 1200 x 1600 (3:4) on white:
 1. `makerworld-sg108e-assembled.png` — cover picture: the panel with the
    switch in place, from the front.
 2. `makerworld-sg108e-empty.png` — the panel without the switch, from behind,
-   showing the arms, the fingers and the splices.
-3. `makerworld-sg108e-exploded.png` — the four printed parts and the switch,
+   showing the arms, the fingers and the joints to the ears.
+3. `makerworld-sg108e-exploded.png` — the three printed parts and the switch,
    drawn apart to show how they go together.
 
 The switch is shown as a plain translucent block the size of its case.
@@ -53,39 +53,44 @@ front, power jack at the back. The panel is open behind the switch.
 
 **What is in the file**
 
-One plate, already arranged for a Bambu Lab A1 mini (180 x 180 mm bed):
+Two plates, already arranged for a Bambu Lab A1 mini (180 x 180 mm bed):
 
-- the left and right halves of the panel, face down
-- two small splice plates that join them
+- Plate 1: the middle of the panel, face down and turned 45 degrees: the
+  plate round the opening, both arms, the fingers and the stops
+- Plate 2: the two ears
 
-A 254 mm panel will not fit a 180 mm bed any way round, so it is split down
-the middle. Each half prints face down with its arm standing up, 106.5 mm
-tall. Nothing is overhung past 45 degrees, so no support is needed.
+A 254 mm panel will not fit a 180 mm bed any way round, so the ears are
+separate. Every part prints face down with its walls standing up. Nothing is
+overhung past 45 degrees, so no support is needed.
 
 **Printing**
 
 - Material: PETG. PLA will work in a cool room.
 - Profile: 0.20 mm Standard for the A1 mini, as carried in the file. 2 walls,
   15% infill.
-- Filament: about 86 g.
-- Time: about 4 hours.
+- Filament: about 92 g for both plates.
+- Time: about 4 h 30 min for both plates.
 
 **Hardware to buy**
 
-- 6 x M6 x 12 button head screws and 6 x M6 washers (12.5 mm outside
-  diameter), for the rack
-- 4 x M3 x 16 screws and 4 x M3 nuts, for the splice
+Every screw is the same: M6 x 12 button head.
 
-The rack's posts already hold the nuts for the M6 screws. The washers are
-needed: the screws go through slots, and a bare screw head will sink into
-the plastic.
+- 10 x M6 x 12 button head screws
+- 6 x M6 washers (12.5 mm outside diameter), for the rack
+- 4 x M6 nuts (10 mm across the flats), for the ears
+
+The rack's posts already hold the nuts for the six rack screws. The washers
+are needed: those screws go through slots, and a bare screw head will sink
+into the plastic.
 
 **Assembly**
 
-1. Drop an M3 nut into each of the four slots in the halves' joint faces.
-2. Butt the two halves together. Lay a splice plate across the back of the
-   top bar and one across the bottom bar, and put an M3 x 16 through each
-   hole into its nut.
+1. Drop an M6 nut into each of the four slots in the tabs at the ends of the
+   middle piece: the upper ones from the top edge, the lower ones from the
+   bottom edge, flats against the sides of the slot.
+2. Hold each ear's flange against the end of its tab and put two M6 x 12
+   through the flange into the nuts. Do this on the bench: in the rack there
+   is no room beside the posts for a driver.
 3. Bolt the panel to the front posts with six M6 x 12 and washers.
 4. Slide the switch in through the opening until it stops.
 
@@ -93,8 +98,9 @@ To take the switch out, pull it forward by its sides.
 
 **Good to know**
 
-- Once it is in the rack each half is held by its own three screws. The
-  splice only has to hold the halves together while you handle the panel.
+- The ears join the middle beside the opening, where the panel is full
+  height. There is no room for an M6 nut in the thin bars above and below
+  the opening.
 - If the switch is loose, the fingers' grip is `PNL_GRIP` in the source, 1 mm.
   If it is tight in the channels, raise `PNL_CLR` from 0.5.
 - Case dimensions are TP-Link's published figures. Measure your unit before

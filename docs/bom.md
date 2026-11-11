@@ -13,7 +13,7 @@ well, so whichever you open is a complete build: print all six plates.
 |---|---|---|
 | `ucg-fiber/UCG_Fiber_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 UCG-Fiber | 261.0 g, 11 h 23 |
 | `usw-flex-mini/USW_Flex_LabRax-A1mini.3mf` | 1–3 chassis, 4–6 USW-Flex | 248.7 g, 11 h 09 |
-| `tl-sg108e/TL_SG108E_LabRax-A1mini.3mf` | 1 its own panel, no chassis | 86.0 g, 3 h 58 |
+| `tl-sg108e/TL_SG108E_LabRax-A1mini.3mf` | 1 its panel's middle, 2 its ears; no chassis | 92.4 g, 4 h 27 |
 | `nuc6i7kyk/NUC6i7KYK_LabRax-A1mini.3mf` | 1–2 its own sides, 3 the rear legs; nothing else | 111.0 g, 5 h 22 |
 
 Every plate carries its own label in Bambu Studio — `Chassis 2 of 3 - right
@@ -25,7 +25,7 @@ belongs to.
 | chassis | `side_l`, `side_r`, `leg_l`, `leg_r` | 112.1 g | 5 h 46 |
 | UCG-Fiber | `tray_ucg_l`, `tray_ucg_r`, `faceplate_ucg` | 149.0 g | 5 h 37 |
 | USW-Flex-2.5G-5 | `tray_usw_l`, `tray_usw_r`, `faceplate_usw` | 136.7 g | 5 h 22 |
-| TL-SG108E | `panel_sg108e_l`, `panel_sg108e_r`, `splice_top_sg108e`, `splice_bottom_sg108e`; no chassis | 86.0 g | 3 h 58 |
+| TL-SG108E | `panel_sg108e`, `ear_sg108e_l`, `ear_sg108e_r`; no chassis | 92.4 g | 4 h 27 |
 | NUC6i7KYK | `side_nuc_l`, `side_nuc_r` in place of `side_l`, `side_r`; no tray, no faceplate | 71.0 g | 3 h 27 |
 
 **Each bracket needs a chassis of its own.** Plate 3, the rear legs, is
@@ -45,7 +45,8 @@ Plate by plate:
 | 4* | `tray_usw_l` | 136.5 × 128.4 × 19.6 | 42.5 g | 1 h 37 | yes |
 | 5* | `tray_usw_r` | 136.5 × 128.4 × 19.6 | 55.5 g | 2 h 05 | yes |
 | 6* | `faceplate_usw` | 213.6 × 20 × 44.5 | 38.6 g | 1 h 40 | no |
-| 1† | `panel_sg108e_l` + `panel_sg108e_r` + both splices | 127 × 106.5 × 44.5 each, face down | 86.0 g | 3 h 58 | no |
+| 1† | `panel_sg108e` | 196 × 106.5 × 44.5, face down, turned 45° | 74.8 g | 3 h 24 | no |
+| 2† | `ear_sg108e_l` + `ear_sg108e_r` | 29 × 36.5 × 44.5 each, face down | 17.7 g | 1 h 03 | no |
 | 1‡ | `side_nuc_l` | 36 × 212.5 × 44.5 | 35.5 g | 1 h 44 | yes |
 | 2‡ | `side_nuc_r` | 36 × 212.5 × 44.5 | 35.5 g | 1 h 43 | yes |
 

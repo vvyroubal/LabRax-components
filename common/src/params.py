@@ -457,14 +457,19 @@ M6_HEX_D = 5.0      # [rack] nut thickness
 # own, bolted to the front posts only, that it slides into from the front and
 # that holds it in a channel along each side. This is the TL-SG108E's. It is
 # drawn after a rack panel made for that switch, one piece 254 wide and 104.5
-# deep -- which no orientation puts on a 180 mm bed. So it is split down the
-# middle into two mirrored halves, each 127 wide, printed face down with the
-# arms standing up as the original is, and joined behind the opening's top
-# and bottom bars by two small splice plates and four M3.
+# deep -- which no orientation puts on a 180 mm bed.
 #
-# Once it is in the rack each half is held by its own three M6, so the splice
-# carries nothing but handling. The switch itself, sitting in both channels,
-# ties the halves together as well.
+# So it is three pieces, and every screw in it is an M6. The middle is one
+# piece: the plate round the opening, the frame behind it, both arms, the
+# fingers and the stops. Printed face down and turned 45 degrees it is 170
+# corner to corner on the bed. The two ears are plates of their own, bolted
+# to tabs on the ends of the middle with two M6 x 12 each into nuts slid into
+# slots in the tabs' ends -- the joint the faceplates use, at the same
+# heights.
+#
+# The joint cannot be in the middle. An M6 nut is 10.1 across its flats, and
+# the bars above and below a 26 mm opening are 8.2 tall: there is nowhere on
+# the centreline an M6 fits. Beside the opening the plate is the full 44.45.
 #
 # Y here is as everywhere: 0 at the front face of the front posts. The panel
 # is the ear, in front of them.
@@ -480,9 +485,8 @@ PNL_STOP_IN = 4.0      # [design] the rear stop at the end of each channel
                        # reaches this far in over the case's back,
 PNL_STOP_CLR = 1.0     # [design] this far behind it. Its face is at 45
                        # degrees, so it is not an overhang printed face down
-PNL_GUSSET_X1 = 108.0  # [design] the gusset outside each arm: out to here on
-PNL_GUSSET_Y1 = 40.0   # [design] the panel, back to here along the arm. 3 mm
-                       # inside the posts' 111.125
+PNL_GUSSET_Y1 = 40.0   # [design] the gusset outside each arm runs out to
+                       # the tab's end on the plate and back to here
 # The finger on top. With nothing in front of the case, this is what keeps it
 # in: a strip off the back of the frame's top bar, lying over the case, with
 # a ramped bump that presses down on it. Printed face down it stands upright,
@@ -495,14 +499,22 @@ PNL_FING_L = 36.0      # [design] from the back of the frame
 PNL_GRIP = 1.0         # [design] how far the bump presses into the case
 PNL_BUMP_RAMP = 5.0    # [design] its ramps; the front one is what the case
 PNL_BUMP_FLAT = 3.0    # [design] rides up going in
-# The splice. Each plate lies against the back of a bar, across the joint,
-# with an M3 each side into a nut slid into the bar from the joint face.
-PNL_SPLICE_HW = 24.0   # [design] half its length
-PNL_SPLICE_T = 6.0     # [design] its thickness, fore and aft
-PNL_SPLICE_CLR = 0.5   # [design] it stops this far short of the case
-PNL_M3_X = 12.0        # [design] the screws, either side of the joint
-M3_CLEAR = 3.4         # [design]
-M3_NUT_AF = 5.5        # [design] DIN 934
-M3_NUT_T = 2.4         # [design]
-M3_SCREW_LEN = 16.0    # [design] M3 x 16 from the back of the splice
-PNL_NUT_FIT = 0.3      # [design] room for the nut in its slot
+# The ears, and how they join the middle. The middle's plate runs out to
+# PNL_TAB_X1 and the ear's from there to the edge, flush with it. Behind the
+# joint the middle has a solid tab, merging with the arm, and the ear a flange
+# that lies against the tab's end. Two M6 x 12 go through the flange into the
+# tab, sideways, into nuts dropped into slots from the tab's top and bottom
+# edges. Both parts print face down with every wall upright: a lap in front
+# of the plate would leave one of them hanging 6.5 mm off the bed.
+PNL_TAB_X0 = 86.0      # [design] the tab's inner face, in the arm's wall
+PNL_TAB_X1 = 98.0      # [design] its end, where the ear starts. The middle
+                       # is twice this wide: 196, which is 170 diagonally
+                       # with 44.45 and goes on the bed with 5 mm to spare
+PNL_TAB_D = 30.0       # [design] how far back the tab and the flange run
+PNL_FLANGE_T = 6.0     # [design] the ear's flange. A 12 mm screw through it
+                       # ends 6 mm into the tab: a 5 mm nut 0.5 in from the
+                       # end face is threaded right through. Its head stands
+                       # 7.3 inside the posts' 111.125
+PNL_JOIN_Y = 15.0      # [design] the joint's screws, halfway back the tab,
+                       # at BAR_SCREW_Z and BOT_SCREW_Z like the faceplates'
+PNL_NUT_IN = 0.5       # [design] the nut's near face, in from the tab's end

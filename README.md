@@ -27,7 +27,7 @@ a bracket. The 3MF files are complete.
 
 1. **Print.** Open the 3MF in your device's folder in Bambu Studio and print
    all six plates, in PETG. See [Printing](#printing). The TL-SG108E's
-   file has one plate: it goes in a panel of its own, see
+   file has two plates: it goes in a panel of its own, see
    [The TL-SG108E's panel](#the-tl-sg108es-panel).
 2. **Buy.** 16 × M6 × 12 button-head screws, 4 × M6 nuts, 12 × M6 washers.
    See [Fasteners](#fasteners).
@@ -96,8 +96,8 @@ its own pair of sides and the shared rear legs, and no tray or faceplate.
 | `faceplate_ucg` | 213.6 × 20 × 44.5 | 1 | UCG-Fiber |
 | `tray_usw_l` / `tray_usw_r` | 136.5 × 128.4 × 19.6 | 1 each | Flex Mini |
 | `faceplate_usw` | 213.6 × 20 × 44.5 | 1 | Flex Mini |
-| `panel_sg108e_l` / `panel_sg108e_r` | 127 × 106.5 × 44.5 | 1 each | TL-SG108E, no chassis |
-| `splice_top_sg108e` / `splice_bottom_sg108e` | 48 × 6 × 8.2 | 1 each | TL-SG108E |
+| `panel_sg108e` | 196 × 106.5 × 44.5 | 1 | TL-SG108E, no chassis |
+| `ear_sg108e_l` / `ear_sg108e_r` | 29 × 36.5 × 44.5 | 1 each | TL-SG108E |
 | `side_nuc_l` / `side_nuc_r` | 36 × 212.5 × 44.5 | 1 each | NUC6i7KYK, in place of `side_l` / `side_r` |
 
 **Four of the seven are a chassis that takes no notice of what is in it.**
@@ -142,7 +142,7 @@ every file — print them once per bracket — except in the NUC's, whose plates
 | 1–3 | chassis (in every file) | 112.1 g | 5 h 46 |
 | 4–6 | UCG-Fiber | 149.0 g | 5 h 37 |
 | 4–6 | Flex Mini 2.5G | 136.7 g | 5 h 22 |
-| 1 | TL-SG108E panel, the whole bracket | 86.0 g | 3 h 58 |
+| 1–2 | TL-SG108E panel and ears, the whole bracket | 92.4 g | 4 h 27 |
 
 A chassis and one kit is about 261 g for the gateway and 249 g for the Flex
 Mini. Print in **PETG**: a gateway running IDS/IPS gets warm enough that PLA
@@ -318,75 +318,40 @@ its own**, drawn after a panel made for this switch, and bolted to the
   edges. A gusset braces each arm to the panel. A 45° stop at the end of each
   channel catches the case's back edge 1 mm behind home, so pushing a plug in
   cannot push the switch back.
-- **A finger on each half** lies over the case's top, with a ramped bump that
+- **A finger each side** lies over the case's top, with a ramped bump that
   presses 1 mm into it (about 3.5 N). That, with the channels, is what keeps
   the switch in. It slides in and out **through the front**, with the panel
   in the rack.
-- **It is two halves.** 254 mm will not go on a 180 mm bed any way round, so
-  the panel splits down the middle. Each half prints **face down**, as the
-  original does, 127 × 44.5 on the bed and 106.5 tall. Nothing is overhung
-  past 45°, and the only bridges are the nut slots' 6 mm roofs, so no support
-  is needed. The halves are joined behind the opening's top and bottom bars
-  by two **splice plates** and **4 × M3 × 16 with 4 × M3 nuts**. The nuts
-  slide into slots in the joint faces before the halves are put together.
-  Once the panel is in the rack each half is held by its own three M6, so
-  the splice only matters while you handle it.
+- **It is three pieces, and every screw is an M6.** 254 mm will not go on a
+  180 mm bed any way round. The **middle** carries everything but the ears:
+  the plate out to x = ±98, the frame, both arms, the fingers and the stops.
+  At 196 wide it goes on the bed face down and turned 45°, 170 mm corner to
+  corner. The two **ears** carry the rack slots. A joint in the middle of
+  the panel cannot take an M6: the bars above and below the opening are
+  8.2 mm tall and an M6 nut is 10.1 across its flats. So the joint is where
+  the panel is full height, beside the opening.
+- **The joint.** Behind each end of the middle's plate stands a solid tab,
+  12 × 30 mm and the full height of the U, merged with the arm. Each ear has
+  a 6 mm flange behind it that lies against the tab's end face. **Two
+  M6 × 12 per side** go sideways through the flange into **M6 nuts** dropped
+  into slots in the tab, the upper one from the tab's top edge and the lower
+  one from its bottom edge. The slots are as wide as a nut across its flats,
+  so it cannot turn, and the screw runs right through it. The heads stand
+  7 mm inside the posts.
 
-Both halves and both splices go on **one plate**: 86 g and about 4 hours.
+Every part prints **face down** with every wall upright. The only bridges
+are the nut slots' 5.6 mm roofs and the tops of the four sideways holes, so
+nothing needs support. Two plates: the middle (74.8 g, 3 h 24) and both ears
+(17.7 g, 1 h 03).
 
-**Assembly:** drop an M3 nut into each of the four slots in the halves'
-joint faces. Butt the halves together, lay a splice across the back of each
-bar, and put an M3 × 16 through each hole into its nut. Bolt the panel to
-the front posts with six M6 × 12 and washers, then slide the switch in
-through the front until it stops.
+**Hardware:** 10 × M6 × 12 button head, 6 × M6 washers, 4 × M6 nuts.
 
-**The NUC** is 233 × 143 × 40 measured whole, where Intel quote
-211 × 116 × 28. That is wider than the bay and too tall for a tray and a
-flange in one U, so it goes in **bare**. Its own sides, `side_nuc_l` and
-`side_nuc_r`, have the rail and the rear stop cut down for the whole depth of
-the case, and stand it on a **seat** 3.5 mm thick and 19.2 mm wide, joined
-across its whole width into a chin on the ear at the front and into a
-**yoke** round the leg at the back: a solid wall the full height of the U
-across the whole seat, behind the case and in front of the leg; a web
-carrying on from it inboard of the leg under a flange over the leg's top;
-and the rail raised to meet the flange -- a channel 44 mm deep over the leg.
-The web stops 15 mm off the floor so the catch's tab can still be reached.
-The seat is as wide as a side can be and still go on the bed. The NUC stands
-on the two seats, between the rack's posts, with its face 0.5 mm behind the
-ears and its back 0.5 mm short of the runners' tongues: the ears overlap its
-ends by 22.5 mm and stop it coming forward, the tongues stop it going back.
-Where the leg runs on them, and at the ear, its sides are the shared
-sides exactly, so they ride the same rear legs.
-
-**These sides are for a rack 240 mm deep** over the outside of its posts,
-the depth of the rack the NUC went into. The legs are fixed to the rear
-posts, so a deeper rack puts them further back; at 240 mm their front is at
-155, which leaves room for the wall behind the case. In a shallower rack the
-legs come forward into the wall. `BARE_RACK_D` in `common/src/params.py`
-sets it, and `verify` sweeps the leg against the side from home to the
-catch's stop at that depth.
-
-The seat is the one thing under the case, and the U leaves it 3.5 mm. Run
-through CalculiX in FreeCAD's FEM workbench, one side with its ear clamped
-and its tongue held where the leg holds it, the NUC's own weight peaks at
-about 1.6 MPa against the 35–50 MPa printed PETG takes, some 20 times over.
-Fifty newtons pressed on one seat -- someone leaning on the NUC -- is about
-23 MPa, and 20 N pushed sideways about 4 MPa. The highest stress is now
-where the seat meets the ear, not behind the case: the wall took the
-seat-to-rail corner from the worst place on the part to an ordinary one.
-
-The NUC draws its air through its underside, and with no tray there is nothing under it but the U below.
-
-Because nothing ties the two sides together at the front, put the NUC on the
-sides on the bench and slide all three in together. The ears are in front of
-its ends, so it cannot go in after them. In the rack's model the front
-screws' tips reach 1.2 mm past where a 233 mm case's front corners are; in a
-rack the NUC passes, they are inside the post, but look before you tighten.
-
-A frame's border is what keeps the case in, and it does so absolutely rather
-than by friction: the case is wider and taller than the hole.
-
-![the Flex Mini, assembled](usw-flex-mini/images/assembly-usw-iso.png)
+**Assembly:** drop an M6 nut into each of the four slots in the middle's
+tabs, flats against the slot's sides. Hold each ear's flange against its
+tab and put two M6 × 12 through the flange into the nuts. This is done on
+the bench: in the rack there is no room beside the posts for a driver. Bolt
+the panel to the front posts with six M6 × 12 and washers, then slide the
+switch in through the front until it stops.
 
 ## Orientation and cooling
 
@@ -481,9 +446,9 @@ Then add its three plates to `KITS` in `common/tools/plate.py` and run `make`.
 that silently does nothing is caught rather than assumed away: 195 checks for
 the gateway, 194 for the Flex Mini, 35 for the NUC, which has no tray or
 faceplate to check and whose sides are checked against the shared ones, and
-70 for the TL-SG108E's panel: its fit in the rack, the case's way in, the
-channels, stops and fingers, the splice's screws and nuts, and that each
-half prints face down with nothing overhung.
+79 for the TL-SG108E's panel: its fit in the rack, the case's way in, the
+channels, stops and fingers, the M6 joint between the middle and the ears,
+and that every part prints face down with nothing overhung.
 Among them:
 
 - each body is one valid solid, built from sketches, and fits the bed;
