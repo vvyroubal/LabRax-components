@@ -94,7 +94,7 @@ class Frame(object):
 class Device(object):
     def __init__(self, key, name, doc, w, d, h, mass_g, front=None, keys_y=(),
                  plinth=0.0, vent=False, clr_w=None, clr_h=None, clr_d=None,
-                 bare=False, panel=False):
+                 bare=False, panel=False, feet=None, keyhole=None):
         self.key = key
         self.name = name
         self.doc = doc
@@ -121,6 +121,13 @@ class Device(object):
         # slides in through the panel's opening and runs in a channel along
         # each side. See PNL_* in params.
         self.panel = panel
+        # Feet under the case, as (diameter, height, centre in from the side
+        # edge). The case's own height is h, without them.
+        self.feet = feet
+        # A keyhole in the case's underside, one near each end, as (its near
+        # and far edges back from the front face, its centre in from the
+        # side edge). A panel catches the case by it.
+        self.keyhole = keyhole
 
     # --- where the case sits ------------------------------------------------
     @property

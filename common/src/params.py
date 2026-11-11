@@ -519,3 +519,26 @@ PNL_JOIN_X = 92.5      # [design] the joint's screws, at BAR_SCREW_Z and
                        # stays on the middle's plate, short of the seam
 PNL_EAR_FIT = 0.2      # [design] between the ear and the middle, at the
                        # seam and at the end of the tongue
+# The case's feet and its keyholes (Device.feet, Device.keyhole).
+#
+# The feet are behind the case's face, so they have to come in through the
+# opening. A groove for each pair runs from the opening's bottom edge right
+# back along the channel, deep enough to clear them. The case's body rides
+# on what is left of the bottom lip beside the wall, and at the front on the
+# frame's bottom bar between the grooves.
+#
+# The keyholes are what keeps it in. Under each one, a finger like the one on
+# top -- off the frame's bottom bar, lying under the case -- carries a narrow
+# ramped bump. Going in, the case rides the bump down; at home the bump
+# springs up into the keyhole. Coming out takes a deliberate pull over the
+# ramp. 3 x 6 x 33 of PETG deflected 1.3 mm pushes back with about 3 N.
+PNL_LEDGE = 2.0        # [design] what the bottom lip keeps beside the wall,
+                       # under the case's edge, where the groove leaves off
+PNL_FOOT_CLR = 0.5     # [design] under the feet, and round them in the groove
+PNL_KEY_IN = 0.8       # [design] how far the bump stands up into a keyhole
+PNL_KEY_W = 3.0        # [design] its width across the bay: under a keyhole's
+                       # slot as well as its round end
+PNL_KEY_RAMP = 2.5     # [design] its ramps, front and back
+PNL_KEY_FLAT = 2.0     # [design] and its flat top, centred on the keyhole
+PNL_KEY_FING_W = 6.0   # [design] the finger under it
+PNL_KEY_FING_T = 3.0   # [design]

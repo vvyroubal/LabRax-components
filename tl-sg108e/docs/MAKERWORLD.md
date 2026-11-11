@@ -31,12 +31,14 @@ The switch is shown as a plain translucent block the size of its case.
 
 **A 1U rack panel for the TP-Link TL-SG108E Easy Smart switch, for a Lab Rax 10 inch rack.**
 
-The switch slides in from the front through a 159 x 26 mm opening and stands
+The switch slides in from the front through a 159 x 27 mm opening and stands
 in it with its face flush with the panel. Nothing covers its ports or LEDs.
 Behind the panel an arm runs along each side of the switch: a channel whose
 lips reach over its top and bottom edges, with a stop at the back so pushing
-a plug in cannot push the switch back. A sprung finger on each side presses
-on its top and holds it in place.
+a plug in cannot push the switch back. Its rubber feet stay on and run in a
+groove each side. When it is home, a sprung bump under each end clicks up
+into the switch's own wall-mounting keyhole, and a sprung finger on each
+side presses on its top.
 
 It bolts to the front posts only. The switch weighs about 250 g, so it needs
 nothing at the back.
@@ -48,8 +50,9 @@ https://makerworld.com/en/collections/5813742-lab-rax
 
 **The device**
 
-TP-Link TL-SG108E Easy Smart switch, 158 x 101 x 25 mm. Ports and LEDs at the
-front, power jack at the back. The panel is open behind the switch.
+TP-Link TL-SG108E Easy Smart switch (v6), 158 x 101.3 x 26 mm measured,
+plus four rubber feet 3.5 mm tall. Ports and LEDs at the front, power jack at
+the back. The panel is open behind the switch.
 
 **What is in the file**
 
@@ -67,8 +70,8 @@ separate. Nothing is overhung past 45 degrees, so no support is needed.
 - Material: PETG. PLA will work in a cool room.
 - Profile: 0.20 mm Standard for the A1 mini, as carried in the file. 2 walls,
   15% infill.
-- Filament: about 83 g for both plates.
-- Time: about 4 h 15 min for both plates.
+- Filament: about 87 g for both plates.
+- Time: about 4 h 20 min for both plates.
 
 **Hardware to buy**
 
@@ -90,9 +93,11 @@ into the plastic.
    the arm, and drive two M6 x 12 from the front through the plate into the
    nuts.
 3. Bolt the panel to the front posts with six M6 x 12 and washers.
-4. Slide the switch in through the opening until it stops.
+4. Slide the switch in through the opening, feet down, until it clicks
+   into place and stops.
 
-To take the switch out, pull it forward by its sides.
+To take the switch out, pull it forward firmly by its sides: the bumps ride
+out of the keyholes.
 
 **Good to know**
 
@@ -101,8 +106,9 @@ To take the switch out, pull it forward by its sides.
   posts.
 - If the switch is loose, the fingers' grip is `PNL_GRIP` in the source, 1 mm.
   If it is tight in the channels, raise `PNL_CLR` from 0.5.
-- Case dimensions are TP-Link's published figures. Measure your unit before
-  printing.
+- The depth, height, feet and keyholes were measured on a v6 unit. The
+  feet's grooves take a foot centred anywhere 8.5 to 14 mm in from the side
+  edge; check yours before printing.
 
 **Source, other devices and full documentation**
 

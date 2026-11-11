@@ -264,10 +264,12 @@ def panel_device(parts, dev):
                   "on %s" % (x, z, e), "%.0f mm3 under its washer" % vs)
 
     print("\n[the case]")
-    # The bump presses into the case's top by design: leave that out of the
-    # case it is checked against, and check it on its own below.
+    # The finger's bump presses into the case's top, and the keyhole bumps
+    # stand up into its underside, by design: leave those out of the case it
+    # is checked against, and check them on their own below.
     top = dev.z1 - P.PNL_GRIP - 0.05
-    case = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d, dev.z0, top)
+    bot = dev.z0 + (P.PNL_KEY_IN + 0.05 if dev.keyhole else 0.0)
+    case = box(-dev.w / 2, dev.w / 2, dev.y0, dev.y0 + dev.d, bot, top)
     check(vol(asm.common(case)) < VOID, "it sits without interference",
           "%.3f mm3" % vol(asm.common(case)))
     check(abs((dev.z0 + dev.z1) / 2 - P.RACK_U / 2) < 0.05,
@@ -278,22 +280,27 @@ def panel_device(parts, dev):
           "its whole face shows, flush with the front of the panel",
           "%.3f mm3 over it" % vol(asm.common(face)))
     path = box(-dev.w / 2, dev.w / 2, dev.y0 - 150.0, dev.y0 + dev.d,
-               dev.z0, top)
+               bot, top)
     check(vol(asm.common(path)) < VOID,
           "it slides in through the opening from the front",
           "%.3f mm3 in its way" % vol(asm.common(path)))
     y0, y1 = dev.y0 + P.PNL_T + 1.0, dev.y0 + dev.d - 1.0
     for sx in (-1, 1):
         side = "left" if sx < 0 else "right"
-        lip = xbox(sx * n.lip_x, sx * dev.w / 2, y0, y1, 0, 1)
-        under = vol(mid.common(xbox(sx * n.lip_x, sx * dev.w / 2,
+        # Under the case's edge the lip is the ledge the feet's groove
+        # leaves beside the wall; over it, the full lip.
+        lo_x = n.ledge_x if dev.feet else n.lip_x
+        lip_u = xbox(sx * lo_x, sx * dev.w / 2, y0, y1, 0, 0.4)
+        lip_o = xbox(sx * n.lip_x, sx * dev.w / 2, y0, y1, 0, 0.4)
+        under = vol(mid.common(xbox(sx * lo_x, sx * dev.w / 2,
                                     y0, y1, dev.z0 - 1.0, dev.z0 - 0.6)))
         over = vol(mid.common(xbox(sx * n.lip_x, sx * dev.w / 2,
                                    y0, y1, dev.z1 + 0.6, dev.z1 + 1.0)))
-        want = 0.9 * vol(lip) * 0.4
-        check(under > want and over > want,
-              "the %s channel's lips run over its edges, top and bottom, "
-              "the whole depth" % side, "%.0f / %.0f mm3" % (under, over))
+        check(under > 0.9 * vol(lip_u) and over > 0.9 * vol(lip_o),
+              "the %s channel carries its edge the whole depth, %.1f mm "
+              "under it and %.1f over it" % (side, dev.w / 2 - lo_x,
+                                             dev.w / 2 - n.lip_x),
+              "%.0f / %.0f mm3" % (under, over))
         gap = vol(mid.common(xbox(sx * dev.w / 2, sx * (n.hw - 0.05),
                                   y0, y1, dev.z0, dev.z1)))
         wall = vol(mid.common(xbox(sx * (n.hw + 0.05), sx * (n.hw + 1.0),
@@ -324,6 +331,59 @@ def panel_device(parts, dev):
           "each finger presses firmly, well inside the plastic's range",
           "%.1f N at %.1f mm, %.2f%% strain" % (k * P.PNL_GRIP, P.PNL_GRIP,
                                                 100 * strain))
+    if dev.feet:
+        fd, fh, fside = dev.feet
+        lo_c = P.PNL_LEDGE + fd / 2.0 + P.PNL_FOOT_CLR
+        hi_c = dev.w / 2.0 - n.groove_x0 - fd / 2.0 - P.PNL_FOOT_CLR
+        check(lo_c <= fside <= hi_c,
+              "its feet, %.0f across, fit their groove centred %.1f in from "
+              "the side" % (fd, fside),
+              "anywhere from %.1f to %.1f in would" % (lo_c, hi_c))
+        for sx in (-1, 1):
+            # Every place a foot can be across the groove, the whole way in.
+            for c in (lo_c, fside, hi_c):
+                fx = sx * (dev.w / 2.0 - c)
+                foot = xbox(fx - fd / 2.0, fx + fd / 2.0, dev.y0 - 150.0,
+                            dev.y0 + dev.d, dev.z0 - fh, dev.z0)
+                v = vol(asm.common(foot))
+                check(v < VOID, "a foot %.1f in from the %s side passes in "
+                      "and sits clear" % (c, "left" if sx < 0 else "right"),
+                      "%.3f mm3 in its way" % v)
+    if dev.keyhole:
+        ka, kb = n.key_y_span
+        for sx in (-1, 1):
+            side = "left" if sx < 0 else "right"
+            kx = sx * n.key_x
+            bump = mid.common(xbox(kx - 3.0, kx + 3.0, dev.y0, dev.y0 + dev.d,
+                                   dev.z0, dev.z0 + 5.0))
+            bb = bump.BoundBox
+            check(vol(bump) > 3.0
+                  and abs(bb.ZMax - (dev.z0 + P.PNL_KEY_IN)) < 0.05,
+                  "the %s keyhole bump stands %.1f mm up into the case"
+                  % (side, P.PNL_KEY_IN), "%.1f mm3" % vol(bump))
+            top_ = mid.common(xbox(kx - 3.0, kx + 3.0, dev.y0, dev.y0 + dev.d,
+                                   dev.z0 + 0.1, dev.z0 + 5.0)).BoundBox
+            check(ka + 0.5 <= top_.YMin and top_.YMax <= kb - 0.5
+                  and abs(bb.XMin - (kx - P.PNL_KEY_W / 2)) < 0.05
+                  and abs(bb.XMax - (kx + P.PNL_KEY_W / 2)) < 0.05,
+                  "and what stands above the case's underside is inside the "
+                  "keyhole", "y %.1f..%.1f in %.1f..%.1f, %.1f wide at x=%+.1f"
+                  % (top_.YMin, top_.YMax, ka, kb, P.PNL_KEY_W, kx))
+            room = xbox(kx - P.PNL_KEY_FING_W / 2, kx + P.PNL_KEY_FING_W / 2,
+                        P.PNL_SLEEVE_D + 1.0, n.key_y + 5.0,
+                        n.key_z0 - P.PNL_KEY_IN - 1.0, n.key_z0 - 0.05)
+            check(vol(asm.common(room)) < VOID,
+                  "and its finger has room to spring down under the case",
+                  "%.3f mm3 under it" % vol(asm.common(room)))
+        L = n.key_y + P.PNL_KEY_FLAT / 2 + P.PNL_KEY_RAMP + 1.5 \
+            - P.PNL_SLEEVE_D
+        k = 3 * e_ * (P.PNL_KEY_FING_W * P.PNL_KEY_FING_T ** 3 / 12.0) / L ** 3
+        dz = P.PNL_KEY_IN + P.PNL_CLR
+        strain = 1.5 * P.PNL_KEY_FING_T * dz / L ** 2
+        check(1.5 <= k * dz <= 15.0 and strain < 0.01,
+              "each keyhole finger springs %.1f mm with the case going over "
+              "it, well inside the plastic's range" % dz,
+              "%.1f N, %.2f%% strain over %.0f mm" % (k * dz, 100 * strain, L))
     span = box(-dev.w / 2, dev.w / 2, dev.y0 + dev.d, dev.y0 + dev.d + 30,
                dev.z0, dev.z1)
     open_ = 1.0 - vol(asm.common(span)) / (dev.w * 30 * dev.h)

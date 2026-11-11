@@ -43,7 +43,7 @@ two small test pieces tell you whether the sliding joint fits on your printer.
 |---|---|---|---|---|
 | **UniFi Cloud Gateway Fiber** | `UCG-Fiber` | 212.8 × 127.6 × 30, 734 g | its 0.96" display, through an oval window | `ucg-fiber/UCG_Fiber_LabRax-A1mini.3mf` |
 | **UniFi Flex Mini 2.5G** | `USW-Flex-2.5G-5` | 117.1 × 90 × 21.2, 206 g | its 5 × 2.5 GbE ports, through an open frame | `usw-flex-mini/USW_Flex_LabRax-A1mini.3mf` |
-| **TP-Link Easy Smart switch** | `TL-SG108E` | 158 × 101 × 25 | its whole face, flush in a rack panel of its own | `tl-sg108e/TL_SG108E_LabRax-A1mini.3mf` |
+| **TP-Link Easy Smart switch** | `TL-SG108E` | 158 × 101.3 × 26 measured, plus 3.5 mm feet | its whole face, flush in a rack panel of its own | `tl-sg108e/TL_SG108E_LabRax-A1mini.3mf` |
 | **Intel NUC, Skull Canyon** | `NUC6i7KYK` | 233 × 143 × 40 measured whole (Intel say 211 × 116 × 28), 45 W | its whole front face, just behind the ears | `nuc6i7kyk/NUC6i7KYK_LabRax-A1mini.3mf` |
 
 ![the gateway](ucg-fiber/images/assembly-ucg-front.png)
@@ -142,7 +142,7 @@ every file — print them once per bracket — except in the NUC's, whose plates
 | 1–3 | chassis (in every file) | 112.1 g | 5 h 46 |
 | 4–6 | UCG-Fiber | 149.0 g | 5 h 37 |
 | 4–6 | Flex Mini 2.5G | 136.7 g | 5 h 22 |
-| 1–2 | TL-SG108E panel and ears, the whole bracket | 82.7 g | 4 h 14 |
+| 1–2 | TL-SG108E panel and ears, the whole bracket | 87.0 g | 4 h 20 |
 
 A chassis and one kit is about 261 g for the gateway and 249 g for the Flex
 Mini. Print in **PETG**: a gateway running IDS/IPS gets warm enough that PLA
@@ -308,9 +308,13 @@ were printed for it and neither was any good. It now goes in a **rack panel of
 its own**, drawn after a panel made for this switch, and bolted to the
 **front posts only**. At about 250 g it needs nothing at the back.
 
+- **The switch, measured:** 158 wide, **101.3 deep and 26 tall** without its
+  four rubber feet, which are 12 across and 3.5 tall. Two keyhole slots in
+  its underside for wall mounting, 42.5–54.5 mm back from the face and
+  centred 24 mm in from each side.
 - **The panel** is the full 254 × 44.45, 6.5 mm thick like an ear, so the
   rack's own M6 × 12 and washers go through three slots each side. The
-  opening is **159 × 26**, the case plus 0.5 mm all round, and the case
+  opening is **159 × 27**, the case plus 0.5 mm all round, and the case
   stands in it with its face flush with the front. Nothing covers its ports
   or LEDs.
 - **An arm along each side** runs 106 mm back. It is a channel: a 7 mm wall
@@ -318,9 +322,19 @@ its own**, drawn after a panel made for this switch, and bolted to the
   edges. A gusset braces each arm to the panel. A 45° stop at the end of each
   channel catches the case's back edge 1 mm behind home, so pushing a plug in
   cannot push the switch back.
-- **A finger each side** lies over the case's top, with a ramped bump that
-  presses 1 mm into it (about 3.5 N). That, with the channels, is what keeps
-  the switch in. It slides in and out **through the front**, with the panel
+- **Its feet run in grooves.** They are behind the case's face, so they come
+  in through the opening: a groove each side, 4 mm deep, from the opening's
+  bottom edge right back along the channel. It is wide enough for a foot
+  centred anywhere 8.5–14 mm in from the side edge. The case's body rides
+  on a 2 mm ledge beside each wall and, at the front, on the frame's bottom
+  bar between the grooves.
+- **The keyholes catch it.** Under each keyhole a finger off the frame's
+  bottom bar lies under the case, carrying a 3 mm-wide ramped bump. Going in,
+  the case rides the bump down; at home it springs 0.8 mm up into the
+  keyhole (about 3 N). Coming out takes a deliberate pull over the ramp.
+- **A finger each side** also lies over the case's top, with a ramped bump
+  that presses 1 mm into it (about 3.5 N), holding the case down onto the
+  keyhole bumps. It slides in and out **through the front**, with the panel
   in the rack.
 - **It is three pieces, and every screw is an M6.** 254 mm will not go on a
   180 mm bed any way round. The **middle** carries everything but the ears:
@@ -347,7 +361,7 @@ its own**, drawn after a panel made for this switch, and bolted to the
 The middle prints **face down** with nothing overhung and nothing bridged.
 The ears print **standing on their bottom edge**, every wall upright; their
 holes run sideways then and their tops are small arches. Nothing needs
-support. Two plates: the middle (67.4 g, 3 h 11) and both ears
+support. Two plates: the middle (71.7 g, 3 h 17) and both ears
 (15.3 g, 1 h 03).
 
 **Hardware:** 10 × M6 × 12 button head, 6 × M6 washers, 4 × M6 nuts.
@@ -452,8 +466,9 @@ Then add its three plates to `KITS` in `common/tools/plate.py` and run `make`.
 that silently does nothing is caught rather than assumed away: 195 checks for
 the gateway, 194 for the Flex Mini, 35 for the NUC, which has no tray or
 faceplate to check and whose sides are checked against the shared ones, and
-82 for the TL-SG108E's panel: its fit in the rack, the case's way in, the
-channels, stops and fingers, the M6 joint between the middle and the ears,
+96 for the TL-SG108E's panel: its fit in the rack, the case's way in, its
+feet's grooves, the keyhole catches, the channels, stops and fingers, the
+M6 joint between the middle and the ears,
 that nothing stands out behind the ears to catch on the posts, and that
 every part prints with nothing overhung.
 Among them:

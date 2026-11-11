@@ -108,7 +108,7 @@ Case dimensions are the manufacturers' published figures:
 |---|---|---|---|
 | UCG-Fiber | 212.8 × 127.6 × 30.0 | 734 g | Ubiquiti; mass with an SSD fitted |
 | USW-Flex-2.5G-5 | 117.1 × 90.0 × 21.2 | 206 g | Ubiquiti |
-| TL-SG108E | 158 × 101 × 25 | 250 g, estimated | TP-Link, who publish no weight |
+| TL-SG108E | 158 × 101.3 × 26, plus 3.5 mm feet | 250 g, estimated | depth, height, feet and keyholes measured on a v6 unit; width TP-Link's, who publish no weight |
 | NUC6i7KYK | 233 × 143 × 40 | 700 g, estimated | measured whole; Intel give 211 × 116 × 28 for the case alone, and publish no weight |
 
 The masses only feed the load checks, where the gateway's 734 g is the

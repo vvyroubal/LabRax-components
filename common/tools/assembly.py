@@ -230,8 +230,10 @@ def one_device(parts, dev):
     # A panel's fingers press into the case's top on purpose; verify checks
     # that they do. Here the case only has to clear everything else.
     h = dev.h - (P.PNL_GRIP + 0.05 if dev.panel else 0.0)
-    case = Part.makeBox(dev.w, dev.d, h,
-                        Vector(-dev.w / 2, dev.y0, dev.z0))
+    # Its keyhole bumps stand up into its underside on purpose, too.
+    lift = P.PNL_KEY_IN + 0.05 if dev.keyhole else 0.0
+    case = Part.makeBox(dev.w, dev.d, h - lift,
+                        Vector(-dev.w / 2, dev.y0, dev.z0 + lift))
     check(vol(asm.common(case)) < VOID, "sits in the bracket without fouling it",
           "%.3f mm3" % vol(asm.common(case)))
     for f in fs:

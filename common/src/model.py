@@ -610,13 +610,29 @@ def _pnl(dev):
     n.z_lo = dev.z0 - P.PNL_CLR                # and its bottom and top
     n.z_hi = dev.z1 + P.PNL_CLR
     n.lip_x = dev.w / 2.0 - P.PNL_LIP          # inner edge of the arm's lips
-    n.arm_z0 = n.z_lo - P.PNL_LIP_T
     n.arm_z1 = n.z_hi + P.PNL_LIP_T
     n.back = dev.y0 + dev.d                    # the case's back face
     n.arm_y1 = n.back + P.PNL_STOP_CLR + P.PNL_STOP_IN + 0.5
     n.bar_z0 = P.PNL_SLEEVE_Z0                 # the frame's bars
     n.bar_z1 = P.RACK_U - P.PNL_SLEEVE_Z0
     n.join_z = (P.BAR_SCREW_Z, P.BOT_SCREW_Z)  # the joint's screws
+    # The bottom lip runs down to the frame's bottom bar, so that a groove
+    # for the feet still leaves a floor under it.
+    n.arm_z0 = n.bar_z0 if dev.feet else n.z_lo - P.PNL_LIP_T
+    if dev.keyhole:
+        k0, k1, kside = dev.keyhole
+        n.key_x = dev.w / 2.0 - kside            # the keyhole's centre
+        n.key_y = dev.y0 + (k0 + k1) / 2.0
+        n.key_y_span = (dev.y0 + k0, dev.y0 + k1)
+        n.key_z0 = n.z_lo - P.PNL_KEY_FING_T     # the finger under the case
+    if dev.feet:
+        fd, fh, fside = dev.feet
+        # The groove: from the ledge beside the wall to short of the
+        # keyhole's finger, from the bottom of the opening down past the feet.
+        n.ledge_x = dev.w / 2.0 - P.PNL_LEDGE
+        n.groove_x0 = (n.key_x + P.PNL_KEY_FING_W / 2.0 + P.PNL_FOOT_CLR
+                       if dev.keyhole else dev.w / 2.0 - fside - fd)
+        n.foot_z = dev.z0 - fh - P.PNL_FOOT_CLR
     return n
 
 
@@ -676,6 +692,39 @@ def panel(doc, dev, name):
                (sx * xi, n.arm_y1), (sx * (n.hw + 0.5), n.arm_y1)]
         sk.polygon(s, pts if sx > 0 else pts[::-1])
     sk.pad(doc, bd, s, n.z_hi - n.z_lo + 1.0)
+
+    # A groove for each side's feet, from the bottom of the opening down
+    # past them, through the plate, the frame's bottom bar and the bottom
+    # lip, the whole length of the channel.
+    if dev.feet:
+        s = sk.sketch(doc, bd, name + "_Sk_feet", xz(-P.PNL_T))
+        for sx in (-1, 1):
+            sk.rect(s, sx * n.groove_x0, n.foot_z, sx * n.ledge_x,
+                    n.z_lo + 0.01)
+        sk.pocket(doc, bd, s, P.PNL_T + n.arm_y1 + 1.0)
+
+    # The keyhole catches: a finger off the back of the frame's bottom bar,
+    # lying under the case, and on it a narrow bump, ramped both ways, that
+    # springs up into the keyhole when the case is home.
+    if dev.keyhole:
+        fw = P.PNL_KEY_FING_W / 2.0
+        yb0 = n.key_y - P.PNL_KEY_FLAT / 2.0 - P.PNL_KEY_RAMP
+        yb1 = n.key_y + P.PNL_KEY_FLAT / 2.0 + P.PNL_KEY_RAMP
+        s = sk.sketch(doc, bd, name + "_Sk_keyfingers", xy(n.key_z0))
+        for sx in (-1, 1):
+            sk.rect(s, sx * (n.key_x - fw), P.PNL_SLEEVE_D - 1.0,
+                    sx * (n.key_x + fw), yb1 + 1.5)
+        sk.pad(doc, bd, s, P.PNL_KEY_FING_T)
+        top = dev.z0 + P.PNL_KEY_IN
+        for sx in (-1, 1):
+            x_lo = min(sx * (n.key_x - P.PNL_KEY_W / 2.0),
+                       sx * (n.key_x + P.PNL_KEY_W / 2.0))
+            s = sk.sketch(doc, bd,
+                          name + "_Sk_keybump%s" % ("l" if sx < 0 else "r"),
+                          sk.plane(Vector(x_lo, 0, 0), sk.Y, sk.Z))
+            sk.polygon(s, [(yb0, n.z_lo - 0.5), (yb0 + P.PNL_KEY_RAMP, top),
+                           (yb1 - P.PNL_KEY_RAMP, top), (yb1, n.z_lo - 0.5)])
+            sk.pad(doc, bd, s, P.PNL_KEY_W)
 
     # The fingers, off the back of the frame's top bar, lying over the case.
     f0, f1 = P.PNL_FING_X - P.PNL_FING_W / 2, P.PNL_FING_X + P.PNL_FING_W / 2
